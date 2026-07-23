@@ -1,0 +1,277 @@
+import { useRef, useEffect, useState, useMemo } from 'react';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls, Grid, Environment, PerspectiveCamera, Text3D, Center } from '@react-three/drei';
+import * as THREE from 'three';
+import { useEditorStore } from '@/lib/store';
+import { getLayerAtTime } from '@/lib/animation';
+import type { MeshLayer, LightLayer, Camera3DLayer, Text3DLayer } from '@/lib/types';
+
+// optimer_bold, not helvetiker: helvetiker's glyph set is ASCII+Greek only
+// and silently renders accented Latin characters (é, à, ç…) as "?" — a
+// dealbreaker for French UI text. optimer_bold covers Latin-1.
+const TEXT3D_FONT = '/fonts/optimer_bold.typeface.json';
+
+export function Canvas3D() {
+  const project = useEditorStore((s) => s.project);
+  const currentSceneId = useEditorStore((s) => s.currentSceneId);
+  const selectedLayerIds = useEditorStore((s) => s.selectedLayerIds);
+  const selectLayer = useEditorStore((s) => s.selectLayer);
+  const currentTime = useEditorStore((s) => s.currentTime);
+  const isPlaying = useEditorStore((s) => s.isPlaying);
+  const setCurrentTime = useEditorStore((s) => s.setCurrentTime);
+  const setPlaying = useEditorStore((s) => s.setPlaying);
+  const viewMode = useEditorStore((s) => s.viewMode);
+  const isExporting = useEditorStore((s) => s.isExporting);
+
+  // currentTime/setCurrentTime deliberately excluded from deps — see the
+  // identical fix and rationale in Canvas2D.tsx.
+  useEffect(() => {
+    if (!isPlaying || !project) return;
+    const scene = project.scenes.find((s) => s.id === currentSceneId);
+    if (!scene) return;
+    let raf = 0;
+    const start = performance.now();
+    const startTime = currentTime;
+    const tick = (now: number) => {
+      const elapsed = (now - start) / 1000;
+      setCurrentTime(Math.min(startTime + elapsed, scene.duration));
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPlaying, currentSceneId, project]);
+
+  if (!project) return null;
+  const scene = project.scenes.find((s) => s.id === currentSceneId);
+  if (!scene) return null;
+
+  const time = currentTime;
+  const aspect = project.settings.width / project.settings.height;
+  const bgColor = project.settings.backgroundColor;
+
+  // Find camera layer — evaluated at the current time so its keyframes
+  // (position/rotation/fov…) actually animate instead of showing the static
+  // base values.
+  const staticCameraLayer = scene.layers.find((l) => l.type === 'camera3d') as Camera3DLayer | undefined;
+  const cameraLayer = staticCameraLayer ? (getLayerAtTime(staticCameraLayer, time) as Camera3DLayer) : undefined;
+
+  return (
+    <div className="w-full h-full relative">
+      <Canvas
+        shadows={project.settings.shadows}
+        // MSAA roughly doubles GPU cost per frame; skip it while exporting
+        // (real-time capture is already fighting for frame budget) — video
+        // compression smooths hard edges anyway.
+        gl={{ preserveDrawingBuffer: true, antialias: !isExporting }}
+        dpr={isExporting ? 1 : undefined}
+        onPointerMissed={() => selectLayer(null)}
+      >
+        <color attach="background" args={[bgColor]} />
+        {project.settings.environment === 'gradient' && (
+          <Environment preset="city" background={false} />
+        )}
+        {project.settings.environment === 'hdri' && (
+          <Environment preset="studio" background={false} />
+        )}
+
+        {/* Camera */}
+        {cameraLayer ? (
+          <PerspectiveCamera
+            makeDefault
+            position={[cameraLayer.position.x, cameraLayer.position.y, cameraLayer.position.z]}
+            rotation={[cameraLayer.rotation.x, cameraLayer.rotation.y, cameraLayer.rotation.z]}
+            fov={cameraLayer.fov}
+            near={cameraLayer.near}
+            far={cameraLayer.far}
+          />
+        ) : (
+          <PerspectiveCamera makeDefault position={[0, 2, 8]} fov={50} />
+        )}
+
+        {/* Default lighting if no light layers */}
+        {!scene.layers.some((l) => l.type === 'light') && (
+          <>
+            <ambientLight intensity={0.3} />
+            <directionalLight position={[5, 5, 5]} intensity={1} castShadow />
+          </>
+        )}
+
+        {/* Lights */}
+        {scene.layers.filter((l) => l.type === 'light' && l.visible).map((layer) => {
+          const l = getLayerAtTime(layer, time) as LightLayer;
+          if (l.light === 'ambient') return <ambientLight key={l.id} intensity={l.intensity} color={l.color} />;
+          if (l.light === 'directional') return (
+            <directionalLight
+              key={l.id}
+              position={[l.position.x, l.position.y, l.position.z]}
+              intensity={l.intensity}
+              color={l.color}
+              castShadow={project.settings.shadows}
+            />
+          );
+          if (l.light === 'point') return (
+            <pointLight
+              key={l.id}
+              position={[l.position.x, l.position.y, l.position.z]}
+              intensity={l.intensity}
+              color={l.color}
+              distance={l.distance || 0}
+              // Point-light shadows render a full 6-face cubemap pass each —
+              // several of these at once tanks frame time. Point lights are
+              // typically fill/accent lights, not the primary shadow source
+              // (that's the directional/spot light), so they don't cast.
+              castShadow={false}
+            />
+          );
+          if (l.light === 'spot') return (
+            <spotLight
+              key={l.id}
+              position={[l.position.x, l.position.y, l.position.z]}
+              intensity={l.intensity}
+              color={l.color}
+              angle={l.angle}
+              castShadow={project.settings.shadows}
+            />
+          );
+          return null;
+        })}
+
+        {/* Meshes */}
+        {scene.layers.filter((l) => l.type === 'mesh' && l.visible).map((layer) => {
+          const m = getLayerAtTime(layer, time) as MeshLayer;
+          const isSelected = selectedLayerIds.includes(m.id);
+          return (
+            <MeshObject
+              key={m.id}
+              layer={m}
+              selected={isSelected}
+              onSelect={() => selectLayer(m.id)}
+              showShadows={project.settings.shadows}
+            />
+          );
+        })}
+
+        {/* Text 3D */}
+        {scene.layers.filter((l) => l.type === 'text3d' && l.visible).map((layer) => {
+          const t = getLayerAtTime(layer, time) as Text3DLayer;
+          const isSelected = selectedLayerIds.includes(t.id);
+          return (
+            <Text3DObject
+              key={t.id}
+              layer={t}
+              selected={isSelected}
+              onSelect={() => selectLayer(t.id)}
+              showShadows={project.settings.shadows}
+            />
+          );
+        })}
+
+        {/* Reference grid: editor-only. It's a real scene object, not an HTML
+            overlay, so it must be hidden in Preview mode and during export or
+            it gets baked into the rendered video. */}
+        {viewMode === 'editor' && !isExporting && (
+          <Grid
+            args={[20, 20]}
+            cellSize={0.5}
+            cellThickness={0.5}
+            cellColor="#2b2b34"
+            sectionSize={2}
+            sectionThickness={1}
+            sectionColor="#3a3a45"
+            fadeDistance={30}
+            fadeStrength={1}
+            position={[0, -0.01, 0]}
+          />
+        )}
+
+        {/* OrbitControls recomputes camera position from its own internal
+            spherical state every frame, silently overriding any animated
+            camera3d layer. Only mount it while paused, so an authored camera
+            animation actually plays during preview/export. */}
+        {!isPlaying && <OrbitControls makeDefault enableDamping dampingFactor={0.1} />}
+      </Canvas>
+    </div>
+  );
+}
+
+function MeshObject({ layer, selected, onSelect, showShadows }: { layer: MeshLayer; selected: boolean; onSelect: () => void; showShadows: boolean }) {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const geometry = useMemo(() => {
+    switch (layer.mesh) {
+      case 'box': return <boxGeometry args={[1, 1, 1]} />;
+      case 'sphere': return <sphereGeometry args={[0.5, 32, 32]} />;
+      case 'cone': return <coneGeometry args={[0.5, 1, 32]} />;
+      case 'cylinder': return <cylinderGeometry args={[0.5, 0.5, 1, 32]} />;
+      case 'plane': return <planeGeometry args={[1, 1]} />;
+      case 'torus': return <torusGeometry args={[0.4, 0.15, 16, 32]} />;
+      default: return <boxGeometry args={[1, 1, 1]} />;
+    }
+  }, [layer.mesh]);
+
+  return (
+    <mesh
+      ref={meshRef}
+      position={[layer.position.x, layer.position.y, layer.position.z]}
+      rotation={[layer.rotation.x, layer.rotation.y, layer.rotation.z]}
+      scale={[layer.scale.x, layer.scale.y, layer.scale.z]}
+      onClick={(e) => { e.stopPropagation(); onSelect(); }}
+      castShadow={showShadows && layer.castShadow}
+      receiveShadow={showShadows}
+    >
+      {geometry}
+      <meshStandardMaterial
+        color={layer.color}
+        metalness={layer.metalness}
+        roughness={layer.roughness}
+        opacity={layer.opacity}
+        transparent={layer.opacity < 1}
+        emissive={selected ? '#8b5cf6' : '#000000'}
+        emissiveIntensity={selected ? 0.2 : 0}
+      />
+      {selected && (
+        <mesh>
+          <boxGeometry args={[1.05, 1.05, 1.05]} />
+          <meshBasicMaterial color="#8b5cf6" wireframe transparent opacity={0.3} />
+        </mesh>
+      )}
+    </mesh>
+  );
+}
+
+function Text3DObject({ layer, selected, onSelect, showShadows }: { layer: Text3DLayer; selected: boolean; onSelect: () => void; showShadows: boolean }) {
+  return (
+    <group
+      position={[layer.position.x, layer.position.y, layer.position.z]}
+      rotation={[layer.rotation.x, layer.rotation.y, layer.rotation.z]}
+      scale={[layer.scale.x, layer.scale.y, layer.scale.z]}
+    >
+      <Center>
+        <Text3D
+          font={TEXT3D_FONT}
+          size={layer.fontSize}
+          height={layer.height}
+          curveSegments={6}
+          bevelEnabled
+          bevelThickness={layer.height * 0.15}
+          bevelSize={layer.height * 0.08}
+          bevelSegments={2}
+          onClick={(e) => { e.stopPropagation(); onSelect(); }}
+          castShadow={showShadows}
+          receiveShadow={showShadows}
+        >
+          {layer.text}
+          <meshStandardMaterial
+            color={layer.color}
+            metalness={0.3}
+            roughness={0.4}
+            opacity={layer.opacity}
+            transparent={layer.opacity < 1}
+            emissive={selected ? '#8b5cf6' : '#000000'}
+            emissiveIntensity={selected ? 0.3 : 0}
+          />
+        </Text3D>
+      </Center>
+    </group>
+  );
+}
