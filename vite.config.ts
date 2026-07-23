@@ -8,21 +8,30 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icon.svg'],
       manifest: {
-        name: 'Motion Studio',
-        short_name: 'Motion Studio',
+        name: 'MyMotionDesignStudio',
+        short_name: 'MyMotionDesignStudio',
         description: 'Create 2D & 3D motion design videos in your browser',
         theme_color: '#0f0f12',
         background_color: '#0f0f12',
         display: 'standalone',
         orientation: 'any',
         icons: [
-          { src: '/icon.svg', sizes: 'any', type: 'image/svg+xml' },
+          { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+          { src: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+          { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        // json/jpg cover the Text3D font (public/fonts) and the landing-page
+        // demo projects + thumbnails (public/demos) — without these, both
+        // silently fail once the PWA is actually used offline.
+        globPatterns: ['**/*.{js,css,html,svg,png,woff2,json,jpg}'],
+        // The full-resolution source art (only used for the OG/share image
+        // and as the source the smaller icon-*.png/logo-sm.png were resized
+        // from) isn't referenced by the app itself — precaching 2.6MB of PWA
+        // install payload for images nothing ever requests is pure waste.
+        globIgnores: ['motion-icon.png', 'motion-logo.png'],
       },
     }),
   ],

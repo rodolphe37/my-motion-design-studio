@@ -64,8 +64,8 @@ const STEPS = [
 ];
 
 const SHOWCASE = [
-  { title: 'Motion Studio — Démo 2D', mode: '2D', thumb: '/demos/2d-thumb.jpg' },
-  { title: 'Motion Studio — Démo 3D', mode: '3D', thumb: '/demos/3d-thumb.jpg' },
+  { title: 'MyMotionDesignStudio — Démo 2D', mode: '2D', thumb: '/demos/2d-thumb.jpg' },
+  { title: 'MyMotionDesignStudio — Démo 3D', mode: '3D', thumb: '/demos/3d-thumb.jpg' },
 ];
 
 export default function LandingPage() {
@@ -75,10 +75,8 @@ export default function LandingPage() {
       <nav className="fixed top-0 left-0 right-0 z-40 backdrop-blur-xl bg-ink-900/70 border-b border-ink-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-violet to-accent-blue flex items-center justify-center shadow-lg shadow-accent-violet/20">
-              <Sparkles className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-semibold">Motion Studio</span>
+            <img src="/icon-96.png" alt="MyMotionDesignStudio" className="w-8 h-8 rounded-lg shadow-lg shadow-accent-violet/20" />
+            <span className="font-semibold">MyMotionDesignStudio</span>
           </div>
           <div className="flex items-center gap-2">
             <Link to="/docs" className="btn-ghost text-sm">Documentation</Link>
@@ -98,6 +96,7 @@ export default function LandingPage() {
         </div>
         <div className="relative max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-6 animate-slide-up">
+            <img src="/logo-sm.png" alt="MyMotionDesignStudio" className="h-20 w-auto -ml-2" />
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-violet/10 border border-accent-violet/30 text-sm text-accent-violet">
               <Sparkles className="w-3.5 h-3.5" />
               Éditeur de motion design 2D & 3D dans le navigateur
@@ -110,7 +109,7 @@ export default function LandingPage() {
               dignes d'un pro
             </h1>
             <p className="text-lg text-ink-300 max-w-lg leading-relaxed">
-              Motion Studio est un éditeur WYSIWYG complet, offline-first. Animez
+              MyMotionDesignStudio est un éditeur WYSIWYG complet, offline-first. Animez
               en 2D ou 3D, prévisualisez en temps réel, exportez en vidéo — sans
               installer aucun logiciel.
             </p>
@@ -243,10 +242,8 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-accent-violet to-accent-blue flex items-center justify-center">
-                <Sparkles className="w-3.5 h-3.5 text-white" />
-              </div>
-              <span className="text-sm text-ink-300">Motion Studio © 2026</span>
+              <img src="/icon-96.png" alt="MyMotionDesignStudio" className="w-7 h-7 rounded-lg" />
+              <span className="text-sm text-ink-300">MyMotionDesignStudio © 2026</span>
             </div>
             <div className="flex items-center gap-4 text-sm text-ink-400">
               <Link to="/docs" className="hover:text-ink-100 transition-colors">Documentation</Link>

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Play, Pause, Square, Undo2, Redo2, ZoomIn, ZoomOut, Maximize,
-  Eye, Download, Save, Plus, ChevronLeft, Check, Loader2, Film, Monitor,
+  Eye, Download, Save, Plus, ChevronLeft, Check, Loader2, Monitor,
 } from 'lucide-react';
 import { useEditorStore } from '@/lib/store';
 import { useTheme } from '@/lib/useTheme';
@@ -56,9 +56,7 @@ export function EditorToolbar({ saveStatus, savedAt, onExport }: Props) {
         <Link to="/projects" className="icon-btn" title="Retour aux projets">
           <ChevronLeft className="w-5 h-5" />
         </Link>
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-violet to-accent-blue flex items-center justify-center shrink-0">
-          <Film className="w-4 h-4 text-white" />
-        </div>
+        <img src="/icon-96.png" alt="MyMotionDesignStudio" className="w-8 h-8 rounded-lg shrink-0" />
         {editingName ? (
           <input
             type="text"

@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Moon, Sun, Film, BookOpen, FolderOpen, Sparkles } from 'lucide-react';
+import { Moon, Sun, Film, BookOpen, FolderOpen } from 'lucide-react';
 import { useTheme } from '@/lib/useTheme';
 
 export function Header() {
@@ -16,10 +16,12 @@ export function Header() {
     <header className="sticky top-0 z-40 backdrop-blur-xl bg-ink-900/80 border-b border-ink-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
         <Link to="/" className="flex items-center gap-2 group shrink-0">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-violet to-accent-blue flex items-center justify-center shadow-lg shadow-accent-violet/20 group-hover:shadow-accent-violet/40 transition-shadow">
-            <Sparkles className="w-4 h-4 text-white" />
-          </div>
-          <span className="font-semibold text-ink-50 hidden sm:block">Motion Studio</span>
+          <img
+            src="/icon-96.png"
+            alt="MyMotionDesignStudio"
+            className="w-8 h-8 rounded-lg shadow-lg shadow-accent-violet/20 group-hover:shadow-accent-violet/40 transition-shadow"
+          />
+          <span className="font-semibold text-ink-50 hidden sm:block">MyMotionDesignStudio</span>
         </Link>
 
         <nav className="flex items-center gap-1">
@@ -47,7 +49,7 @@ export function Header() {
             {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent-pink to-accent-violet flex items-center justify-center text-xs font-bold text-white">
-            MS
+            MM
           </div>
         </div>
       </div>

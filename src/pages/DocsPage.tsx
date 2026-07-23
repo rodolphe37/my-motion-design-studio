@@ -20,7 +20,7 @@ const CONTENT: Record<string, { title: string; body: { h?: string; p: string }[]
   start: {
     title: 'Prise en main',
     body: [
-      { p: "Motion Studio est un éditeur de motion design 2D et 3D qui fonctionne entièrement dans votre navigateur. Aucune installation n'est nécessaire — l'application est une PWA installable et fonctionne offline." },
+      { p: "MyMotionDesignStudio est un éditeur de motion design 2D et 3D qui fonctionne entièrement dans votre navigateur. Aucune installation n'est nécessaire — l'application est une PWA installable et fonctionne offline." },
       { h: 'Créer un projet', p: "Rendez-vous sur la page Mes projets, cliquez sur « Nouveau projet », puis suivez la configuration initiale : nom, mode 2D ou 3D, format, et réglages de base." },
       { h: 'L\'éditeur', p: "L'éditeur est composé d'une barre d'outils en haut, d'une barre d'outils à gauche (outils de création), d'un canvas central, et de panneaux à droite (calques, propriétés, animation, transitions). La timeline se trouve en bas." },
     ],
@@ -37,7 +37,7 @@ const CONTENT: Record<string, { title: string; body: { h?: string; p: string }[]
   modes: {
     title: 'Mode 2D vs Mode 3D',
     body: [
-      { p: "Motion Studio propose deux modes distincts. Un projet ne peut pas mélanger 2D et 3D en V1." },
+      { p: "MyMotionDesignStudio propose deux modes distincts. Un projet ne peut pas mélanger 2D et 3D en V1." },
       { h: 'Mode 2D', p: "Scène plane avec formes vectorielles, texte, images. Léger et rapide, idéal pour les réseaux sociaux et le motion graphics classique. Utilise Konva.js pour le rendu canvas." },
       { h: 'Mode 3D', p: "Scène volumétrique avec objets 3D, caméra et éclairage réglables. Utilise Three.js via React Three Fiber pour un rendu WebGL temps réel avec ombres et matériaux PBR." },
     ],
@@ -79,7 +79,7 @@ const CONTENT: Record<string, { title: string; body: { h?: string; p: string }[]
   animation: {
     title: 'Animations & Keyframes',
     body: [
-      { p: "Le moteur d'animation de Motion Studio est commun aux modes 2D et 3D. Il interpole position, rotation, échelle, opacité et couleur entre les keyframes." },
+      { p: "Le moteur d'animation de MyMotionDesignStudio est commun aux modes 2D et 3D. Il interpole position, rotation, échelle, opacité et couleur entre les keyframes." },
       { h: 'Keyframes', p: "Placez des keyframes sur n'importe quelle propriété animable. Chaque keyframe a un type d'easing : linéaire, ease-in, ease-out, ease-in-out, spring, ou bézier custom." },
       { h: 'Préréglages', p: "Des préréglages d'animation sont disponibles : Fade in, Slide + bounce, Zoom pop (2D), Orbit reveal, Drop + rebond, Rotation continue (3D)." },
     ],
@@ -113,7 +113,7 @@ const CONTENT: Record<string, { title: string; body: { h?: string; p: string }[]
     body: [
       { h: 'Mes données sont-elles sauvegardées ?', p: "Oui, tout est persisté localement via IndexedDB. Vous pouvez aussi exporter/importer vos projets en JSON." },
       { h: 'Puis-je mélanger 2D et 3D ?', p: "Pas en V1. Le mode est figé à la création. Vous pouvez dupliquer un projet pour repartir sur l'autre mode." },
-      { h: 'L\'app fonctionne-t-elle hors ligne ?', p: "Oui, Motion Studio est une PWA offline-first. Seul l'export vidéo lourd peut nécessiter du temps de calcul local." },
+      { h: 'L\'app fonctionne-t-elle hors ligne ?', p: "Oui, MyMotionDesignStudio est une PWA offline-first. Seul l'export vidéo lourd peut nécessiter du temps de calcul local." },
     ],
   },
 };
