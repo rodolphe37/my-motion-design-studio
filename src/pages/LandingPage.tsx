@@ -72,6 +72,7 @@ const STEPS = [
 const SHOWCASE = [
   { title: 'MyMotionDesignStudio — Démo 2D', mode: '2D', thumb: '/demos/2d-thumb.jpg' },
   { title: 'MyMotionDesignStudio — Démo 3D', mode: '3D', thumb: '/demos/3d-thumb.jpg' },
+  { title: 'MyMotionDesignStudio — Démo Import 3D', mode: '3D', thumb: '/demos/3d-objects-thumb.jpg' },
 ];
 
 export default function LandingPage() {
@@ -147,18 +148,27 @@ export default function LandingPage() {
         </div>
         <div className="relative max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-6 animate-slide-up">
-            <img src="/logo-sm.png" alt="MyMotionDesignStudio" className="h-20 w-auto -ml-2" />
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-violet/10 border border-accent-violet/30 text-sm text-accent-violet">
               <Sparkles className="w-3.5 h-3.5" />
               Éditeur de motion design 2D & 3D dans le navigateur
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight">
-              Créez des vidéos de{' '}
-              <span className="bg-gradient-to-r from-accent-violet via-accent-pink to-accent-blue bg-clip-text text-transparent">
-                motion design
-              </span>{' '}
-              dignes d'un pro
-            </h1>
+            <div className="flex items-center gap-5">
+              <div className="relative shrink-0">
+                <div className="absolute inset-0 bg-gradient-to-br from-accent-violet via-accent-pink to-accent-blue rounded-full blur-2xl opacity-40" />
+                <img
+                  src="/logo-sm.png"
+                  alt="MyMotionDesignStudio"
+                  className="relative h-28 sm:h-32 lg:h-40 w-auto drop-shadow-[0_0_30px_rgba(139,92,246,0.45)]"
+                />
+              </div>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight">
+                Créez des vidéos de{' '}
+                <span className="bg-gradient-to-r from-accent-violet via-accent-pink to-accent-blue bg-clip-text text-transparent">
+                  motion design
+                </span>{' '}
+                dignes d'un pro
+              </h1>
+            </div>
             <p className="text-lg text-ink-300 max-w-lg leading-relaxed">
               MyMotionDesignStudio est un éditeur WYSIWYG complet, offline-first. Animez
               en 2D ou 3D, prévisualisez en temps réel, exportez en vidéo — sans
@@ -245,7 +255,7 @@ export default function LandingPage() {
             <h2 className="text-3xl sm:text-4xl font-bold mb-3">Galerie d'exemples</h2>
             <p className="text-ink-300">Images extraites des démos exportées ci-dessus — le rendu réel de l'app.</p>
           </div>
-          <div className="grid sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
             {SHOWCASE.map((item, i) => (
               <div key={i} className="group relative aspect-video rounded-xl overflow-hidden panel cursor-pointer">
                 <img src={item.thumb} alt={item.title} className="absolute inset-0 w-full h-full object-cover" />

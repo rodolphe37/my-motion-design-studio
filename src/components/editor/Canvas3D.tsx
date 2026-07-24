@@ -77,7 +77,12 @@ export function Canvas3D() {
   return (
     <div className="w-full h-full relative">
       <Canvas
-        shadows={project.settings.shadows}
+        // R3F's boolean shadows shorthand sets shadowMap.type to the now-
+        // deprecated PCFSoftShadowMap (three.js warns and silently falls
+        // back to PCFShadowMap every frame). Request PCFShadowMap directly
+        // via the "percentage" preset to get the same look without the
+        // console spam.
+        shadows={project.settings.shadows ? 'percentage' : false}
         // MSAA roughly doubles GPU cost per frame; skip it while exporting
         // (real-time capture is already fighting for frame budget) — video
         // compression smooths hard edges anyway.
