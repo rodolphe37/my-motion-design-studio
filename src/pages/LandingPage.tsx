@@ -152,8 +152,12 @@ export default function LandingPage() {
               <Sparkles className="w-3.5 h-3.5" />
               Éditeur de motion design 2D & 3D dans le navigateur
             </div>
-            <div className="flex items-center gap-5">
-              <div className="relative shrink-0">
+            {/* flow-root contains the float so it doesn't bleed into the
+                paragraph/buttons below; float-left on the logo is what
+                actually makes the heading text wrap around it instead of
+                just sitting in a column next to it. */}
+            <div className="flow-root">
+              <div className="relative float-left mr-5 mb-2">
                 <div className="absolute inset-0 bg-gradient-to-br from-accent-violet via-accent-pink to-accent-blue rounded-full blur-2xl opacity-40" />
                 <img
                   src="/logo-sm.png"
