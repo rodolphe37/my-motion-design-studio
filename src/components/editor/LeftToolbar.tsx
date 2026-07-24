@@ -142,8 +142,18 @@ export function LeftToolbar2D() {
   );
 }
 
+const TRANSFORM_MODE_BY_TOOL: Record<Tool3D, 'translate' | 'rotate' | 'scale' | null> = {
+  select: null,
+  move: 'translate',
+  rotate: 'rotate',
+  scale: 'scale',
+};
+
 export function LeftToolbar3D() {
-  const [tool, setTool] = useState<Tool3D>('select');
+  const transformMode = useEditorStore((s) => s.transformMode);
+  const setTransformMode = useEditorStore((s) => s.setTransformMode);
+  const tool: Tool3D = transformMode === 'translate' ? 'move' : transformMode === 'rotate' ? 'rotate' : transformMode === 'scale' ? 'scale' : 'select';
+  const setTool = (t: Tool3D) => setTransformMode(TRANSFORM_MODE_BY_TOOL[t]);
   const addLayer = useEditorStore((s) => s.addLayer);
   const modelInputRef = useRef<HTMLInputElement>(null);
 

@@ -1,12 +1,12 @@
 import { useRef, useEffect, useState, useMemo, Suspense, Component, type ReactNode } from 'react';
-import { Canvas, useLoader } from '@react-three/fiber';
-import { OrbitControls, Grid, Environment, PerspectiveCamera, Text3D, Center } from '@react-three/drei';
+import { Canvas, useLoader, useThree } from '@react-three/fiber';
+import { OrbitControls, Grid, Environment, PerspectiveCamera, Text3D, Center, TransformControls } from '@react-three/drei';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import * as THREE from 'three';
 import { useEditorStore } from '@/lib/store';
 import { getLayerAtTime } from '@/lib/animation';
-import type { MeshLayer, LightLayer, Camera3DLayer, Text3DLayer } from '@/lib/types';
+import type { Layer, MeshLayer, LightLayer, Camera3DLayer, Text3DLayer } from '@/lib/types';
 
 // A broken/invalid imported model file would otherwise throw during render
 // and take down the whole 3D canvas — isolate each import so the rest of the
@@ -38,6 +38,8 @@ export function Canvas3D() {
   const setPlaying = useEditorStore((s) => s.setPlaying);
   const viewMode = useEditorStore((s) => s.viewMode);
   const isExporting = useEditorStore((s) => s.isExporting);
+  const transformMode = useEditorStore((s) => s.transformMode);
+  const updateLayer = useEditorStore((s) => s.updateLayer);
 
   // currentTime/setCurrentTime deliberately excluded from deps — see the
   // identical fix and rationale in Canvas2D.tsx.
@@ -215,13 +217,55 @@ export function Canvas3D() {
           />
         )}
 
+        {/* Transform gizmo: drags the current selection directly in the
+            viewport. TransformControls auto-disables the (makeDefault)
+            OrbitControls for the duration of the drag via its own
+            dragging-changed listener, so the two never fight over input. */}
+        {viewMode === 'editor' && !isPlaying && !isExporting && transformMode && selectedLayerIds.length === 1 && (() => {
+          const selected = scene.layers.find((l) => l.id === selectedLayerIds[0]);
+          if (!selected || !selected.visible || (selected.type !== 'mesh' && selected.type !== 'text3d')) return null;
+          return <SelectionGizmo key={selected.id} layerId={selected.id} mode={transformMode} onCommit={updateLayer} />;
+        })()}
+
         {/* OrbitControls recomputes camera position from its own internal
             spherical state every frame, silently overriding any animated
-            camera3d layer. Only mount it while paused, so an authored camera
-            animation actually plays during preview/export. */}
-        {!isPlaying && <OrbitControls makeDefault enableDamping dampingFactor={0.1} />}
+            camera3d layer. Only mount it in the editor viewport while
+            paused — never in Preview or during export, or it hijacks the
+            authored camera3d layer and the rendered video no longer shows
+            what was actually set up in the scene. */}
+        {viewMode === 'editor' && !isPlaying && !isExporting && <OrbitControls makeDefault enableDamping dampingFactor={0.1} />}
       </Canvas>
     </div>
+  );
+}
+
+// Looks the selected object up by name (set to the layer id on its mesh/group
+// below) rather than threading refs down through three separate object
+// components — TransformControls attaches directly to the live Object3D and
+// drives it every frame while dragging, so the store is only updated once,
+// on mouseUp, to avoid flooding undo history with per-frame writes.
+function SelectionGizmo({ layerId, mode, onCommit }: { layerId: string; mode: 'translate' | 'rotate' | 'scale'; onCommit: (id: string, patch: Partial<Layer>) => void }) {
+  const { scene } = useThree();
+  const [target, setTarget] = useState<THREE.Object3D | null>(null);
+
+  useEffect(() => {
+    setTarget(scene.getObjectByName(layerId) ?? null);
+  }, [scene, layerId]);
+
+  if (!target) return null;
+
+  return (
+    <TransformControls
+      object={target}
+      mode={mode}
+      onMouseUp={() => {
+        onCommit(layerId, {
+          position: { x: target.position.x, y: target.position.y, z: target.position.z },
+          rotation: { x: target.rotation.x, y: target.rotation.y, z: target.rotation.z },
+          scale: { x: target.scale.x, y: target.scale.y, z: target.scale.z },
+        } as Partial<Layer>);
+      }}
+    />
   );
 }
 
@@ -242,6 +286,7 @@ function MeshObject({ layer, selected, onSelect, showShadows }: { layer: MeshLay
   return (
     <mesh
       ref={meshRef}
+      name={layer.id}
       position={[layer.position.x, layer.position.y, layer.position.z]}
       rotation={[layer.rotation.x, layer.rotation.y, layer.rotation.z]}
       scale={[layer.scale.x, layer.scale.y, layer.scale.z]}
@@ -300,6 +345,7 @@ function ImportedMeshObject({ layer, selected, onSelect, showShadows }: { layer:
 
   return (
     <group
+      name={layer.id}
       position={[layer.position.x, layer.position.y, layer.position.z]}
       rotation={[layer.rotation.x, layer.rotation.y, layer.rotation.z]}
       scale={[layer.scale.x, layer.scale.y, layer.scale.z]}
@@ -319,6 +365,7 @@ function ImportedMeshObject({ layer, selected, onSelect, showShadows }: { layer:
 function Text3DObject({ layer, selected, onSelect, showShadows }: { layer: Text3DLayer; selected: boolean; onSelect: () => void; showShadows: boolean }) {
   return (
     <group
+      name={layer.id}
       position={[layer.position.x, layer.position.y, layer.position.z]}
       rotation={[layer.rotation.x, layer.rotation.y, layer.rotation.z]}
       scale={[layer.scale.x, layer.scale.y, layer.scale.z]}

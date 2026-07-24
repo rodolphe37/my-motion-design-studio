@@ -3,6 +3,7 @@ import type { Project, Scene, Layer, Keyframe, Transition, BackgroundFill } from
 import { uid } from './types';
 
 export type ViewMode = 'editor' | 'preview';
+export type TransformMode = 'translate' | 'rotate' | 'scale' | null;
 
 interface EditorState {
   project: Project | null;
@@ -13,6 +14,10 @@ interface EditorState {
   currentTime: number;
   zoom: number;
   saveStatus: 'saved' | 'saving' | 'unsaved';
+
+  // Active 3D viewport gizmo (null = plain selection, no gizmo attached).
+  transformMode: TransformMode;
+  setTransformMode: (m: TransformMode) => void;
 
   // Content-area rect of the on-screen canvas in CSS px, reported by Canvas2D.
   // Used by export to crop out letterboxing instead of stretching the whole
@@ -88,6 +93,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   currentTime: 0,
   zoom: 1,
   saveStatus: 'saved',
+  transformMode: null,
+  setTransformMode: (m) => set({ transformMode: m }),
   canvasViewport: null,
   setCanvasViewport: (v) => set({ canvasViewport: v }),
   isExporting: false,

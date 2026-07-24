@@ -12,6 +12,7 @@ export function useKeyboardShortcuts() {
   const selectedLayerIds = useEditorStore((s) => s.selectedLayerIds);
   const setPlaying = useEditorStore((s) => s.setPlaying);
   const isPlaying = useEditorStore((s) => s.isPlaying);
+  const setTransformMode = useEditorStore((s) => s.setTransformMode);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -35,10 +36,16 @@ export function useKeyboardShortcuts() {
         if (e.key === 'v' || e.key === 'V') { /* select tool */ }
         else if (e.key === 'r' || e.key === 'R') { addLayer(createShapeLayer()); }
         else if (e.key === 't' || e.key === 'T') { addLayer(createTextLayer()); }
+      } else if (project.mode === '3d') {
+        if (e.key === 'v' || e.key === 'V') { setTransformMode(null); }
+        else if (e.key === 'g' || e.key === 'G') { setTransformMode('translate'); }
+        else if (e.key === 'r' || e.key === 'R') { setTransformMode('rotate'); }
+        else if (e.key === 's' || e.key === 'S') { setTransformMode('scale'); }
+        else if (e.key === 'Escape') { setTransformMode(null); }
       }
     };
 
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [project, undo, redo, addLayer, deleteLayer, duplicateLayer, selectedLayerIds, setPlaying, isPlaying]);
+  }, [project, undo, redo, addLayer, deleteLayer, duplicateLayer, selectedLayerIds, setPlaying, isPlaying, setTransformMode]);
 }
