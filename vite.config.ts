@@ -38,6 +38,11 @@ export default defineConfig({
         // from) isn't referenced by the app itself — precaching 2.6MB of PWA
         // install payload for images nothing ever requests is pure waste.
         globIgnores: ['motion-icon.png', 'motion-logo.png'],
+        // The 3D object-import demo embeds its GLB models as base64 JSON
+        // (~2.5MB), over workbox's default 2MB precache cap — bump it so
+        // that demo stays offline-available like the others instead of
+        // failing the production build.
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
       },
     }),
   ],
