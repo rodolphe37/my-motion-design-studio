@@ -153,16 +153,29 @@ export default function LandingPage() {
               Éditeur de motion design 2D & 3D dans le navigateur
             </div>
             {/* flow-root contains the float so it doesn't bleed into the
-                paragraph/buttons below; float-left on the logo is what
-                actually makes the heading text wrap around it instead of
-                just sitting in a column next to it. */}
+                paragraph/buttons below. The float uses shape-outside to make
+                the heading wrap the logo instead of sitting in a rectangular
+                box next to it. A raw alpha mask of the full PNG was tried
+                first, but this artwork (play panel, cursor, cube, atom,
+                sphere) fills almost the entire square canvas with barely any
+                transparent margin, so every heading line saturated to the
+                same near-full width -- no visible wrap. Circling just the
+                core "M" medallion gives the first line real breathing room;
+                the small decorative accents around it are allowed to sit
+                behind the text where they overlap. */}
             <div className="flow-root">
-              <div className="relative float-left mr-5 mb-2">
+              <div
+                className="relative float-left mr-3 mb-2 h-44 sm:h-60 lg:h-72"
+                style={{
+                  shapeOutside: 'circle(37% at 50% 52%)',
+                  shapeMargin: '20px',
+                }}
+              >
                 <div className="absolute inset-0 bg-gradient-to-br from-accent-violet via-accent-pink to-accent-blue rounded-full blur-2xl opacity-40" />
                 <img
                   src="/logo-sm.png"
                   alt="MyMotionDesignStudio"
-                  className="relative h-28 sm:h-32 lg:h-40 w-auto drop-shadow-[0_0_30px_rgba(139,92,246,0.45)]"
+                  className="relative h-full w-auto drop-shadow-[0_0_30px_rgba(139,92,246,0.45)]"
                 />
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight">
