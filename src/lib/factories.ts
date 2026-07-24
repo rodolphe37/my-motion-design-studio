@@ -13,6 +13,7 @@ import type {
   Text3DLayer,
   AspectRatioPreset,
   ExportDefaults,
+  ImportedMeshFormat,
 } from './types';
 import { ASPECT_RATIOS, uid } from './types';
 
@@ -129,6 +130,29 @@ export function createMeshLayer(mesh: MeshLayer['mesh']): MeshLayer {
     roughness: 0.5,
     opacity: 1,
     castShadow: true,
+    visible: true,
+    locked: false,
+    keyframes: [],
+    parentId: null,
+  };
+}
+
+export function createImportedMeshLayer(name: string, src: string, format: ImportedMeshFormat): MeshLayer {
+  return {
+    id: uid(),
+    name,
+    type: 'mesh',
+    mesh: 'imported',
+    position: { x: 0, y: 0, z: 0 },
+    rotation: { x: 0, y: 0, z: 0 },
+    scale: { x: 1, y: 1, z: 1 },
+    color: '#8b5cf6',
+    metalness: 0.3,
+    roughness: 0.5,
+    opacity: 1,
+    castShadow: true,
+    src,
+    importedFormat: format,
     visible: true,
     locked: false,
     keyframes: [],

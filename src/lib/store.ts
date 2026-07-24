@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Project, Scene, Layer, Keyframe, Transition } from './types';
+import type { Project, Scene, Layer, Keyframe, Transition, BackgroundFill } from './types';
 import { uid } from './types';
 
 export type ViewMode = 'editor' | 'preview';
@@ -43,6 +43,7 @@ interface EditorState {
   reorderScenes: (from: number, to: number) => void;
   updateScene: (id: string, patch: Partial<Scene>) => void;
   setSceneTransition: (sceneId: string, transition: Transition | null) => void;
+  setSceneBackground: (sceneId: string, background: BackgroundFill | null) => void;
 
   addLayer: (layer: Layer) => void;
   updateLayer: (id: string, patch: Partial<Layer>) => void;
@@ -193,6 +194,16 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       const project = cloneProject(s.project);
       const scene = project.scenes.find((sc) => sc.id === sceneId);
       if (scene) scene.transitionToNext = transition;
+      return { project, ...hist, saveStatus: 'unsaved' };
+    }),
+
+  setSceneBackground: (sceneId, background) =>
+    set((s) => {
+      if (!s.project) return {};
+      const hist = pushHistory(s);
+      const project = cloneProject(s.project);
+      const scene = project.scenes.find((sc) => sc.id === sceneId);
+      if (scene) scene.background = background ?? undefined;
       return { project, ...hist, saveStatus: 'unsaved' };
     }),
 

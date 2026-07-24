@@ -6,7 +6,7 @@ import type { Project } from '@/lib/types';
 import { useEditorStore } from '@/lib/store';
 import { EditorToolbar } from '@/components/editor/EditorToolbar';
 import { LeftToolbar2D, LeftToolbar3D } from '@/components/editor/LeftToolbar';
-import { LayersPanel, PropertiesPanel, AnimationPanel, TransitionsPanel } from '@/components/editor/RightPanels';
+import { LayersPanel, PropertiesPanel, AnimationPanel, TransitionsPanel, ScenePanel } from '@/components/editor/RightPanels';
 import { Canvas2D } from '@/components/editor/Canvas2D';
 import { Canvas3D } from '@/components/editor/Canvas3D';
 import { Timeline } from '@/components/editor/Timeline';
@@ -22,7 +22,7 @@ export default function EditorPage() {
   const setProject = useEditorStore((s) => s.setProject);
   const viewMode = useEditorStore((s) => s.viewMode);
   const [exportOpen, setExportOpen] = useState(false);
-  const [rightPanel, setRightPanel] = useState<'layers' | 'properties' | 'animation' | 'transitions'>('properties');
+  const [rightPanel, setRightPanel] = useState<'layers' | 'properties' | 'animation' | 'transitions' | 'scene'>('properties');
   const { saveStatus, savedAt } = useAutoSave();
   useKeyboardShortcuts();
 
@@ -77,7 +77,10 @@ export default function EditorPage() {
         {/* Right panels */}
         <div className="w-72 shrink-0 border-l border-ink-700 bg-ink-850 flex flex-col overflow-hidden">
           <div className="flex border-b border-ink-700">
-            {(['properties', 'layers', 'animation', 'transitions'] as const).map((p) => (
+            {(is3D
+              ? (['properties', 'layers', 'animation', 'transitions'] as const)
+              : (['properties', 'layers', 'animation', 'transitions', 'scene'] as const)
+            ).map((p) => (
               <button
                 key={p}
                 onClick={() => setRightPanel(p)}
@@ -85,7 +88,7 @@ export default function EditorPage() {
                   rightPanel === p ? 'text-accent-violet bg-accent-violet/10 border-b-2 border-accent-violet' : 'text-ink-300 hover:text-ink-50'
                 }`}
               >
-                {p === 'properties' ? 'Propriétés' : p === 'layers' ? 'Calques' : p === 'animation' ? 'Anim' : 'Trans.'}
+                {p === 'properties' ? 'Propriétés' : p === 'layers' ? 'Calques' : p === 'animation' ? 'Anim' : p === 'transitions' ? 'Trans.' : 'Scène'}
               </button>
             ))}
           </div>
@@ -94,6 +97,7 @@ export default function EditorPage() {
             {rightPanel === 'layers' && <LayersPanel />}
             {rightPanel === 'animation' && <AnimationPanel />}
             {rightPanel === 'transitions' && <TransitionsPanel />}
+            {rightPanel === 'scene' && !is3D && <ScenePanel />}
           </div>
         </div>
       </div>

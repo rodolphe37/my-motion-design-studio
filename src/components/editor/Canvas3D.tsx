@@ -1,10 +1,26 @@
-import { useRef, useEffect, useState, useMemo } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { useRef, useEffect, useState, useMemo, Suspense, Component, type ReactNode } from 'react';
+import { Canvas, useLoader } from '@react-three/fiber';
 import { OrbitControls, Grid, Environment, PerspectiveCamera, Text3D, Center } from '@react-three/drei';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import * as THREE from 'three';
 import { useEditorStore } from '@/lib/store';
 import { getLayerAtTime } from '@/lib/animation';
 import type { MeshLayer, LightLayer, Camera3DLayer, Text3DLayer } from '@/lib/types';
+
+// A broken/invalid imported model file would otherwise throw during render
+// and take down the whole 3D canvas — isolate each import so the rest of the
+// scene (and the Calques panel, to delete the offending layer) stays usable.
+class ImportErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  state = { hasError: false };
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  render() {
+    if (this.state.hasError) return null;
+    return this.props.children;
+  }
+}
 
 // optimer_bold, not helvetiker: helvetiker's glyph set is ASCII+Greek only
 // and silently renders accented Latin characters (é, à, ç…) as "?" — a
@@ -141,6 +157,20 @@ export function Canvas3D() {
         {scene.layers.filter((l) => l.type === 'mesh' && l.visible).map((layer) => {
           const m = getLayerAtTime(layer, time) as MeshLayer;
           const isSelected = selectedLayerIds.includes(m.id);
+          if (m.mesh === 'imported' && m.src) {
+            return (
+              <ImportErrorBoundary key={m.id}>
+                <Suspense fallback={null}>
+                  <ImportedMeshObject
+                    layer={m}
+                    selected={isSelected}
+                    onSelect={() => selectLayer(m.id)}
+                    showShadows={project.settings.shadows}
+                  />
+                </Suspense>
+              </ImportErrorBoundary>
+            );
+          }
           return (
             <MeshObject
               key={m.id}
@@ -236,6 +266,53 @@ function MeshObject({ layer, selected, onSelect, showShadows }: { layer: MeshLay
         </mesh>
       )}
     </mesh>
+  );
+}
+
+function ImportedMeshObject({ layer, selected, onSelect, showShadows }: { layer: MeshLayer; selected: boolean; onSelect: () => void; showShadows: boolean }) {
+  const format = layer.importedFormat ?? 'gltf';
+  // useLoader caches by (loader, url) — clone before mutating so tweaking
+  // shadows/opacity on one instance can't bleed into others sharing the file.
+  const loaded = useLoader(format === 'obj' ? OBJLoader : GLTFLoader, layer.src!);
+  const root = useMemo(() => {
+    const source = format === 'obj' ? (loaded as THREE.Group) : (loaded as { scene: THREE.Group }).scene;
+    const clone = source.clone(true);
+    clone.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        child.castShadow = showShadows && layer.castShadow;
+        child.receiveShadow = showShadows;
+        const mats = (Array.isArray(child.material) ? child.material : [child.material]).map((mat) => mat.clone());
+        if (layer.opacity < 1) {
+          mats.forEach((mat) => {
+            mat.transparent = true;
+            mat.opacity = layer.opacity;
+          });
+        }
+        child.material = mats.length === 1 ? mats[0] : mats;
+      }
+    });
+    return clone;
+  }, [loaded, format, showShadows, layer.castShadow, layer.opacity]);
+
+  const bbox = useMemo(() => new THREE.Box3().setFromObject(root), [root]);
+  const size = useMemo(() => bbox.getSize(new THREE.Vector3()), [bbox]);
+  const center = useMemo(() => bbox.getCenter(new THREE.Vector3()), [bbox]);
+
+  return (
+    <group
+      position={[layer.position.x, layer.position.y, layer.position.z]}
+      rotation={[layer.rotation.x, layer.rotation.y, layer.rotation.z]}
+      scale={[layer.scale.x, layer.scale.y, layer.scale.z]}
+      onClick={(e) => { e.stopPropagation(); onSelect(); }}
+    >
+      <primitive object={root} />
+      {selected && (
+        <mesh position={[center.x, center.y, center.z]}>
+          <boxGeometry args={[Math.max(size.x, 0.01) * 1.05, Math.max(size.y, 0.01) * 1.05, Math.max(size.z, 0.01) * 1.05]} />
+          <meshBasicMaterial color="#8b5cf6" wireframe transparent opacity={0.3} />
+        </mesh>
+      )}
+    </group>
   );
 }
 

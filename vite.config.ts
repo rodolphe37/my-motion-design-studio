@@ -47,6 +47,14 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ['react-router-dom', 'zustand', 'dexie', 'dexie-react-hooks', 'konva', 'react-konva', 'three', '@react-three/fiber', '@react-three/drei'],
+    include: [
+      'react-router-dom', 'zustand', 'dexie', 'dexie-react-hooks', 'konva', 'react-konva',
+      'three', '@react-three/fiber', '@react-three/drei',
+      // Without these, Vite pre-bundles the main 'three' package but leaves
+      // these example loaders to be transformed on demand, which resolves a
+      // second copy of three.js and trips its "multiple instances" warning.
+      'three/examples/jsm/loaders/GLTFLoader.js',
+      'three/examples/jsm/loaders/OBJLoader.js',
+    ],
   },
 });

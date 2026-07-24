@@ -37,7 +37,8 @@ export type LayerType3D = 'mesh' | 'light' | 'camera3d' | 'text3d';
 export type LayerType = LayerType2D | LayerType3D;
 
 export type ShapeKind = 'rectangle' | 'ellipse' | 'line' | 'polygon' | 'star';
-export type MeshKind = 'box' | 'sphere' | 'cone' | 'cylinder' | 'plane' | 'torus';
+export type MeshKind = 'box' | 'sphere' | 'cone' | 'cylinder' | 'plane' | 'torus' | 'imported';
+export type ImportedMeshFormat = 'gltf' | 'obj';
 export type LightKind = 'directional' | 'point' | 'spot' | 'ambient';
 
 export interface Vec2 {
@@ -120,7 +121,10 @@ export interface MeshLayer extends BaseLayer {
   roughness: number;
   opacity: number;
   castShadow: boolean;
+  // Only set when mesh === 'imported': the model file, embedded as a data
+  // URL so it round-trips through IndexedDB/JSON export like image layers.
   src?: string;
+  importedFormat?: ImportedMeshFormat;
 }
 
 export interface LightLayer extends BaseLayer {

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   Eye, EyeOff, Lock, Unlock, Trash2, Copy, ChevronDown, ChevronRight,
   Square, Type, Box, Lightbulb, Camera, Image, Layers as LayersIcon,
@@ -29,10 +29,20 @@ export function LayersPanel() {
   const duplicateLayer = useEditorStore((s) => s.duplicateLayer);
   const setLayerVisibility = useEditorStore((s) => s.setLayerVisibility);
   const setLayerLocked = useEditorStore((s) => s.setLayerLocked);
+  const reorderLayers = useEditorStore((s) => s.reorderLayers);
+  const [dragDisplayIndex, setDragDisplayIndex] = useState<number | null>(null);
+  // A ref (not just the state above) so onDrop always reads the value set by
+  // this drag's onDragStart — state set there is not guaranteed to have
+  // flushed to a re-render yet by the time drop fires.
+  const dragRef = useRef<number | null>(null);
 
   if (!project) return null;
   const scene = project.scenes.find((s) => s.id === currentSceneId);
   if (!scene) return null;
+
+  // The list is rendered newest-first (reversed), but reorderLayers works on
+  // the underlying array order, so a displayed index has to be flipped back.
+  const toActualIndex = (displayIndex: number) => scene.layers.length - 1 - displayIndex;
 
   return (
     <div className="p-2 space-y-0.5">
@@ -42,16 +52,29 @@ export function LayersPanel() {
           Aucun calque. Utilisez la barre d'outils à gauche pour ajouter des éléments.
         </div>
       )}
-      {[...scene.layers].reverse().map((layer) => {
+      {[...scene.layers].reverse().map((layer, displayIndex) => {
         const Icon = layerIcon(layer);
         const isSelected = selectedLayerIds.includes(layer.id);
         return (
           <div
             key={layer.id}
+            draggable
+            onDragStart={() => { dragRef.current = displayIndex; setDragDisplayIndex(displayIndex); }}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => {
+              e.preventDefault();
+              const from = dragRef.current;
+              if (from !== null && from !== displayIndex) {
+                reorderLayers(scene.id, toActualIndex(from), toActualIndex(displayIndex));
+              }
+              dragRef.current = null;
+              setDragDisplayIndex(null);
+            }}
+            onDragEnd={() => { dragRef.current = null; setDragDisplayIndex(null); }}
             onClick={() => selectLayer(layer.id)}
-            className={`group flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-pointer text-sm transition-colors ${
+            className={`group flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-grab active:cursor-grabbing text-sm transition-colors ${
               isSelected ? 'bg-accent-violet/15 text-ink-50' : 'hover:bg-ink-750 text-ink-200'
-            }`}
+            } ${dragDisplayIndex === displayIndex ? 'opacity-50' : ''}`}
           >
             <Icon className="w-4 h-4 shrink-0 opacity-70" />
             <span className="flex-1 truncate">{layer.name}</span>
@@ -229,8 +252,14 @@ function Properties2D({ layer, updateLayer }: { layer: Layer; updateLayer: (id: 
 
 function Properties3D({ layer, updateLayer }: { layer: Layer; updateLayer: (id: string, patch: Partial<Layer>) => void }) {
   if (layer.type === 'mesh') {
+    const isImported = layer.mesh === 'imported';
     return (
       <>
+        {isImported && (
+          <p className="text-xs text-ink-400 -mt-1">
+            Modèle importé ({layer.importedFormat === 'obj' ? 'OBJ' : 'glTF/GLB'}) — conserve ses propres matériaux.
+          </p>
+        )}
         <div className="grid grid-cols-3 gap-2">
           <NumberField label="Pos X" value={layer.position.x} onChange={(v) => updateLayer(layer.id, { position: { ...layer.position, x: v } } as Partial<Layer>)} step={0.1} />
           <NumberField label="Pos Y" value={layer.position.y} onChange={(v) => updateLayer(layer.id, { position: { ...layer.position, y: v } } as Partial<Layer>)} step={0.1} />
@@ -246,11 +275,15 @@ function Properties3D({ layer, updateLayer }: { layer: Layer; updateLayer: (id: 
           <NumberField label="Scale Y" value={layer.scale.y} onChange={(v) => updateLayer(layer.id, { scale: { ...layer.scale, y: v } } as Partial<Layer>)} step={0.1} />
           <NumberField label="Scale Z" value={layer.scale.z} onChange={(v) => updateLayer(layer.id, { scale: { ...layer.scale, z: v } } as Partial<Layer>)} step={0.1} />
         </div>
-        <ColorField label="Couleur" value={layer.color} onChange={(v) => updateLayer(layer.id, { color: v } as Partial<Layer>)} />
-        <div className="grid grid-cols-2 gap-2">
-          <NumberField label="Metalness" value={layer.metalness} onChange={(v) => updateLayer(layer.id, { metalness: v } as Partial<Layer>)} step={0.1} />
-          <NumberField label="Roughness" value={layer.roughness} onChange={(v) => updateLayer(layer.id, { roughness: v } as Partial<Layer>)} step={0.1} />
-        </div>
+        {!isImported && (
+          <>
+            <ColorField label="Couleur" value={layer.color} onChange={(v) => updateLayer(layer.id, { color: v } as Partial<Layer>)} />
+            <div className="grid grid-cols-2 gap-2">
+              <NumberField label="Metalness" value={layer.metalness} onChange={(v) => updateLayer(layer.id, { metalness: v } as Partial<Layer>)} step={0.1} />
+              <NumberField label="Roughness" value={layer.roughness} onChange={(v) => updateLayer(layer.id, { roughness: v } as Partial<Layer>)} step={0.1} />
+            </div>
+          </>
+        )}
         <NumberField label="Opacité" value={layer.opacity} onChange={(v) => updateLayer(layer.id, { opacity: v } as Partial<Layer>)} step={0.1} />
       </>
     );
@@ -482,6 +515,137 @@ export function TransitionsPanel() {
               <option value="easeInOut">Ease InOut</option>
               <option value="spring">Spring</option>
             </select>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+export function ScenePanel() {
+  const project = useEditorStore((s) => s.project);
+  const currentSceneId = useEditorStore((s) => s.currentSceneId);
+  const setSceneBackground = useEditorStore((s) => s.setSceneBackground);
+
+  if (!project) return null;
+  const scene = project.scenes.find((s) => s.id === currentSceneId);
+  if (!scene) return null;
+
+  const bg = scene.background;
+  const mode: 'default' | 'solid' | 'gradient' | 'spots' = bg?.type ?? 'default';
+
+  const modes: { value: typeof mode; label: string }[] = [
+    { value: 'default', label: 'Projet (défaut)' },
+    { value: 'solid', label: 'Uni' },
+    { value: 'gradient', label: 'Dégradé' },
+    { value: 'spots', label: 'Spots' },
+  ];
+
+  const setMode = (m: typeof mode) => {
+    if (m === 'default') setSceneBackground(scene.id, null);
+    else if (m === 'solid') setSceneBackground(scene.id, { type: 'solid', color: project.settings.backgroundColor });
+    else if (m === 'gradient') setSceneBackground(scene.id, { type: 'gradient', from: '#8b5cf6', to: '#3b82f6', angle: 45 });
+    else setSceneBackground(scene.id, {
+      type: 'spots',
+      base: project.settings.backgroundColor,
+      spots: [{ color: '#8b5cf6', x: project.settings.width / 2, y: project.settings.height / 2, radius: Math.round(project.settings.width / 5), opacity: 0.5 }],
+    });
+  };
+
+  return (
+    <div className="p-3 space-y-3">
+      <div>
+        <label className="label">Fond de la scène</label>
+        <div className="grid grid-cols-2 gap-2 mt-1">
+          {modes.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => setMode(opt.value)}
+              className={`px-3 py-2 rounded-lg border-2 text-sm transition-all ${
+                mode === opt.value ? 'border-accent-violet bg-accent-violet/10 text-accent-violet' : 'border-ink-600 text-ink-300 hover:border-ink-500'
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+        {mode === 'default' && (
+          <p className="text-xs text-ink-400 mt-2">Utilise la couleur de fond définie à la création du projet.</p>
+        )}
+      </div>
+
+      {bg?.type === 'solid' && (
+        <ColorField label="Couleur" value={bg.color} onChange={(v) => setSceneBackground(scene.id, { ...bg, color: v })} />
+      )}
+
+      {bg?.type === 'gradient' && (
+        <>
+          <ColorField label="Couleur de départ" value={bg.from} onChange={(v) => setSceneBackground(scene.id, { ...bg, from: v })} />
+          <ColorField label="Couleur d'arrivée" value={bg.to} onChange={(v) => setSceneBackground(scene.id, { ...bg, to: v })} />
+          <NumberField label="Angle (°)" value={bg.angle} onChange={(v) => setSceneBackground(scene.id, { ...bg, angle: v })} />
+        </>
+      )}
+
+      {bg?.type === 'spots' && (
+        <>
+          <ColorField label="Couleur de fond" value={bg.base} onChange={(v) => setSceneBackground(scene.id, { ...bg, base: v })} />
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="label !mb-0">Spots ({bg.spots.length})</label>
+              <button
+                onClick={() => setSceneBackground(scene.id, {
+                  ...bg,
+                  spots: [...bg.spots, { color: '#3b82f6', x: project.settings.width / 2, y: project.settings.height / 2, radius: Math.round(project.settings.width / 6), opacity: 0.5 }],
+                })}
+                className="icon-btn w-6 h-6"
+                title="Ajouter un spot"
+              >
+                +
+              </button>
+            </div>
+            {bg.spots.map((spot, i) => (
+              <div key={i} className="p-2 rounded-lg border border-ink-700 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-ink-400">Spot {i + 1}</span>
+                  <button
+                    onClick={() => setSceneBackground(scene.id, { ...bg, spots: bg.spots.filter((_, si) => si !== i) })}
+                    className="p-1 hover:bg-red-500/20 hover:text-red-400 rounded"
+                    title="Supprimer ce spot"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                </div>
+                <ColorField
+                  label="Couleur"
+                  value={spot.color}
+                  onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, color: v } : s)) })}
+                />
+                <div className="grid grid-cols-2 gap-2">
+                  <NumberField
+                    label="X"
+                    value={spot.x}
+                    onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, x: v } : s)) })}
+                  />
+                  <NumberField
+                    label="Y"
+                    value={spot.y}
+                    onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, y: v } : s)) })}
+                  />
+                  <NumberField
+                    label="Rayon"
+                    value={spot.radius}
+                    onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, radius: v } : s)) })}
+                  />
+                  <NumberField
+                    label="Opacité"
+                    value={spot.opacity}
+                    step={0.1}
+                    onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, opacity: v } : s)) })}
+                  />
+                </div>
+              </div>
+            ))}
+            {bg.spots.length === 0 && <p className="text-xs text-ink-400 px-1">Aucun spot — cliquez + pour en ajouter un.</p>}
           </div>
         </>
       )}

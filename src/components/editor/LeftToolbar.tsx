@@ -2,11 +2,11 @@ import { useState, useEffect, useRef } from 'react';
 import {
   MousePointer2, Square, Circle, Triangle, Star, Type, Image, Minus,
   Box, Disc, Cone, Cylinder, Plane, Lightbulb, Camera, Move, RotateCw,
-  Scale3d, Sparkles, Layers,
+  Scale3d, Sparkles, Layers, Upload,
 } from 'lucide-react';
 import { useEditorStore } from '@/lib/store';
-import { createShapeLayer, createTextLayer, createImageLayer, createMeshLayer, createLightLayer, createCamera3DLayer, createText3DLayer } from '@/lib/factories';
-import type { ShapeKind, MeshKind, LightKind } from '@/lib/types';
+import { createShapeLayer, createTextLayer, createImageLayer, createMeshLayer, createLightLayer, createCamera3DLayer, createText3DLayer, createImportedMeshLayer } from '@/lib/factories';
+import type { ShapeKind, MeshKind, LightKind, ImportedMeshFormat } from '@/lib/types';
 
 function readImageFile(file: File): Promise<{ src: string; width: number; height: number }> {
   return new Promise((resolve, reject) => {
@@ -19,6 +19,17 @@ function readImageFile(file: File): Promise<{ src: string; width: number; height
       img.onerror = () => reject(new Error('Image invalide'));
       img.src = src;
     };
+    reader.readAsDataURL(file);
+  });
+}
+
+function readModelFile(file: File): Promise<{ src: string; format: ImportedMeshFormat }> {
+  const ext = file.name.toLowerCase().split('.').pop();
+  const format: ImportedMeshFormat = ext === 'obj' ? 'obj' : 'gltf';
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(reader.error);
+    reader.onload = () => resolve({ src: reader.result as string, format });
     reader.readAsDataURL(file);
   });
 }
@@ -134,6 +145,7 @@ export function LeftToolbar2D() {
 export function LeftToolbar3D() {
   const [tool, setTool] = useState<Tool3D>('select');
   const addLayer = useEditorStore((s) => s.addLayer);
+  const modelInputRef = useRef<HTMLInputElement>(null);
 
   const handleAddMesh = (kind: MeshKind) => {
     addLayer(createMeshLayer(kind));
@@ -149,6 +161,19 @@ export function LeftToolbar3D() {
 
   const handleAddText3D = () => {
     addLayer(createText3DLayer());
+  };
+
+  const handleImportModel = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    try {
+      const { src, format } = await readModelFile(file);
+      const name = file.name.replace(/\.(gltf|glb|obj)$/i, '');
+      addLayer(createImportedMeshLayer(name || 'Modèle importé', src, format));
+    } catch {
+      // ignore invalid/unreadable file
+    }
   };
 
   return (
@@ -190,6 +215,21 @@ export function LeftToolbar3D() {
           <div className="tooltip left-14 top-1/2 -translate-y-1/2">{m.label}</div>
         </div>
       ))}
+
+      {/* Import model */}
+      <input
+        ref={modelInputRef}
+        type="file"
+        accept=".gltf,.glb,.obj"
+        className="hidden"
+        onChange={handleImportModel}
+      />
+      <div className="relative group">
+        <button onClick={() => modelInputRef.current?.click()} className="icon-btn">
+          <Upload className="w-5 h-5" />
+        </button>
+        <div className="tooltip left-14 top-1/2 -translate-y-1/2">Importer un modèle (glTF/GLB/OBJ)</div>
+      </div>
 
       <div className="w-8 h-px bg-ink-700 my-1" />
 
