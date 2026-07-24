@@ -1,15 +1,18 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Moon, Sun, Film, BookOpen, FolderOpen } from 'lucide-react';
+import { Moon, Sun, BookOpen, FolderOpen } from 'lucide-react';
 import { useTheme } from '@/lib/useTheme';
 
 export function Header() {
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
 
+  // No direct link to the editor: a project must be created (or opened) via
+  // the "Nouveau projet" modal on /projects, which is what actually creates
+  // a valid project id — /editor/new isn't a real project and just bounces
+  // back to /projects.
   const navItems = [
     { to: '/docs', label: 'Documentation', icon: BookOpen },
     { to: '/projects', label: 'Mes projets', icon: FolderOpen },
-    { to: '/editor/new', label: 'Éditeur', icon: Film },
   ];
 
   return (
