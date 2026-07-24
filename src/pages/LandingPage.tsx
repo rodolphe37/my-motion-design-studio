@@ -165,10 +165,10 @@ export default function LandingPage() {
                 behind the text where they overlap. */}
             <div className="flow-root">
               <div
-                className="relative float-left mr-3 mb-2 h-44 sm:h-60 lg:h-72"
+                className="relative float-left mr-3 mb-2 h-20 sm:h-24 lg:h-28"
                 style={{
                   shapeOutside: 'circle(37% at 50% 52%)',
-                  shapeMargin: '20px',
+                  shapeMargin: '14px',
                 }}
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-accent-violet via-accent-pink to-accent-blue rounded-full blur-2xl opacity-40" />
