@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Sparkles,
@@ -14,8 +15,13 @@ import {
   GitBranch,
   Send,
   Monitor,
+  Sun,
+  Moon,
+  Menu,
+  X,
 } from 'lucide-react';
 import { DemoPlayer } from '@/components/DemoPlayer';
+import { useTheme } from '@/lib/useTheme';
 
 const FEATURES = [
   {
@@ -69,23 +75,68 @@ const SHOWCASE = [
 ];
 
 export default function LandingPage() {
+  const { theme, toggleTheme } = useTheme();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   return (
     <div className="min-h-screen bg-ink-900 text-ink-100 overflow-x-hidden">
       {/* Nav */}
       <nav className="fixed top-0 left-0 right-0 z-40 backdrop-blur-xl bg-ink-900/70 border-b border-ink-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <img src="/icon-96.png" alt="MyMotionDesignStudio" className="w-8 h-8 rounded-lg shadow-lg shadow-accent-violet/20" />
-            <span className="font-semibold">MyMotionDesignStudio</span>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <img src="/icon-96.png" alt="MyMotionDesignStudio" className="w-8 h-8 rounded-lg shadow-lg shadow-accent-violet/20 shrink-0" />
+            <span className="font-semibold truncate text-sm sm:text-base">MyMotionDesignStudio</span>
           </div>
-          <div className="flex items-center gap-2">
+
+          {/* Desktop nav */}
+          <div className="hidden sm:flex items-center gap-2 shrink-0">
             <Link to="/docs" className="btn-ghost text-sm">Documentation</Link>
-            <Link to="/projects" className="btn-primary text-sm">
+            <button onClick={toggleTheme} className="icon-btn" aria-label="Changer de thème">
+              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+            <Link to="/projects" className="btn-primary text-sm px-4">
               Ouvrir l'app
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
+
+          {/* Mobile burger toggle */}
+          <button
+            onClick={() => setMobileMenuOpen((v) => !v)}
+            className="icon-btn sm:hidden"
+            aria-label={mobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+            aria-expanded={mobileMenuOpen}
+          >
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
         </div>
+
+        {/* Mobile menu panel */}
+        {mobileMenuOpen && (
+          <div className="sm:hidden border-t border-ink-700 bg-ink-900/95 backdrop-blur-xl px-4 py-4 flex flex-col gap-2 animate-fade-in">
+            <Link
+              to="/docs"
+              onClick={() => setMobileMenuOpen(false)}
+              className="btn-ghost text-sm w-full justify-start"
+            >
+              Documentation
+            </Link>
+            <button
+              onClick={() => { toggleTheme(); setMobileMenuOpen(false); }}
+              className="btn-ghost text-sm w-full justify-start"
+            >
+              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {theme === 'dark' ? 'Thème clair' : 'Thème sombre'}
+            </button>
+            <Link
+              to="/projects"
+              onClick={() => setMobileMenuOpen(false)}
+              className="btn-primary text-sm w-full justify-center mt-1"
+            >
+              Ouvrir l'app
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        )}
       </nav>
 
       {/* Hero */}
@@ -203,9 +254,9 @@ export default function LandingPage() {
                   <Play className="w-12 h-12 text-white drop-shadow-lg group-hover:scale-110 transition-transform" />
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-medium text-white">{item.title}</h3>
-                    <span className="px-2 py-0.5 rounded text-xs font-bold bg-white/20 text-white backdrop-blur">
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="font-medium text-white truncate min-w-0">{item.title}</h3>
+                    <span className="shrink-0 px-2 py-0.5 rounded text-xs font-bold bg-white/20 text-white backdrop-blur">
                       {item.mode}
                     </span>
                   </div>
@@ -238,12 +289,13 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-4 sm:px-6 border-t border-ink-800 bg-ink-950">
+      <footer className="py-12 px-4 sm:px-6 border-t border-ink-800 bg-ink-850">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <img src="/icon-96.png" alt="MyMotionDesignStudio" className="w-7 h-7 rounded-lg" />
               <span className="text-sm text-ink-300">MyMotionDesignStudio © 2026</span>
+              <span className="text-xs text-ink-500 font-mono">v{__APP_VERSION__}</span>
             </div>
             <div className="flex items-center gap-4 text-sm text-ink-400">
               <Link to="/docs" className="hover:text-ink-100 transition-colors">Documentation</Link>
