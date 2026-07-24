@@ -3,8 +3,53 @@
 @tailwind utilities;
 
 @layer base {
+  /*
+   * The `ink` palette (see tailwind.config.js) is defined from these
+   * variables, not fixed hex values, so every existing `bg-ink-900`,
+   * `text-ink-300`, `border-ink-700`, etc. class automatically repaints for
+   * the active theme — no component needs a `dark:` variant.
+   *
+   * Each shade keeps its role across themes (900 = page bg, 850 = panel bg,
+   * 700/600 = borders, 400..50 = muted -> prominent text) but the actual
+   * lightness flips: in dark mode the ramp runs dark (950) -> light (50); in
+   * light mode backgrounds run light -> the ramp's text end goes dark.
+   *
+   * ink-950 is the one exception: it's only ever used for canvas/video-like
+   * surfaces (editor viewport, preview player, thumbnail placeholders) that
+   * are conventionally dark in every creative tool regardless of UI theme,
+   * so it stays a near-black in both themes.
+   */
   :root {
     color-scheme: dark;
+    --ink-950: 10 10 13;
+    --ink-900: 15 15 18;
+    --ink-850: 20 20 24;
+    --ink-800: 22 22 26;
+    --ink-750: 28 28 34;
+    --ink-700: 34 34 41;
+    --ink-600: 43 43 52;
+    --ink-500: 58 58 69;
+    --ink-400: 82 82 94;
+    --ink-300: 113 113 126;
+    --ink-200: 160 160 174;
+    --ink-100: 196 196 208;
+    --ink-50: 232 232 238;
+  }
+  :root:not(.dark) {
+    color-scheme: light;
+    --ink-950: 24 25 29;
+    --ink-900: 247 247 249;
+    --ink-850: 255 255 255;
+    --ink-800: 236 238 242;
+    --ink-750: 240 241 244;
+    --ink-700: 226 228 233;
+    --ink-600: 205 210 218;
+    --ink-500: 152 160 172;
+    --ink-400: 107 114 128;
+    --ink-300: 74 81 101;
+    --ink-200: 51 58 77;
+    --ink-100: 30 35 48;
+    --ink-50: 10 12 17;
   }
   html {
     -webkit-font-smoothing: antialiased;
@@ -14,14 +59,8 @@
     @apply bg-ink-900 text-ink-100 font-sans;
     overscroll-behavior: none;
   }
-  html:not(.dark) body {
-    @apply bg-gray-50 text-gray-900;
-  }
   * {
     @apply border-ink-700;
-  }
-  html:not(.dark) * {
-    @apply border-gray-200;
   }
 }
 
@@ -33,7 +72,7 @@
     @apply btn text-white bg-gradient-to-r from-accent-violet to-accent-blue hover:shadow-lg hover:shadow-accent-violet/30;
   }
   .btn-ghost {
-    @apply btn text-ink-200 hover:bg-ink-750 hover:text-white;
+    @apply btn text-ink-200 hover:bg-ink-750 hover:text-ink-50;
   }
   .btn-outline {
     @apply btn border border-ink-600 text-ink-100 hover:bg-ink-750 hover:border-ink-500;
@@ -48,17 +87,20 @@
     @apply text-xs font-medium text-ink-300 uppercase tracking-wide;
   }
   .icon-btn {
-    @apply inline-flex items-center justify-center w-9 h-9 rounded-lg text-ink-200 hover:bg-ink-700 hover:text-white transition-all duration-150 active:scale-90;
+    @apply inline-flex items-center justify-center w-9 h-9 rounded-lg text-ink-200 hover:bg-ink-700 hover:text-ink-50 transition-all duration-150 active:scale-90;
   }
   .icon-btn-active {
     @apply icon-btn bg-accent-violet/20 text-accent-violet hover:bg-accent-violet/30 hover:text-accent-violet;
   }
+  /* Tooltips are a small dark chip in both themes (like most design
+     systems) — text-white rather than text-ink-100, which flips dark in
+     light mode and would go illegible on this always-dark background. */
   .tooltip {
-    @apply absolute pointer-events-none px-2 py-1 rounded-md bg-ink-950 text-ink-100 text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-50 border border-ink-600;
+    @apply absolute pointer-events-none px-2 py-1 rounded-md bg-ink-950 text-white text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-50 border border-ink-600;
   }
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: #3a3a45 transparent;
+    scrollbar-color: rgb(var(--ink-500)) transparent;
   }
   .scrollbar-thin::-webkit-scrollbar {
     width: 6px;
@@ -68,11 +110,11 @@
     background: transparent;
   }
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: #3a3a45;
+    background: rgb(var(--ink-500));
     border-radius: 3px;
   }
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background: #52525e;
+    background: rgb(var(--ink-400));
   }
 }
 
@@ -86,7 +128,7 @@ input[type="range"] {
 input[type="range"]::-webkit-slider-runnable-track {
   height: 4px;
   border-radius: 2px;
-  background: #2b2b34;
+  background: rgb(var(--ink-600));
 }
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
@@ -96,20 +138,20 @@ input[type="range"]::-webkit-slider-thumb {
   height: 16px;
   border-radius: 50%;
   background: #8b5cf6;
-  border: 2px solid #16161a;
+  border: 2px solid rgb(var(--ink-850));
   box-shadow: 0 0 0 1px #8b5cf6;
 }
 input[type="range"]::-moz-range-track {
   height: 4px;
   border-radius: 2px;
-  background: #2b2b34;
+  background: rgb(var(--ink-600));
 }
 input[type="range"]::-moz-range-thumb {
   width: 14px;
   height: 14px;
   border-radius: 50%;
   background: #8b5cf6;
-  border: 2px solid #16161a;
+  border: 2px solid rgb(var(--ink-850));
   box-shadow: 0 0 0 1px #8b5cf6;
 }
 
@@ -126,6 +168,6 @@ input[type="color"]::-webkit-color-swatch-wrapper {
   padding: 0;
 }
 input[type="color"]::-webkit-color-swatch {
-  border: 1px solid #2b2b34;
+  border: 1px solid rgb(var(--ink-600));
   border-radius: 6px;
 }

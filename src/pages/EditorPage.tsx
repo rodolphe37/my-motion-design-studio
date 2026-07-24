@@ -62,11 +62,13 @@ export default function EditorPage() {
         <div className="flex-1 flex flex-col overflow-hidden">
           <div className="flex-1 relative bg-ink-950 overflow-hidden">
             {is3D ? <Canvas3D /> : <Canvas2D />}
-            {/* Small screen warning */}
+            {/* Small screen warning — bg-ink-950 stays dark in both themes
+                (see index.css), so its text is fixed light rather than the
+                theme-flipping ink-* tokens, which would go dark-on-dark. */}
             <div className="sm:hidden absolute inset-0 bg-ink-950/95 flex flex-col items-center justify-center p-6 text-center z-50">
               <Monitor className="w-10 h-10 text-amber-400 mb-3" />
-              <h3 className="font-semibold mb-1">Écran trop petit</h3>
-              <p className="text-sm text-ink-300">L'éditeur est optimisé pour desktop. Utilisez un écran plus large pour une meilleure expérience{is3D ? ', surtout en mode 3D' : ''}.</p>
+              <h3 className="font-semibold mb-1 text-white">Écran trop petit</h3>
+              <p className="text-sm text-gray-300">L'éditeur est optimisé pour desktop. Utilisez un écran plus large pour une meilleure expérience{is3D ? ', surtout en mode 3D' : ''}.</p>
             </div>
           </div>
           <Timeline />
