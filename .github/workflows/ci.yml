@@ -59,8 +59,10 @@ jobs:
     # Attendre que toute la matrice CI soit verte avant le déploiement sur Netlify
     needs: test
 
-    # Ne déployer que sur un push vers main
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Ne déployer que sur un push ou une pull request vers main
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'pull_request' && github.base_ref == 'main')
 
     steps:
       - name: Trigger Netlify Build
