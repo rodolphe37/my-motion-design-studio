@@ -8,18 +8,30 @@ export function useAutoSave() {
   const setSaveStatus = useEditorStore((s) => s.setSaveStatus);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Deliberately depends on `project` only, not `saveStatus`. Setting the
+  // status to 'saving' below is itself a store update — if `saveStatus`
+  // were a dependency, that write would re-run this same effect, and its
+  // cleanup would clearTimeout the very timer just scheduled a line above,
+  // silently dropping every autosave (status gets stuck on "saving" forever
+  // and IndexedDB never actually receives the write). Read the latest
+  // status via getState() instead of subscribing to it here.
   useEffect(() => {
-    if (!project || saveStatus !== 'unsaved') return;
+    if (!project || useEditorStore.getState().saveStatus !== 'unsaved') return;
     setSaveStatus('saving');
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(async () => {
-      await saveProject(project);
-      setSaveStatus('saved');
+      try {
+        await saveProject(project);
+        setSaveStatus('saved');
+      } catch (err) {
+        console.error('Échec de l\'enregistrement automatique :', err);
+        setSaveStatus('unsaved');
+      }
     }, 2000);
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [project, saveStatus, setSaveStatus]);
+  }, [project, setSaveStatus]);
 
   const formatTime = (date: Date) =>
     date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
