@@ -1,4 +1,4 @@
-name: CI
+name: CI & Deploy
 
 on:
   push:
@@ -51,3 +51,18 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  deploy:
+    name: Deploy to Netlify
+    runs-on: ubuntu-latest
+
+    # Attendre que toute la matrice CI soit verte
+    needs: test
+
+    # Ne déployer que sur un push vers main
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Trigger Netlify Build
+        run: |
+          curl -X POST "${{ secrets.NETLIFY_BUILD_HOOK }}"
