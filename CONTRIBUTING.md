@@ -149,10 +149,15 @@ There's no strict format enforced, but commits in this repo tend to:
 5. Open the PR against `main` with a clear description of *what* changed
    and *why*. Link any related issue.
 6. CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs the same
-   `full-test` + `build` sequence automatically on Node 20 and 22 — fix any
+   `full-test` + `build` sequence automatically on Node 22 and 24 — fix any
    red check before asking for review.
 7. Be responsive to review feedback — this is a side project, so review
    turnaround may take a few days.
+
+Note: since PRs come from forks, they don't get an automatic Netlify preview
+deploy (fork PRs don't have access to repo secrets, by GitHub design) — only
+branches pushed directly to this repo do. Maintainers reviewing a fork PR
+should pull the branch and run `npm run build && npm run preview` locally.
 
 Small, focused PRs are much easier to review than large ones touching many
 unrelated things — if a change grew to cover several unrelated concerns,

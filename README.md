@@ -200,7 +200,7 @@ npm run full-test    # typecheck + lint + test, in sequence — run this before 
 
 Coverage today focuses on the framework-agnostic logic under `src/lib/` — the animation/easing engine, the Zustand store's mutations and undo/redo history, the IndexedDB persistence layer, and the autosave hook (including a regression test for a real race-condition bug that used to silently drop every save — see `useAutoSave.test.ts`).
 
-Every push and pull request against `main` runs the full `typecheck` → `lint` → `test` → `build` sequence via GitHub Actions (see [`.github/workflows/ci.yml`](.github/workflows/ci.yml), badge at the top of this README), on both the minimum supported Node 20 and Node 22.
+Every push and pull request against `main` runs the full `typecheck` → `lint` → `test` → `build` sequence via GitHub Actions (see [`.github/workflows/ci.yml`](.github/workflows/ci.yml), badge at the top of this README), on both the minimum supported Node 22 and Node 24.
 
 Component tests for `Canvas2D`/`Canvas3D` aren't included: both need a real canvas/WebGL context that jsdom doesn't provide, and would require heavy mocking to be worth much. Contributions that add meaningful coverage there are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -342,7 +342,7 @@ npm run full-test    # typecheck + lint + test, dans l'ordre — à lancer avant
 
 La couverture se concentre aujourd'hui sur la logique indépendante du rendu, dans `src/lib/` : moteur d'animation/easing, mutations du store Zustand et historique annuler/rétablir, couche de persistance IndexedDB, et le hook d'enregistrement automatique (avec un test de non-régression pour un vrai bug de *race condition* qui faisait échouer silencieusement chaque sauvegarde — voir `useAutoSave.test.ts`).
 
-Chaque push et pull request vers `main` déclenche l'enchaînement complet `typecheck` → `lint` → `test` → `build` via GitHub Actions (voir [`.github/workflows/ci.yml`](.github/workflows/ci.yml), badge en haut de ce README), sur Node 20 et Node 22 (les versions minimales supportées).
+Chaque push et pull request vers `main` déclenche l'enchaînement complet `typecheck` → `lint` → `test` → `build` via GitHub Actions (voir [`.github/workflows/ci.yml`](.github/workflows/ci.yml), badge en haut de ce README), sur Node 22 et Node 24 (les versions minimales supportées).
 
 Il n'y a pas de tests de composants pour `Canvas2D`/`Canvas3D` : les deux ont besoin d'un vrai contexte canvas/WebGL que jsdom ne fournit pas, et demanderaient un *mocking* lourd pour être vraiment utiles. Les contributions qui y ajoutent une couverture pertinente sont bienvenues — voir [CONTRIBUTING.md](CONTRIBUTING.md).
 
