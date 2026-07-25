@@ -26,7 +26,7 @@ jobs:
       matrix:
         # Matches the "node" range in package.json's "engines" field
         # (^20.19.0 || >=22.12.0) — the latest 20.x and 22.x satisfy it.
-        node-version: ['20', '22']
+        node-version: ['22', '24']
     steps:
       - name: Checkout
         uses: actions/checkout@v4
