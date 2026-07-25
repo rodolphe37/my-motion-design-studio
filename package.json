@@ -1,5 +1,5 @@
 {
-  "name": "my-motion-design-studio",
+  "name": "my-motion-studio",
   "description": "A free, open-source, offline-first 2D & 3D motion design editor that runs entirely in your browser.",
   "private": true,
   "version": "0.2.11",
@@ -8,11 +8,11 @@
   "author": "rodolphe37",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rodolphe37/my-motion-design-studio.git"
+    "url": "git+https://github.com/rodolphe37/my-motion-studio.git"
   },
-  "homepage": "https://github.com/rodolphe37/my-motion-design-studio#readme",
+  "homepage": "https://github.com/rodolphe37/my-motion-studio#readme",
   "bugs": {
-    "url": "https://github.com/rodolphe37/my-motion-design-studio/issues"
+    "url": "https://github.com/rodolphe37/my-motion-studio/issues"
   },
   "scripts": {
     "dev": "vite",

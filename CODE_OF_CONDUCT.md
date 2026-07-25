@@ -54,7 +54,7 @@ representing the community in public spaces.
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
 reported to the project maintainers by opening a
-[GitHub issue](https://github.com/rodolphe37/my-motion-design-studio/issues)
+[GitHub issue](https://github.com/rodolphe37/my-motion-studio/issues)
 marked confidential, or via the contact information on the maintainer's
 GitHub profile. All complaints will be reviewed and investigated promptly
 and fairly.

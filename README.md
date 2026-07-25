@@ -6,7 +6,7 @@
   <p><strong>A free, open-source, offline-first 2D &amp; 3D motion design editor that runs entirely in your browser.</strong></p>
 
   <p>
-    <a href="https://github.com/rodolphe37/my-motion-design-studio/actions/workflows/ci.yml"><img src="https://github.com/rodolphe37/my-motion-design-studio/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+    <a href="https://github.com/rodolphe37/my-motion-studio/actions/workflows/ci.yml"><img src="https://github.com/rodolphe37/my-motion-studio/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
     <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"></a>
     <a href="CODE_OF_CONDUCT.md"><img src="https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg" alt="Contributor Covenant"></a>
@@ -117,8 +117,8 @@ The three source projects behind these are available as `public/demos/*.json` an
 
 ```bash
 # Clone the repository
-git clone https://github.com/rodolphe37/my-motion-design-studio.git
-cd my-motion-design-studio
+git clone https://github.com/rodolphe37/my-motion-studio.git
+cd my-motion-studio
 
 # Install dependencies
 npm install
@@ -315,8 +315,8 @@ Voir le tableau de la section anglaise ci-dessus ([Tech stack](#tech-stack)) —
 Les commandes sont identiques à celles de la section anglaise ([Getting started](#getting-started)) :
 
 ```bash
-git clone https://github.com/rodolphe37/my-motion-design-studio.git
-cd my-motion-design-studio
+git clone https://github.com/rodolphe37/my-motion-studio.git
+cd my-motion-studio
 npm install
 npm run dev
 ```

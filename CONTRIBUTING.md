@@ -57,8 +57,8 @@ only — `package-lock.json` is the committed lockfile; please don't add a
 `yarn.lock` or `pnpm-lock.yaml` in a PR.
 
 ```bash
-git clone https://github.com/rodolphe37/my-motion-design-studio.git
-cd my-motion-design-studio
+git clone https://github.com/rodolphe37/my-motion-studio.git
+cd my-motion-studio
 npm install
 npm run dev
 ```
@@ -165,7 +165,7 @@ consider splitting it.
 
 ## Reporting bugs
 
-Open a [GitHub issue](https://github.com/rodolphe37/my-motion-design-studio/issues/new)
+Open a [GitHub issue](https://github.com/rodolphe37/my-motion-studio/issues/new)
 with:
 
 - Steps to reproduce (as precise as possible — which project mode, which
