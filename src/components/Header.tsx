@@ -7,7 +7,6 @@ export function Header() {
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
   const { t, i18n } = useTranslation('common');
-  const toggleLanguage = () => i18n.changeLanguage(i18n.language === 'fr' ? 'en' : 'fr');
 
   // No direct link to the editor: a project must be created (or opened) via
   // the "Nouveau projet" modal on /projects, which is what actually creates
@@ -51,9 +50,22 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2 shrink-0">
-          <button onClick={toggleLanguage} className="icon-btn text-xs font-bold" aria-label={t('language.toggleAria')}>
-            {i18n.language === 'fr' ? 'EN' : 'FR'}
-          </button>
+          <div className="flex items-center rounded-lg border border-ink-600 overflow-hidden text-xs font-bold" role="group" aria-label={t('language.toggleAria')}>
+            <button
+              onClick={() => i18n.changeLanguage('fr')}
+              aria-pressed={i18n.language === 'fr'}
+              className={`px-2 py-1 transition-colors ${i18n.language === 'fr' ? 'bg-accent-violet text-white' : 'text-ink-300 hover:text-ink-50 hover:bg-ink-750'}`}
+            >
+              FR
+            </button>
+            <button
+              onClick={() => i18n.changeLanguage('en')}
+              aria-pressed={i18n.language === 'en'}
+              className={`px-2 py-1 transition-colors ${i18n.language === 'en' ? 'bg-accent-violet text-white' : 'text-ink-300 hover:text-ink-50 hover:bg-ink-750'}`}
+            >
+              EN
+            </button>
+          </div>
           <button onClick={toggleTheme} className="icon-btn" aria-label={t('theme.toggleAria')}>
             {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>

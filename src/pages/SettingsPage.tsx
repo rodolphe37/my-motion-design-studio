@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { Moon, Sun, Trash2, AlertTriangle, Database, Languages } from 'lucide-react';
+import { Moon, Sun, Trash2, AlertTriangle, Database } from 'lucide-react';
 import { useTheme } from '@/lib/useTheme';
 import { getAllProjects, resetDatabase } from '@/lib/db';
 import type { Project } from '@/lib/types';
@@ -11,7 +11,6 @@ export default function SettingsPage() {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
   const { t, i18n } = useTranslation('settings');
-  const toggleLanguage = () => i18n.changeLanguage(i18n.language === 'fr' ? 'en' : 'fr');
   const projects = useLiveQuery(() => getAllProjects(), [], [] as Project[]);
   const [confirmReset, setConfirmReset] = useState(false);
   const [resetting, setResetting] = useState(false);
@@ -48,10 +47,22 @@ export default function SettingsPage() {
             <div className="text-sm font-medium">{t('general.language')}</div>
             <div className="text-xs text-ink-400">{t('general.languageDesc')}</div>
           </div>
-          <button onClick={toggleLanguage} className="btn-outline text-sm shrink-0">
-            <Languages className="w-4 h-4" />
-            {i18n.language === 'fr' ? 'Français' : 'English'}
-          </button>
+          <div className="flex items-center rounded-lg border border-ink-600 overflow-hidden text-sm font-medium shrink-0">
+            <button
+              onClick={() => i18n.changeLanguage('fr')}
+              aria-pressed={i18n.language === 'fr'}
+              className={`px-3 py-1.5 transition-colors ${i18n.language === 'fr' ? 'bg-accent-violet text-white' : 'text-ink-300 hover:text-ink-50'}`}
+            >
+              FR
+            </button>
+            <button
+              onClick={() => i18n.changeLanguage('en')}
+              aria-pressed={i18n.language === 'en'}
+              className={`px-3 py-1.5 transition-colors ${i18n.language === 'en' ? 'bg-accent-violet text-white' : 'text-ink-300 hover:text-ink-50'}`}
+            >
+              EN
+            </button>
+          </div>
         </div>
         <div className="flex items-center justify-between gap-4">
           <div>

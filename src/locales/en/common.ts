@@ -8,8 +8,6 @@ export default {
   },
   language: {
     toggleAria: 'Change language',
-    fr: 'Français',
-    en: 'English',
   },
   settingsLink: 'Settings',
   docsSearchPlaceholder: 'Search...',

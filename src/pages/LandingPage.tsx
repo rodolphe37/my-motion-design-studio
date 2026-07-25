@@ -20,7 +20,6 @@ import {
   Moon,
   Menu,
   X,
-  Languages,
 } from 'lucide-react';
 import { DemoPlayer } from '@/components/DemoPlayer';
 import { useTheme } from '@/lib/useTheme';
@@ -29,7 +28,6 @@ export default function LandingPage() {
   const { theme, toggleTheme } = useTheme();
   const { t, i18n } = useTranslation('landing');
   const { t: tCommon } = useTranslation('common');
-  const toggleLanguage = () => i18n.changeLanguage(i18n.language === 'fr' ? 'en' : 'fr');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const FEATURES = [
@@ -67,9 +65,22 @@ export default function LandingPage() {
           {/* Desktop nav */}
           <div className="hidden sm:flex items-center gap-2 shrink-0">
             <Link to="/docs" className="btn-ghost text-sm">{t('nav.docs')}</Link>
-            <button onClick={toggleLanguage} className="icon-btn text-xs font-bold" aria-label={tCommon('language.toggleAria')}>
-              {i18n.language === 'fr' ? 'EN' : 'FR'}
-            </button>
+            <div className="flex items-center rounded-lg border border-ink-600 overflow-hidden text-xs font-bold" role="group" aria-label={tCommon('language.toggleAria')}>
+              <button
+                onClick={() => i18n.changeLanguage('fr')}
+                aria-pressed={i18n.language === 'fr'}
+                className={`px-2 py-1 transition-colors ${i18n.language === 'fr' ? 'bg-accent-violet text-white' : 'text-ink-300 hover:text-ink-50 hover:bg-ink-750'}`}
+              >
+                FR
+              </button>
+              <button
+                onClick={() => i18n.changeLanguage('en')}
+                aria-pressed={i18n.language === 'en'}
+                className={`px-2 py-1 transition-colors ${i18n.language === 'en' ? 'bg-accent-violet text-white' : 'text-ink-300 hover:text-ink-50 hover:bg-ink-750'}`}
+              >
+                EN
+              </button>
+            </div>
             <button onClick={toggleTheme} className="icon-btn" aria-label={t('nav.themeToggleAria')}>
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
@@ -100,13 +111,22 @@ export default function LandingPage() {
             >
               {t('nav.docs')}
             </Link>
-            <button
-              onClick={() => { toggleLanguage(); setMobileMenuOpen(false); }}
-              className="btn-ghost text-sm w-full justify-start"
-            >
-              <Languages className="w-4 h-4" />
-              {i18n.language === 'fr' ? tCommon('language.en') : tCommon('language.fr')}
-            </button>
+            <div className="flex items-center rounded-lg border border-ink-700 overflow-hidden text-sm font-medium w-full" role="group" aria-label={tCommon('language.toggleAria')}>
+              <button
+                onClick={() => { i18n.changeLanguage('fr'); setMobileMenuOpen(false); }}
+                aria-pressed={i18n.language === 'fr'}
+                className={`flex-1 py-2 transition-colors ${i18n.language === 'fr' ? 'bg-accent-violet text-white' : 'text-ink-300'}`}
+              >
+                FR
+              </button>
+              <button
+                onClick={() => { i18n.changeLanguage('en'); setMobileMenuOpen(false); }}
+                aria-pressed={i18n.language === 'en'}
+                className={`flex-1 py-2 transition-colors ${i18n.language === 'en' ? 'bg-accent-violet text-white' : 'text-ink-300'}`}
+              >
+                EN
+              </button>
+            </div>
             <button
               onClick={() => { toggleTheme(); setMobileMenuOpen(false); }}
               className="btn-ghost text-sm w-full justify-start"
