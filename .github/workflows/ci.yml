@@ -17,10 +17,14 @@ concurrency:
 permissions:
   contents: read
 
+env:
+  NODE_VERSION_BUILD: '24'
+
 jobs:
   test:
     name: Test (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
@@ -29,10 +33,10 @@ jobs:
         node-version: ['22', '24']
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
       - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
@@ -53,18 +57,98 @@ jobs:
         run: npm run build
 
   deploy:
-    name: Deploy to Netlify
+    name: Deploy to Netlify (Production)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     # Attendre que toute la matrice CI soit verte avant le déploiement sur Netlify
     needs: test
 
-    # Ne déployer que sur un push ou une pull request vers main
-    if: |
-      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
-      (github.event_name == 'pull_request' && github.base_ref == 'main')
+    # Ne déployer que sur un push vers main
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    permissions:
+      contents: read
+      deployments: write
+
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.deploy-url }}
 
     steps:
-      - name: Trigger Netlify Build
-        run: |
-          curl -X POST "${{ secrets.NETLIFY_BUILD_HOOK }}"
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: ${{ env.NODE_VERSION_BUILD }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to Netlify
+        id: deploy
+        uses: nwtgck/actions-netlify@4cbaf4c08f1a7bfa537d6113472ef4424e4eb654 # v3.0.0
+        with:
+          publish-dir: './dist'
+          production-deploy: true
+          deploy-message: 'Deploy ${{ github.sha }}'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        timeout-minutes: 5
+
+  preview:
+    name: Deploy PR Preview to Netlify
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    # Attendre que les tests passent avant de publier une preview
+    needs: test
+
+    # Les PR venant d'un fork n'ont pas accès aux secrets du repo (protection
+    # GitHub) : le déploiement Netlify échouerait donc pour tout contributeur
+    # externe. On ne publie une preview que pour les PR internes au repo.
+    if: |
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+
+    permissions:
+      contents: read
+      pull-requests: write
+      deployments: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: ${{ env.NODE_VERSION_BUILD }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy preview to Netlify
+        uses: nwtgck/actions-netlify@4cbaf4c08f1a7bfa537d6113472ef4424e4eb654 # v3.0.0
+        with:
+          publish-dir: './dist'
+          production-deploy: false
+          deploy-message: 'Preview PR #${{ github.event.pull_request.number }} — ${{ github.event.pull_request.head.sha }}'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-deployment-environment: 'pr-${{ github.event.pull_request.number }}'
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        timeout-minutes: 5
