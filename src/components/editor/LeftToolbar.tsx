@@ -1,12 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import {
   MousePointer2, Square, Circle, Triangle, Star, Type, Image, Minus,
   Box, Disc, Cone, Cylinder, Plane, Lightbulb, Camera, Move, RotateCw,
-  Scale3d, Sparkles, Layers, Upload,
+  Scale3d, Sparkles, Upload,
 } from 'lucide-react';
 import { useEditorStore } from '@/lib/store';
 import { createShapeLayer, createTextLayer, createImageLayer, createMeshLayer, createLightLayer, createCamera3DLayer, createText3DLayer, createImportedMeshLayer } from '@/lib/factories';
-import type { ShapeKind, MeshKind, LightKind, ImportedMeshFormat } from '@/lib/types';
+import type { MeshKind, LightKind, ImportedMeshFormat } from '@/lib/types';
 
 function readImageFile(file: File): Promise<{ src: string; width: number; height: number }> {
   return new Promise((resolve, reject) => {
@@ -55,13 +55,6 @@ const MESHES: { kind: MeshKind; icon: typeof Box; label: string }[] = [
   { kind: 'cylinder', icon: Cylinder, label: 'Cylindre' },
   { kind: 'plane', icon: Plane, label: 'Plan' },
   { kind: 'torus', icon: Sparkles, label: 'Tore' },
-];
-
-const LIGHTS: { kind: LightKind; label: string }[] = [
-  { kind: 'directional', label: 'Directionnelle' },
-  { kind: 'point', label: 'Point' },
-  { kind: 'spot', label: 'Spot' },
-  { kind: 'ambient', label: 'Ambiante' },
 ];
 
 export function LeftToolbar2D() {
@@ -126,17 +119,14 @@ export function LeftToolbar2D() {
         onChange={handleFileChange}
       />
       {TOOLS_2D.map((t) => (
-        <div key={t.id} className="relative group">
-          <button
-            onClick={() => handleSelect(t.id)}
-            className={`icon-btn ${tool === t.id ? 'icon-btn-active' : ''}`}
-          >
-            <t.icon className="w-5 h-5" />
-          </button>
-          <div className="tooltip left-14 top-1/2 -translate-y-1/2">
-            {t.label} <span className="text-ink-400 ml-1">{t.shortcut}</span>
-          </div>
-        </div>
+        <button
+          key={t.id}
+          onClick={() => handleSelect(t.id)}
+          title={`${t.label} (${t.shortcut})`}
+          className={`icon-btn ${tool === t.id ? 'icon-btn-active' : ''}`}
+        >
+          <t.icon className="w-5 h-5" />
+        </button>
       ))}
     </div>
   );
@@ -189,41 +179,26 @@ export function LeftToolbar3D() {
   return (
     <div className="w-14 shrink-0 border-r border-ink-700 bg-ink-850 flex flex-col items-center py-2 gap-1 overflow-y-auto scrollbar-thin">
       {/* Transform tools */}
-      <div key="select" className="relative group">
-        <button onClick={() => setTool('select')} className={`icon-btn ${tool === 'select' ? 'icon-btn-active' : ''}`}>
-          <MousePointer2 className="w-5 h-5" />
-        </button>
-        <div className="tooltip left-14 top-1/2 -translate-y-1/2">Sélection</div>
-      </div>
-      <div key="move" className="relative group">
-        <button onClick={() => setTool('move')} className={`icon-btn ${tool === 'move' ? 'icon-btn-active' : ''}`}>
-          <Move className="w-5 h-5" />
-        </button>
-        <div className="tooltip left-14 top-1/2 -translate-y-1/2">Déplacer <span className="text-ink-400 ml-1">G</span></div>
-      </div>
-      <div key="rotate" className="relative group">
-        <button onClick={() => setTool('rotate')} className={`icon-btn ${tool === 'rotate' ? 'icon-btn-active' : ''}`}>
-          <RotateCw className="w-5 h-5" />
-        </button>
-        <div className="tooltip left-14 top-1/2 -translate-y-1/2">Tourner <span className="text-ink-400 ml-1">R</span></div>
-      </div>
-      <div key="scale" className="relative group">
-        <button onClick={() => setTool('scale')} className={`icon-btn ${tool === 'scale' ? 'icon-btn-active' : ''}`}>
-          <Scale3d className="w-5 h-5" />
-        </button>
-        <div className="tooltip left-14 top-1/2 -translate-y-1/2">Échelle <span className="text-ink-400 ml-1">S</span></div>
-      </div>
+      <button onClick={() => setTool('select')} title="Sélection" className={`icon-btn ${tool === 'select' ? 'icon-btn-active' : ''}`}>
+        <MousePointer2 className="w-5 h-5" />
+      </button>
+      <button onClick={() => setTool('move')} title="Déplacer (G)" className={`icon-btn ${tool === 'move' ? 'icon-btn-active' : ''}`}>
+        <Move className="w-5 h-5" />
+      </button>
+      <button onClick={() => setTool('rotate')} title="Tourner (R)" className={`icon-btn ${tool === 'rotate' ? 'icon-btn-active' : ''}`}>
+        <RotateCw className="w-5 h-5" />
+      </button>
+      <button onClick={() => setTool('scale')} title="Échelle (S)" className={`icon-btn ${tool === 'scale' ? 'icon-btn-active' : ''}`}>
+        <Scale3d className="w-5 h-5" />
+      </button>
 
       <div className="w-8 h-px bg-ink-700 my-1" />
 
       {/* Meshes */}
       {MESHES.map((m) => (
-        <div key={m.kind} className="relative group">
-          <button onClick={() => handleAddMesh(m.kind)} className="icon-btn">
-            <m.icon className="w-5 h-5" />
-          </button>
-          <div className="tooltip left-14 top-1/2 -translate-y-1/2">{m.label}</div>
-        </div>
+        <button key={m.kind} onClick={() => handleAddMesh(m.kind)} title={m.label} className="icon-btn">
+          <m.icon className="w-5 h-5" />
+        </button>
       ))}
 
       {/* Import model */}
@@ -234,40 +209,28 @@ export function LeftToolbar3D() {
         className="hidden"
         onChange={handleImportModel}
       />
-      <div className="relative group">
-        <button onClick={() => modelInputRef.current?.click()} className="icon-btn">
-          <Upload className="w-5 h-5" />
-        </button>
-        <div className="tooltip left-14 top-1/2 -translate-y-1/2">Importer un modèle (glTF/GLB/OBJ)</div>
-      </div>
+      <button onClick={() => modelInputRef.current?.click()} title="Importer un modèle (glTF/GLB/OBJ)" className="icon-btn">
+        <Upload className="w-5 h-5" />
+      </button>
 
       <div className="w-8 h-px bg-ink-700 my-1" />
 
       {/* Text 3D */}
-      <div className="relative group">
-        <button onClick={handleAddText3D} className="icon-btn">
-          <Type className="w-5 h-5" />
-        </button>
-        <div className="tooltip left-14 top-1/2 -translate-y-1/2">Texte 3D</div>
-      </div>
+      <button onClick={handleAddText3D} title="Texte 3D" className="icon-btn">
+        <Type className="w-5 h-5" />
+      </button>
 
       <div className="w-8 h-px bg-ink-700 my-1" />
 
       {/* Lights */}
-      <div className="relative group">
-        <button onClick={() => handleAddLight('directional')} className="icon-btn">
-          <Lightbulb className="w-5 h-5" />
-        </button>
-        <div className="tooltip left-14 top-1/2 -translate-y-1/2">Lumière</div>
-      </div>
+      <button onClick={() => handleAddLight('directional')} title="Lumière" className="icon-btn">
+        <Lightbulb className="w-5 h-5" />
+      </button>
 
       {/* Camera */}
-      <div className="relative group">
-        <button onClick={handleAddCamera} className="icon-btn">
-          <Camera className="w-5 h-5" />
-        </button>
-        <div className="tooltip left-14 top-1/2 -translate-y-1/2">Caméra</div>
-      </div>
+      <button onClick={handleAddCamera} title="Caméra" className="icon-btn">
+        <Camera className="w-5 h-5" />
+      </button>
     </div>
   );
 }

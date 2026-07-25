@@ -77,10 +77,7 @@ export default function EditorPage() {
         {/* Right panels */}
         <div className="w-72 shrink-0 border-l border-ink-700 bg-ink-850 flex flex-col overflow-hidden">
           <div className="flex border-b border-ink-700">
-            {(is3D
-              ? (['properties', 'layers', 'animation', 'transitions'] as const)
-              : (['properties', 'layers', 'animation', 'transitions', 'scene'] as const)
-            ).map((p) => (
+            {(['properties', 'layers', 'animation', 'transitions', 'scene'] as const).map((p) => (
               <button
                 key={p}
                 onClick={() => setRightPanel(p)}
@@ -97,7 +94,7 @@ export default function EditorPage() {
             {rightPanel === 'layers' && <LayersPanel />}
             {rightPanel === 'animation' && <AnimationPanel />}
             {rightPanel === 'transitions' && <TransitionsPanel />}
-            {rightPanel === 'scene' && !is3D && <ScenePanel />}
+            {rightPanel === 'scene' && <ScenePanel />}
           </div>
         </div>
       </div>

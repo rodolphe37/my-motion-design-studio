@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Link } from 'react-router-dom';
 import { Plus, Search, MoreVertical, FolderOpen, Copy, Trash2, Edit3, Download, Upload, Film, Box, Square, Clock, Monitor } from 'lucide-react';
@@ -128,8 +128,8 @@ export default function ProjectsPage() {
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filtered.map((p) => (
-              <div key={p.id} className="group panel overflow-hidden hover:border-ink-500 transition-all hover:-translate-y-1 hover:shadow-xl">
-                <Link to={`/editor/${p.id}`} className="block relative aspect-video bg-ink-950 overflow-hidden">
+              <div key={p.id} className="group panel hover:border-ink-500 transition-all hover:-translate-y-1 hover:shadow-xl">
+                <Link to={`/editor/${p.id}`} className="block relative aspect-video bg-ink-950 rounded-t-xl overflow-hidden">
                   {p.thumbnail ? (
                     <img src={p.thumbnail} alt={p.name} className="w-full h-full object-cover" />
                   ) : (

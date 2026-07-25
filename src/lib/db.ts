@@ -31,6 +31,10 @@ export async function deleteProject(id: string): Promise<void> {
   await db.projects.delete(id);
 }
 
+export async function resetDatabase(): Promise<void> {
+  await db.projects.clear();
+}
+
 export async function duplicateProject(id: string): Promise<Project | undefined> {
   const original = await db.projects.get(id);
   if (!original) return undefined;

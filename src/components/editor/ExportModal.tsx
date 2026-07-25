@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { X, Download, FileVideo, Check, Loader2, AlertTriangle, Film } from 'lucide-react';
+import { X, Download, FileVideo, Check, Loader2, AlertTriangle } from 'lucide-react';
 import { useEditorStore } from '@/lib/store';
 import { getExportResolution } from '@/lib/factories';
 import type { ExportDefaults } from '@/lib/types';

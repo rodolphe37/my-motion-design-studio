@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState, useMemo, Suspense, Component, type ReactNode } from 'react';
 import { Canvas, useLoader, useThree } from '@react-three/fiber';
-import { OrbitControls, Grid, Environment, PerspectiveCamera, Text3D, Center, TransformControls } from '@react-three/drei';
+import { OrbitControls, Grid, Environment, PerspectiveCamera, OrthographicCamera, Text3D, Center, TransformControls } from '@react-three/drei';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import * as THREE from 'three';
@@ -35,7 +35,6 @@ export function Canvas3D() {
   const currentTime = useEditorStore((s) => s.currentTime);
   const isPlaying = useEditorStore((s) => s.isPlaying);
   const setCurrentTime = useEditorStore((s) => s.setCurrentTime);
-  const setPlaying = useEditorStore((s) => s.setPlaying);
   const viewMode = useEditorStore((s) => s.viewMode);
   const isExporting = useEditorStore((s) => s.isExporting);
   const transformMode = useEditorStore((s) => s.transformMode);
@@ -65,7 +64,6 @@ export function Canvas3D() {
   if (!scene) return null;
 
   const time = currentTime;
-  const aspect = project.settings.width / project.settings.height;
   const bgColor = project.settings.backgroundColor;
 
   // Find camera layer — evaluated at the current time so its keyframes
@@ -100,14 +98,25 @@ export function Canvas3D() {
 
         {/* Camera */}
         {cameraLayer ? (
-          <PerspectiveCamera
-            makeDefault
-            position={[cameraLayer.position.x, cameraLayer.position.y, cameraLayer.position.z]}
-            rotation={[cameraLayer.rotation.x, cameraLayer.rotation.y, cameraLayer.rotation.z]}
-            fov={cameraLayer.fov}
-            near={cameraLayer.near}
-            far={cameraLayer.far}
-          />
+          cameraLayer.orthographic ? (
+            <OrthographicCamera
+              makeDefault
+              position={[cameraLayer.position.x, cameraLayer.position.y, cameraLayer.position.z]}
+              rotation={[cameraLayer.rotation.x, cameraLayer.rotation.y, cameraLayer.rotation.z]}
+              near={cameraLayer.near}
+              far={cameraLayer.far}
+              zoom={100}
+            />
+          ) : (
+            <PerspectiveCamera
+              makeDefault
+              position={[cameraLayer.position.x, cameraLayer.position.y, cameraLayer.position.z]}
+              rotation={[cameraLayer.rotation.x, cameraLayer.rotation.y, cameraLayer.rotation.z]}
+              fov={cameraLayer.fov}
+              near={cameraLayer.near}
+              far={cameraLayer.far}
+            />
+          )
         ) : (
           <PerspectiveCamera makeDefault position={[0, 2, 8]} fov={50} />
         )}

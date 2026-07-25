@@ -3,6 +3,7 @@ import { Header } from '@/components/Header';
 import LandingPage from '@/pages/LandingPage';
 import DocsPage from '@/pages/DocsPage';
 import ProjectsPage from '@/pages/ProjectsPage';
+import SettingsPage from '@/pages/SettingsPage';
 import EditorPage from '@/pages/EditorPage';
 
 export default function App() {
@@ -25,6 +26,15 @@ export default function App() {
             <div className="min-h-screen">
               <Header />
               <ProjectsPage />
+            </div>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <div className="min-h-screen">
+              <Header />
+              <SettingsPage />
             </div>
           }
         />

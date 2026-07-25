@@ -51,9 +51,13 @@ export function Header() {
           <button onClick={toggleTheme} className="icon-btn" aria-label="Toggle theme">
             {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent-pink to-accent-violet flex items-center justify-center text-xs font-bold text-white">
+          <Link
+            to="/settings"
+            title="Paramètres"
+            className="w-8 h-8 rounded-full bg-gradient-to-br from-accent-pink to-accent-violet flex items-center justify-center text-xs font-bold text-white hover:opacity-85 transition-opacity"
+          >
             MM
-          </div>
+          </Link>
         </div>
       </div>
     </header>

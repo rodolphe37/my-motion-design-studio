@@ -3,7 +3,6 @@ import type {
   ProjectMode,
   ProjectSettings,
   Scene,
-  Layer,
   ShapeLayer,
   TextLayer,
   ImageLayer,
@@ -243,15 +242,6 @@ export function createProject(
     thumbnail: null,
     settings,
     scenes: [createScene('Scène 1', settings.defaultSceneDuration, 0)],
-  };
-}
-
-export function defaultExportForPreset(preset: AspectRatioPreset): ExportDefaults {
-  return {
-    format: 'mp4',
-    resolutionPreset: '1080p',
-    quality: 'high',
-    fps: 30,
   };
 }
 

@@ -124,7 +124,6 @@ export function Canvas2D() {
   const isPlaying = useEditorStore((s) => s.isPlaying);
   const currentTime = useEditorStore((s) => s.currentTime);
   const setCurrentTime = useEditorStore((s) => s.setCurrentTime);
-  const setPlaying = useEditorStore((s) => s.setPlaying);
   const setCanvasViewport = useEditorStore((s) => s.setCanvasViewport);
 
   const stageScale = project
@@ -296,7 +295,7 @@ export function Canvas2D() {
                     key={layer.id}
                     x={lx + (s.width * scale) / 2}
                     y={ly + (s.height * scale) / 2}
-                    sides={s.sides}
+                    sides={Math.max(3, s.sides)}
                     radius={(s.width * scale) / 2}
                     rotation={s.rotation}
                     fill={s.fill}
@@ -318,7 +317,7 @@ export function Canvas2D() {
                     key={layer.id}
                     x={lx + (s.width * scale) / 2}
                     y={ly + (s.height * scale) / 2}
-                    numPoints={5}
+                    numPoints={Math.max(3, s.sides)}
                     innerRadius={(s.width * scale) / 4}
                     outerRadius={(s.width * scale) / 2}
                     rotation={s.rotation}

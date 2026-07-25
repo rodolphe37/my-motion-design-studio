@@ -183,6 +183,20 @@ function ColorField({ label, value, onChange }: { label: string; value: string; 
   );
 }
 
+function ToggleField({ label, description, value, onChange }: { label: string; description?: string; value: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <div className="flex items-center justify-between p-2 rounded-lg border border-ink-700">
+      <div>
+        <div className="text-sm font-medium">{label}</div>
+        {description && <div className="text-xs text-ink-400">{description}</div>}
+      </div>
+      <button onClick={() => onChange(!value)} className={`w-11 h-6 rounded-full transition-colors shrink-0 ${value ? 'bg-accent-violet' : 'bg-ink-600'}`}>
+        <div className={`w-5 h-5 rounded-full bg-white transition-transform ${value ? 'translate-x-5' : 'translate-x-0.5'}`} />
+      </button>
+    </div>
+  );
+}
+
 function Properties2D({ layer, updateLayer }: { layer: Layer; updateLayer: (id: string, patch: Partial<Layer>) => void }) {
   if (layer.type === 'shape') {
     return (
@@ -198,7 +212,16 @@ function Properties2D({ layer, updateLayer }: { layer: Layer; updateLayer: (id: 
         <ColorField label="Remplissage" value={layer.fill} onChange={(v) => updateLayer(layer.id, { fill: v } as Partial<Layer>)} />
         <ColorField label="Contour" value={layer.stroke} onChange={(v) => updateLayer(layer.id, { stroke: v } as Partial<Layer>)} />
         <NumberField label="Épaisseur contour" value={layer.strokeWidth} onChange={(v) => updateLayer(layer.id, { strokeWidth: v } as Partial<Layer>)} />
-        <NumberField label="Rayon coins" value={layer.cornerRadius} onChange={(v) => updateLayer(layer.id, { cornerRadius: v } as Partial<Layer>)} />
+        {layer.shape === 'rectangle' && (
+          <NumberField label="Rayon coins" value={layer.cornerRadius} onChange={(v) => updateLayer(layer.id, { cornerRadius: v } as Partial<Layer>)} />
+        )}
+        {(layer.shape === 'polygon' || layer.shape === 'star') && (
+          <NumberField
+            label={layer.shape === 'star' ? 'Branches' : 'Côtés'}
+            value={layer.sides}
+            onChange={(v) => updateLayer(layer.id, { sides: Math.max(3, Math.round(v)) } as Partial<Layer>)}
+          />
+        )}
       </>
     );
   }
@@ -230,6 +253,14 @@ function Properties2D({ layer, updateLayer }: { layer: Layer; updateLayer: (id: 
             <option value={400}>Normal</option>
             <option value={600}>Semi-bold</option>
             <option value={700}>Bold</option>
+          </select>
+        </div>
+        <div>
+          <label className="label">Alignement</label>
+          <select value={layer.align} onChange={(e) => updateLayer(layer.id, { align: e.target.value as never } as Partial<Layer>)} className="input text-sm">
+            <option value="left">Gauche</option>
+            <option value="center">Centre</option>
+            <option value="right">Droite</option>
           </select>
         </div>
       </>
@@ -285,6 +316,12 @@ function Properties3D({ layer, updateLayer }: { layer: Layer; updateLayer: (id: 
           </>
         )}
         <NumberField label="Opacité" value={layer.opacity} onChange={(v) => updateLayer(layer.id, { opacity: v } as Partial<Layer>)} step={0.1} />
+        <ToggleField
+          label="Ombre portée"
+          description="Cet objet projette une ombre"
+          value={layer.castShadow}
+          onChange={(v) => updateLayer(layer.id, { castShadow: v } as Partial<Layer>)}
+        />
       </>
     );
   }
@@ -298,6 +335,22 @@ function Properties3D({ layer, updateLayer }: { layer: Layer; updateLayer: (id: 
         </div>
         <ColorField label="Couleur" value={layer.color} onChange={(v) => updateLayer(layer.id, { color: v } as Partial<Layer>)} />
         <NumberField label="Intensité" value={layer.intensity} onChange={(v) => updateLayer(layer.id, { intensity: v } as Partial<Layer>)} step={0.1} />
+        {layer.light === 'point' && (
+          <NumberField
+            label="Distance (0 = illimitée)"
+            value={layer.distance}
+            onChange={(v) => updateLayer(layer.id, { distance: Math.max(0, v) } as Partial<Layer>)}
+            step={0.5}
+          />
+        )}
+        {layer.light === 'spot' && (
+          <NumberField
+            label="Angle (rad)"
+            value={layer.angle}
+            onChange={(v) => updateLayer(layer.id, { angle: v } as Partial<Layer>)}
+            step={0.05}
+          />
+        )}
       </>
     );
   }
@@ -309,11 +362,22 @@ function Properties3D({ layer, updateLayer }: { layer: Layer; updateLayer: (id: 
           <NumberField label="Pos Y" value={layer.position.y} onChange={(v) => updateLayer(layer.id, { position: { ...layer.position, y: v } } as Partial<Layer>)} step={0.1} />
           <NumberField label="Pos Z" value={layer.position.z} onChange={(v) => updateLayer(layer.id, { position: { ...layer.position, z: v } } as Partial<Layer>)} step={0.1} />
         </div>
-        <NumberField label="FOV" value={layer.fov} onChange={(v) => updateLayer(layer.id, { fov: v } as Partial<Layer>)} />
+        <div className="grid grid-cols-3 gap-2">
+          <NumberField label="Rot X" value={layer.rotation.x} onChange={(v) => updateLayer(layer.id, { rotation: { ...layer.rotation, x: v } } as Partial<Layer>)} step={0.1} />
+          <NumberField label="Rot Y" value={layer.rotation.y} onChange={(v) => updateLayer(layer.id, { rotation: { ...layer.rotation, y: v } } as Partial<Layer>)} step={0.1} />
+          <NumberField label="Rot Z" value={layer.rotation.z} onChange={(v) => updateLayer(layer.id, { rotation: { ...layer.rotation, z: v } } as Partial<Layer>)} step={0.1} />
+        </div>
+        {!layer.orthographic && <NumberField label="FOV" value={layer.fov} onChange={(v) => updateLayer(layer.id, { fov: v } as Partial<Layer>)} />}
         <div className="grid grid-cols-2 gap-2">
           <NumberField label="Near" value={layer.near} onChange={(v) => updateLayer(layer.id, { near: v } as Partial<Layer>)} step={0.1} />
           <NumberField label="Far" value={layer.far} onChange={(v) => updateLayer(layer.id, { far: v } as Partial<Layer>)} />
         </div>
+        <ToggleField
+          label="Orthographique"
+          description="Projection sans perspective (au lieu de perspective)"
+          value={layer.orthographic}
+          onChange={(v) => updateLayer(layer.id, { orthographic: v } as Partial<Layer>)}
+        />
       </>
     );
   }
@@ -453,7 +517,7 @@ function getAnimatableProps(layer: Layer): string[] {
   if (layer.type === 'text') return ['x', 'y', 'fontSize', 'rotation', 'opacity', 'fill'];
   if (layer.type === 'mesh') return ['position', 'rotation', 'scale', 'color', 'opacity'];
   if (layer.type === 'light') return ['position', 'intensity', 'color'];
-  if (layer.type === 'camera3d') return ['position', 'fov'];
+  if (layer.type === 'camera3d') return ['position', 'rotation', 'fov'];
   return [];
 }
 
@@ -526,10 +590,12 @@ export function ScenePanel() {
   const project = useEditorStore((s) => s.project);
   const currentSceneId = useEditorStore((s) => s.currentSceneId);
   const setSceneBackground = useEditorStore((s) => s.setSceneBackground);
+  const updateScene = useEditorStore((s) => s.updateScene);
 
   if (!project) return null;
   const scene = project.scenes.find((s) => s.id === currentSceneId);
   if (!scene) return null;
+  const is3D = project.mode === '3d';
 
   const bg = scene.background;
   const mode: 'default' | 'solid' | 'gradient' | 'spots' = bg?.type ?? 'default';
@@ -554,99 +620,110 @@ export function ScenePanel() {
 
   return (
     <div className="p-3 space-y-3">
-      <div>
-        <label className="label">Fond de la scène</label>
-        <div className="grid grid-cols-2 gap-2 mt-1">
-          {modes.map((opt) => (
-            <button
-              key={opt.value}
-              onClick={() => setMode(opt.value)}
-              className={`px-3 py-2 rounded-lg border-2 text-sm transition-all ${
-                mode === opt.value ? 'border-accent-violet bg-accent-violet/10 text-accent-violet' : 'border-ink-600 text-ink-300 hover:border-ink-500'
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-        {mode === 'default' && (
-          <p className="text-xs text-ink-400 mt-2">Utilise la couleur de fond définie à la création du projet.</p>
-        )}
-      </div>
+      <NumberField
+        label="Durée de la scène (s)"
+        value={scene.duration}
+        step={0.1}
+        onChange={(v) => updateScene(scene.id, { duration: Math.max(0.1, v) })}
+      />
 
-      {bg?.type === 'solid' && (
-        <ColorField label="Couleur" value={bg.color} onChange={(v) => setSceneBackground(scene.id, { ...bg, color: v })} />
-      )}
-
-      {bg?.type === 'gradient' && (
+      {!is3D && (
         <>
-          <ColorField label="Couleur de départ" value={bg.from} onChange={(v) => setSceneBackground(scene.id, { ...bg, from: v })} />
-          <ColorField label="Couleur d'arrivée" value={bg.to} onChange={(v) => setSceneBackground(scene.id, { ...bg, to: v })} />
-          <NumberField label="Angle (°)" value={bg.angle} onChange={(v) => setSceneBackground(scene.id, { ...bg, angle: v })} />
-        </>
-      )}
-
-      {bg?.type === 'spots' && (
-        <>
-          <ColorField label="Couleur de fond" value={bg.base} onChange={(v) => setSceneBackground(scene.id, { ...bg, base: v })} />
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="label !mb-0">Spots ({bg.spots.length})</label>
-              <button
-                onClick={() => setSceneBackground(scene.id, {
-                  ...bg,
-                  spots: [...bg.spots, { color: '#3b82f6', x: project.settings.width / 2, y: project.settings.height / 2, radius: Math.round(project.settings.width / 6), opacity: 0.5 }],
-                })}
-                className="icon-btn w-6 h-6"
-                title="Ajouter un spot"
-              >
-                +
-              </button>
+          <div>
+            <label className="label">Fond de la scène</label>
+            <div className="grid grid-cols-2 gap-2 mt-1">
+              {modes.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setMode(opt.value)}
+                  className={`px-3 py-2 rounded-lg border-2 text-sm transition-all ${
+                    mode === opt.value ? 'border-accent-violet bg-accent-violet/10 text-accent-violet' : 'border-ink-600 text-ink-300 hover:border-ink-500'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
             </div>
-            {bg.spots.map((spot, i) => (
-              <div key={i} className="p-2 rounded-lg border border-ink-700 space-y-2">
+            {mode === 'default' && (
+              <p className="text-xs text-ink-400 mt-2">Utilise la couleur de fond définie à la création du projet.</p>
+            )}
+          </div>
+
+          {bg?.type === 'solid' && (
+            <ColorField label="Couleur" value={bg.color} onChange={(v) => setSceneBackground(scene.id, { ...bg, color: v })} />
+          )}
+
+          {bg?.type === 'gradient' && (
+            <>
+              <ColorField label="Couleur de départ" value={bg.from} onChange={(v) => setSceneBackground(scene.id, { ...bg, from: v })} />
+              <ColorField label="Couleur d'arrivée" value={bg.to} onChange={(v) => setSceneBackground(scene.id, { ...bg, to: v })} />
+              <NumberField label="Angle (°)" value={bg.angle} onChange={(v) => setSceneBackground(scene.id, { ...bg, angle: v })} />
+            </>
+          )}
+
+          {bg?.type === 'spots' && (
+            <>
+              <ColorField label="Couleur de fond" value={bg.base} onChange={(v) => setSceneBackground(scene.id, { ...bg, base: v })} />
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-ink-400">Spot {i + 1}</span>
+                  <label className="label !mb-0">Spots ({bg.spots.length})</label>
                   <button
-                    onClick={() => setSceneBackground(scene.id, { ...bg, spots: bg.spots.filter((_, si) => si !== i) })}
-                    className="p-1 hover:bg-red-500/20 hover:text-red-400 rounded"
-                    title="Supprimer ce spot"
+                    onClick={() => setSceneBackground(scene.id, {
+                      ...bg,
+                      spots: [...bg.spots, { color: '#3b82f6', x: project.settings.width / 2, y: project.settings.height / 2, radius: Math.round(project.settings.width / 6), opacity: 0.5 }],
+                    })}
+                    className="icon-btn w-6 h-6"
+                    title="Ajouter un spot"
                   >
-                    <Trash2 className="w-3 h-3" />
+                    +
                   </button>
                 </div>
-                <ColorField
-                  label="Couleur"
-                  value={spot.color}
-                  onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, color: v } : s)) })}
-                />
-                <div className="grid grid-cols-2 gap-2">
-                  <NumberField
-                    label="X"
-                    value={spot.x}
-                    onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, x: v } : s)) })}
-                  />
-                  <NumberField
-                    label="Y"
-                    value={spot.y}
-                    onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, y: v } : s)) })}
-                  />
-                  <NumberField
-                    label="Rayon"
-                    value={spot.radius}
-                    onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, radius: v } : s)) })}
-                  />
-                  <NumberField
-                    label="Opacité"
-                    value={spot.opacity}
-                    step={0.1}
-                    onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, opacity: v } : s)) })}
-                  />
-                </div>
+                {bg.spots.map((spot, i) => (
+                  <div key={i} className="p-2 rounded-lg border border-ink-700 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-ink-400">Spot {i + 1}</span>
+                      <button
+                        onClick={() => setSceneBackground(scene.id, { ...bg, spots: bg.spots.filter((_, si) => si !== i) })}
+                        className="p-1 hover:bg-red-500/20 hover:text-red-400 rounded"
+                        title="Supprimer ce spot"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
+                    <ColorField
+                      label="Couleur"
+                      value={spot.color}
+                      onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, color: v } : s)) })}
+                    />
+                    <div className="grid grid-cols-2 gap-2">
+                      <NumberField
+                        label="X"
+                        value={spot.x}
+                        onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, x: v } : s)) })}
+                      />
+                      <NumberField
+                        label="Y"
+                        value={spot.y}
+                        onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, y: v } : s)) })}
+                      />
+                      <NumberField
+                        label="Rayon"
+                        value={spot.radius}
+                        onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, radius: v } : s)) })}
+                      />
+                      <NumberField
+                        label="Opacité"
+                        value={spot.opacity}
+                        step={0.1}
+                        onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, opacity: v } : s)) })}
+                      />
+                    </div>
+                  </div>
+                ))}
+                {bg.spots.length === 0 && <p className="text-xs text-ink-400 px-1">Aucun spot — cliquez + pour en ajouter un.</p>}
               </div>
-            ))}
-            {bg.spots.length === 0 && <p className="text-xs text-ink-400 px-1">Aucun spot — cliquez + pour en ajouter un.</p>}
-          </div>
+            </>
+          )}
         </>
       )}
     </div>

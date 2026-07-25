@@ -2,11 +2,12 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Play, Pause, Square, Undo2, Redo2, ZoomIn, ZoomOut, Maximize,
-  Eye, Download, Save, Plus, ChevronLeft, Check, Loader2, Monitor, X,
+  Eye, Download, Plus, ChevronLeft, Check, Loader2, X, Settings,
 } from 'lucide-react';
 import { useEditorStore } from '@/lib/store';
 import { useTheme } from '@/lib/useTheme';
 import { Moon, Sun } from 'lucide-react';
+import { ProjectSettingsModal } from './ProjectSettingsModal';
 
 interface Props {
   saveStatus: 'saved' | 'saving' | 'unsaved';
@@ -25,7 +26,6 @@ export function EditorToolbar({ saveStatus, savedAt, onExport }: Props) {
   const setPlaying = useEditorStore((s) => s.setPlaying);
   const setZoom = useEditorStore((s) => s.setZoom);
   const setCurrentTime = useEditorStore((s) => s.setCurrentTime);
-  const currentTime = useEditorStore((s) => s.currentTime);
   const undo = useEditorStore((s) => s.undo);
   const redo = useEditorStore((s) => s.redo);
   const past = useEditorStore((s) => s.past);
@@ -43,6 +43,7 @@ export function EditorToolbar({ saveStatus, savedAt, onExport }: Props) {
   const [renamingSceneId, setRenamingSceneId] = useState<string | null>(null);
   const [sceneNameValue, setSceneNameValue] = useState('');
   const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   // See the identical comment in RightPanels.tsx's LayersPanel: onDrop needs
   // the value onDragStart set even if no re-render has happened in between.
   const dragRef = useRef<number | null>(null);
@@ -52,11 +53,6 @@ export function EditorToolbar({ saveStatus, savedAt, onExport }: Props) {
   }, [project?.name]);
 
   if (!project) return null;
-
-  const currentScene = project.scenes.find((s) => s.id === currentSceneId);
-  const sceneDuration = currentScene?.duration || 1;
-  const totalScenes = project.scenes.length;
-  const currentSceneIndex = project.scenes.findIndex((s) => s.id === currentSceneId);
 
   return (
     <header className="h-14 border-b border-ink-700 bg-ink-850 flex items-center px-3 gap-2 shrink-0">
@@ -84,6 +80,9 @@ export function EditorToolbar({ saveStatus, savedAt, onExport }: Props) {
             </span>
           </button>
         )}
+        <button onClick={() => setSettingsOpen(true)} className="icon-btn" title="Réglages du projet">
+          <Settings className="w-4 h-4" />
+        </button>
       </div>
 
       {/* Center: scene tabs */}
@@ -208,6 +207,8 @@ export function EditorToolbar({ saveStatus, savedAt, onExport }: Props) {
           <span className="hidden xl:inline">Exporter</span>
         </button>
       </div>
+
+      <ProjectSettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </header>
   );
 }
