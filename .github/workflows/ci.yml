@@ -56,7 +56,7 @@ jobs:
     name: Deploy to Netlify
     runs-on: ubuntu-latest
 
-    # Attendre que toute la matrice CI soit verte
+    # Attendre que toute la matrice CI soit verte avant le déploiement sur Netlify
     needs: test
 
     # Ne déployer que sur un push vers main
