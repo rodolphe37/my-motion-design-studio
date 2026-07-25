@@ -11,6 +11,12 @@ dist
 dist-ssr
 *.local
 
+# npm only — package-lock.json is the single committed lockfile (see
+# CONTRIBUTING.md); ignore other package managers' lockfiles so running
+# `yarn`/`pnpm` locally can't accidentally reintroduce one.
+yarn.lock
+pnpm-lock.yaml
+
 .vscode/*
 !.vscode/extensions.json
 .idea

@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
@@ -15,8 +16,8 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'MyMotionDesignStudio',
-        short_name: 'MyMotionDesignStudio',
+        name: 'MyMotionStudio',
+        short_name: 'MyMotionStudio',
         description: 'Create 2D & 3D motion design videos in your browser',
         theme_color: '#0f0f12',
         background_color: '#0f0f12',
@@ -61,5 +62,18 @@ export default defineConfig({
       'three/examples/jsm/loaders/GLTFLoader.js',
       'three/examples/jsm/loaders/OBJLoader.js',
     ],
+  },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: ['./src/test/setup.ts'],
+    css: false,
+    // Konva/react-konva and the Three.js/WebGL renderer both need a real
+    // canvas/WebGL context that jsdom doesn't provide — component tests for
+    // Canvas2D/Canvas3D would need heavy mocking to be worth much. The test
+    // suite instead targets the framework-agnostic logic (store, animation,
+    // persistence, hooks), which is both where regressions are cheapest to
+    // catch and where they actually happened (see useAutoSave.test.ts).
+    exclude: ['node_modules/**', 'dist/**'],
   },
 });

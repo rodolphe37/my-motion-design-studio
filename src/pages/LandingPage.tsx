@@ -70,9 +70,9 @@ const STEPS = [
 ];
 
 const SHOWCASE = [
-  { title: 'MyMotionDesignStudio — Démo 2D', mode: '2D', thumb: '/demos/2d-thumb.jpg' },
-  { title: 'MyMotionDesignStudio — Démo 3D', mode: '3D', thumb: '/demos/3d-thumb.jpg' },
-  { title: 'MyMotionDesignStudio — Démo Import 3D', mode: '3D', thumb: '/demos/3d-objects-thumb.jpg' },
+  { title: 'MyMotionStudio — Démo 2D', mode: '2D', thumb: '/demos/2d-thumb.jpg' },
+  { title: 'MyMotionStudio — Démo 3D', mode: '3D', thumb: '/demos/3d-thumb.jpg' },
+  { title: 'MyMotionStudio — Démo Import 3D', mode: '3D', thumb: '/demos/3d-objects-thumb.jpg' },
 ];
 
 export default function LandingPage() {
@@ -84,8 +84,8 @@ export default function LandingPage() {
       <nav className="fixed top-0 left-0 right-0 z-40 backdrop-blur-xl bg-ink-900/70 border-b border-ink-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
-            <img src="/icon-96.png" alt="MyMotionDesignStudio" className="w-8 h-8 rounded-lg shadow-lg shadow-accent-violet/20 shrink-0" />
-            <span className="font-semibold truncate text-sm sm:text-base">MyMotionDesignStudio</span>
+            <img src="/icon-96.png" alt="MyMotionStudio" className="w-8 h-8 rounded-lg shadow-lg shadow-accent-violet/20 shrink-0" />
+            <span className="font-semibold truncate text-sm sm:text-base">MyMotionStudio</span>
           </div>
 
           {/* Desktop nav */}
@@ -174,7 +174,7 @@ export default function LandingPage() {
                 <div className="absolute inset-0 bg-gradient-to-br from-accent-violet via-accent-pink to-accent-blue rounded-full blur-2xl opacity-40" />
                 <img
                   src="/logo-sm.png"
-                  alt="MyMotionDesignStudio"
+                  alt="MyMotionStudio"
                   className="relative h-full w-auto drop-shadow-[0_0_30px_rgba(139,92,246,0.45)]"
                 />
               </div>
@@ -187,7 +187,7 @@ export default function LandingPage() {
               </h1>
             </div>
             <p className="text-lg text-ink-300 max-w-lg leading-relaxed">
-              MyMotionDesignStudio est un éditeur WYSIWYG complet, offline-first. Animez
+              MyMotionStudio est un éditeur WYSIWYG complet, offline-first. Animez
               en 2D ou 3D, prévisualisez en temps réel, exportez en vidéo — sans
               installer aucun logiciel.
             </p>
@@ -320,8 +320,8 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <img src="/icon-96.png" alt="MyMotionDesignStudio" className="w-7 h-7 rounded-lg" />
-              <span className="text-sm text-ink-300">MyMotionDesignStudio © 2026</span>
+              <img src="/icon-96.png" alt="MyMotionStudio" className="w-7 h-7 rounded-lg" />
+              <span className="text-sm text-ink-300">MyMotionStudio © 2026</span>
               <span className="text-xs text-ink-500 font-mono">v{__APP_VERSION__}</span>
             </div>
             <div className="flex items-center gap-4 text-sm text-ink-400">

@@ -21,10 +21,10 @@ export function Header() {
         <Link to="/" className="flex items-center gap-2 group shrink-0">
           <img
             src="/icon-96.png"
-            alt="MyMotionDesignStudio"
+            alt="MyMotionStudio"
             className="w-8 h-8 rounded-lg shadow-lg shadow-accent-violet/20 group-hover:shadow-accent-violet/40 transition-shadow"
           />
-          <span className="font-semibold text-ink-50 hidden sm:block">MyMotionDesignStudio</span>
+          <span className="font-semibold text-ink-50 hidden sm:block">MyMotionStudio</span>
         </Link>
 
         <nav className="flex items-center gap-1">

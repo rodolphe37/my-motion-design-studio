@@ -61,7 +61,7 @@ export function EditorToolbar({ saveStatus, savedAt, onExport }: Props) {
         <Link to="/projects" className="icon-btn" title="Retour aux projets">
           <ChevronLeft className="w-5 h-5" />
         </Link>
-        <img src="/icon-96.png" alt="MyMotionDesignStudio" className="w-8 h-8 rounded-lg shrink-0" />
+        <img src="/icon-96.png" alt="MyMotionStudio" className="w-8 h-8 rounded-lg shrink-0" />
         {editingName ? (
           <input
             type="text"

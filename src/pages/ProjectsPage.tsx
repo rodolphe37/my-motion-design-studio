@@ -72,7 +72,7 @@ export default function ProjectsPage() {
         </div>
         <h2 className="font-semibold text-lg mb-1">Disponible sur desktop uniquement</h2>
         <p className="text-sm text-ink-400 max-w-xs">
-          La gestion de projets est optimisée pour un grand écran. Ouvrez MyMotionDesignStudio sur un ordinateur pour créer et gérer vos projets.
+          La gestion de projets est optimisée pour un grand écran. Ouvrez MyMotionStudio sur un ordinateur pour créer et gérer vos projets.
         </p>
       </div>
       <div className="hidden md:block max-w-7xl mx-auto px-4 sm:px-6 py-8">

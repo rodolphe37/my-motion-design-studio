@@ -1,11 +1,12 @@
 <div align="center">
-  <img src="public/logo-sm.png" alt="MyMotionDesignStudio" width="140" />
+  <img src="public/logo-sm.png" alt="MyMotionStudio" width="140" />
 
-  <h1>MyMotionDesignStudio</h1>
+  <h1>MyMotionStudio</h1>
 
   <p><strong>A free, open-source, offline-first 2D &amp; 3D motion design editor that runs entirely in your browser.</strong></p>
 
   <p>
+    <a href="https://github.com/rodolphe37/my-motion-design-studio/actions/workflows/ci.yml"><img src="https://github.com/rodolphe37/my-motion-design-studio/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
     <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"></a>
     <a href="CODE_OF_CONDUCT.md"><img src="https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg" alt="Contributor Covenant"></a>
@@ -48,7 +49,7 @@
 
 ### Overview
 
-**MyMotionDesignStudio** is a WYSIWYG motion design editor for the web: create animated 2D scenes (shapes, text, images) or fully 3D scenes (primitives, imported glTF/OBJ models, PBR materials, lights, cameras), animate them with a keyframe/easing engine, chain multiple scenes with transitions, and export the result as a video (MP4/WebM/GIF/MOV) — all without installing anything or creating an account.
+**MyMotionStudio** is a WYSIWYG motion design editor for the web: create animated 2D scenes (shapes, text, images) or fully 3D scenes (primitives, imported glTF/OBJ models, PBR materials, lights, cameras), animate them with a keyframe/easing engine, chain multiple scenes with transitions, and export the result as a video (MP4/WebM/GIF/MOV) — all without installing anything or creating an account.
 
 It's built as an **offline-first Progressive Web App**: install it once, and it keeps working — editing and exporting video — with no network connection. All project data lives locally in the browser (IndexedDB); there is no backend, no server-side rendering, and no telemetry.
 
@@ -126,7 +127,7 @@ npm install
 npm run dev
 ```
 
-> The repo currently has both a `package-lock.json` and a `yarn.lock` committed. The workflow above (and this project's own history) uses **npm** — if you prefer Yarn, `yarn install` should also work, but isn't the primary tested path.
+> **npm only.** `package-lock.json` is the single source of truth for dependency versions — it's what CI installs from (`npm ci`) and what the commands throughout this README assume. `yarn.lock` isn't used or committed.
 
 ### Available scripts
 
@@ -137,6 +138,9 @@ npm run dev
 | `npm run preview` | Serve the production build locally, to sanity-check it before deploying |
 | `npm run lint` | Run ESLint over the codebase |
 | `npm run typecheck` | Run the TypeScript compiler in `--noEmit` mode |
+| `npm run test` | Run the test suite once ([Vitest](https://vitest.dev/)) |
+| `npm run test:watch` | Run the test suite in watch mode |
+| `npm run full-test` | Run `typecheck`, `lint`, and `test` in sequence, stopping at the first failure — the full pre-commit/pre-PR gate |
 
 ### Project structure
 
@@ -186,7 +190,19 @@ src/
 
 ### Testing
 
-There is currently **no automated test suite**. Correctness is verified via `npm run typecheck`, `npm run lint`, `npm run build`, and manual QA in the browser. Adding a test setup (e.g. [Vitest](https://vitest.dev/) + [React Testing Library](https://testing-library.com/), which fit the existing Vite toolchain) is a welcome contribution — see [CONTRIBUTING.md](CONTRIBUTING.md).
+The project uses [Vitest](https://vitest.dev/) (+ [Testing Library](https://testing-library.com/) and [fake-indexeddb](https://github.com/dumbmatter/fakeIndexedDB) for storage tests):
+
+```bash
+npm run test         # run once
+npm run test:watch   # watch mode
+npm run full-test    # typecheck + lint + test, in sequence — run this before opening a PR
+```
+
+Coverage today focuses on the framework-agnostic logic under `src/lib/` — the animation/easing engine, the Zustand store's mutations and undo/redo history, the IndexedDB persistence layer, and the autosave hook (including a regression test for a real race-condition bug that used to silently drop every save — see `useAutoSave.test.ts`).
+
+Every push and pull request against `main` runs the full `typecheck` → `lint` → `test` → `build` sequence via GitHub Actions (see [`.github/workflows/ci.yml`](.github/workflows/ci.yml), badge at the top of this README), on both the minimum supported Node 20 and Node 22.
+
+Component tests for `Canvas2D`/`Canvas3D` aren't included: both need a real canvas/WebGL context that jsdom doesn't provide, and would require heavy mocking to be worth much. Contributions that add meaningful coverage there are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ### Browser support
 
@@ -202,7 +218,7 @@ The app is a static site — `npm run build` outputs a self-contained `dist/` fo
 
 A few things that are honestly still missing or rough, in no particular order:
 
-- No automated tests and no CI pipeline yet.
+- Test coverage is limited to `src/lib/` (store, animation, persistence, autosave) — no component tests for `Canvas2D`/`Canvas3D` yet.
 - No internationalization — UI and docs are French only (see [Internationalization](CONTRIBUTING.md#internationalization)).
 - The 3D toolbar currently only adds **directional** lights; point/spot/ambient exist in the data model and are fully editable once present, but aren't reachable as a distinct "add" action yet.
 - Layer grouping is defined in the data model (`GroupLayer`) but has no creation UI yet — nothing produces a group today.
@@ -251,7 +267,7 @@ This project wouldn't exist without these open-source projects:
 
 ### Présentation
 
-**MyMotionDesignStudio** est un éditeur de motion design WYSIWYG qui fonctionne entièrement dans le navigateur : créez des scènes 2D animées (formes, texte, images) ou des scènes 3D complètes (primitives, modèles glTF/OBJ importés, matériaux PBR, lumières, caméras), animez-les avec un moteur de keyframes/easing, enchaînez plusieurs scènes avec des transitions, puis exportez le résultat en vidéo (MP4/WebM/GIF/MOV) — sans rien installer et sans créer de compte.
+**MyMotionStudio** est un éditeur de motion design WYSIWYG qui fonctionne entièrement dans le navigateur : créez des scènes 2D animées (formes, texte, images) ou des scènes 3D complètes (primitives, modèles glTF/OBJ importés, matériaux PBR, lumières, caméras), animez-les avec un moteur de keyframes/easing, enchaînez plusieurs scènes avec des transitions, puis exportez le résultat en vidéo (MP4/WebM/GIF/MOV) — sans rien installer et sans créer de compte.
 
 C'est une **Progressive Web App offline-first** : installez-la une fois, et elle continue de fonctionner — édition et export vidéo compris — sans connexion réseau. Toutes les données de projet vivent localement dans le navigateur (IndexedDB) ; il n'y a ni backend, ni rendu côté serveur, ni télémétrie.
 
@@ -316,7 +332,19 @@ L'app tourne alors sur `http://localhost:5173`. Voir la table des [scripts dispo
 
 ### Tests
 
-Il n'existe actuellement **aucune suite de tests automatisés**. La fiabilité est vérifiée via `npm run typecheck`, `npm run lint`, `npm run build`, et des tests manuels dans le navigateur. Mettre en place des tests (par exemple [Vitest](https://vitest.dev/) + [React Testing Library](https://testing-library.com/), qui s'intègrent bien à la stack Vite existante) est une contribution bienvenue — voir [CONTRIBUTING.md](CONTRIBUTING.md).
+Le projet utilise [Vitest](https://vitest.dev/) (+ Testing Library et fake-indexeddb pour les tests de persistance) :
+
+```bash
+npm run test         # une seule passe
+npm run test:watch   # mode watch
+npm run full-test    # typecheck + lint + test, dans l'ordre — à lancer avant d'ouvrir une PR
+```
+
+La couverture se concentre aujourd'hui sur la logique indépendante du rendu, dans `src/lib/` : moteur d'animation/easing, mutations du store Zustand et historique annuler/rétablir, couche de persistance IndexedDB, et le hook d'enregistrement automatique (avec un test de non-régression pour un vrai bug de *race condition* qui faisait échouer silencieusement chaque sauvegarde — voir `useAutoSave.test.ts`).
+
+Chaque push et pull request vers `main` déclenche l'enchaînement complet `typecheck` → `lint` → `test` → `build` via GitHub Actions (voir [`.github/workflows/ci.yml`](.github/workflows/ci.yml), badge en haut de ce README), sur Node 20 et Node 22 (les versions minimales supportées).
+
+Il n'y a pas de tests de composants pour `Canvas2D`/`Canvas3D` : les deux ont besoin d'un vrai contexte canvas/WebGL que jsdom ne fournit pas, et demanderaient un *mocking* lourd pour être vraiment utiles. Les contributions qui y ajoutent une couverture pertinente sont bienvenues — voir [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ### Navigateurs supportés
 
@@ -332,7 +360,7 @@ L'application est un site statique — `npm run build` génère un dossier `dist
 
 Quelques points honnêtement encore manquants ou perfectibles, sans ordre particulier :
 
-- Pas encore de tests automatisés ni de pipeline CI.
+- Couverture de tests limitée à `src/lib/` (store, animation, persistance, autosave) — pas encore de tests de composants pour `Canvas2D`/`Canvas3D`.
 - Pas d'internationalisation — l'interface et la documentation sont exclusivement en français (voir [Internationalization](CONTRIBUTING.md#internationalization)).
 - La barre d'outils 3D n'ajoute aujourd'hui que des lumières **directionnelles** ; les types point/spot/ambiante existent dans le modèle de données et sont pleinement éditables une fois présents, mais ne sont pas encore accessibles comme action d'ajout dédiée.
 - Le regroupement de calques existe dans le modèle de données (`GroupLayer`) mais n'a pas encore d'interface de création — rien ne produit de groupe aujourd'hui.

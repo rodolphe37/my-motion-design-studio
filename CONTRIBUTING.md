@@ -1,4 +1,4 @@
-# Contributing to MyMotionDesignStudio
+# Contributing to MyMotionStudio
 
 First off, thank you for considering contributing! This project is a
 single-maintainer, spare-time effort, so any help — bug reports, fixes,
@@ -39,8 +39,9 @@ You don't need to write code to help:
 - **Feature requests / ideas** — see [Suggesting features](#suggesting-features).
 - **Documentation** — the in-app docs (`src/pages/DocsPage.tsx`) and this
   README are both fair game for fixes and improvements.
-- **Code** — bug fixes, new features, performance improvements, tests
-  (there currently are none — see [Testing](#testing) in the README).
+- **Code** — bug fixes, new features, performance improvements, or tests
+  (see the README's [Testing](README.md#testing) section for current
+  coverage and gaps).
 - **Design/UX feedback** — this is a creative tool; usability issues are as
   valuable as functional bugs.
 
@@ -51,8 +52,9 @@ the project.
 
 ## Development setup
 
-Requirements: Node.js `20.19+` or `22.12+`, and npm (or yarn — both
-lockfiles are currently committed; see [note in the README](README.md)).
+Requirements: Node.js `20.19+` or `22.12+`, and npm. This project uses npm
+only — `package-lock.json` is the committed lockfile; please don't add a
+`yarn.lock` or `pnpm-lock.yaml` in a PR.
 
 ```bash
 git clone https://github.com/rodolphe37/my-motion-design-studio.git
@@ -65,16 +67,22 @@ The app runs at `http://localhost:5173`. Before opening a PR, make sure
 these all pass:
 
 ```bash
-npm run typecheck   # tsc --noEmit
-npm run lint         # eslint .
+npm run full-test   # typecheck + lint + test, in sequence, stops at the first failure
 npm run build        # production build (also catches type/PWA config issues)
 ```
 
-There is currently no automated test suite (see the README's
-[Testing](README.md#testing) section) — manual verification in the browser
-is the only check beyond the three commands above. Contributions that add
-a test setup (Vitest + React Testing Library would fit the existing Vite
-toolchain) are very welcome.
+`full-test` is a thin wrapper — `npm run typecheck && npm run lint && npm
+run test` — kept as a single command for convenience. If you touch it,
+keep the commands chained with `&&` (not `&`): `&` backgrounds each command
+and only checks the *last* one's exit code, so a failing test or lint error
+would silently not fail the script.
+
+See the README's [Testing](README.md#testing) section for what's covered
+today (`src/lib/` — store, animation, persistence, autosave) and what isn't
+(component tests for `Canvas2D`/`Canvas3D`, CI). If you're adding a
+non-trivial change to anything under `src/lib/`, a test alongside it is
+appreciated; for UI-only changes, manual verification in the browser is
+still the norm.
 
 ## Project structure
 
@@ -133,14 +141,17 @@ There's no strict format enforced, but commits in this repo tend to:
 1. Fork the repo and create a branch off `main` (`git checkout -b
    fix/short-description`).
 2. Make your change, following the conventions above.
-3. Run `npm run typecheck && npm run lint && npm run build` and fix
+3. Run `npm run full-test && npm run build` and fix
    anything that fails.
 4. Manually verify the change in the browser — screenshots or a short
    screen recording in the PR description are appreciated for anything
    visual.
 5. Open the PR against `main` with a clear description of *what* changed
    and *why*. Link any related issue.
-6. Be responsive to review feedback — this is a side project, so review
+6. CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs the same
+   `full-test` + `build` sequence automatically on Node 20 and 22 — fix any
+   red check before asking for review.
+7. Be responsive to review feedback — this is a side project, so review
    turnaround may take a few days.
 
 Small, focused PRs are much easier to review than large ones touching many

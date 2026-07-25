@@ -25,7 +25,7 @@ const CONTENT: Record<string, { title: string; body: { h?: string; p: string }[]
   start: {
     title: 'Prise en main',
     body: [
-      { p: "MyMotionDesignStudio est un éditeur de motion design 2D et 3D qui fonctionne entièrement dans votre navigateur. Aucune installation n'est nécessaire — l'application est une PWA (Progressive Web App) installable et fonctionne hors ligne une fois chargée une première fois." },
+      { p: "MyMotionStudio est un éditeur de motion design 2D et 3D qui fonctionne entièrement dans votre navigateur. Aucune installation n'est nécessaire — l'application est une PWA (Progressive Web App) installable et fonctionne hors ligne une fois chargée une première fois." },
       { h: 'Créer un projet', p: "Rendez-vous sur la page « Mes projets », cliquez sur « Nouveau projet », puis suivez les 4 étapes de configuration : nom, mode 2D ou 3D, format d'image, réglages de base. Le projet est créé et enregistré localement dès la dernière étape, et vous êtes redirigé directement dans l'éditeur." },
       { h: "L'éditeur", p: "L'éditeur est composé d'une barre d'outils en haut (scènes, lecture, export...), d'une barre d'outils à gauche (ajout d'éléments), d'un canvas central, de panneaux à droite (Propriétés, Calques, Anim, Trans.) et d'une timeline en bas." },
       { h: 'Installer l\'application', p: "Depuis un navigateur compatible (Chrome, Edge...), une icône d'installation apparaît dans la barre d'adresse. Une fois installée, l'app se lance comme une application native et reste utilisable sans connexion réseau." },
@@ -46,7 +46,7 @@ const CONTENT: Record<string, { title: string; body: { h?: string; p: string }[]
   modes: {
     title: 'Mode 2D vs Mode 3D',
     body: [
-      { p: "MyMotionDesignStudio propose deux modes distincts et un projet ne peut pas mélanger 2D et 3D." },
+      { p: "MyMotionStudio propose deux modes distincts et un projet ne peut pas mélanger 2D et 3D." },
       { h: 'Mode 2D', p: "Scène plane avec formes vectorielles (rectangle, ellipse, ligne, polygone, étoile), texte et images. Rendu via Konva.js sur un canvas HTML5. Léger et rapide, idéal pour les réseaux sociaux et le motion graphics classique." },
       { h: 'Mode 3D', p: "Scène volumétrique avec primitives géométriques, texte 3D extrudé, caméra et éclairage réglables. Rendu via Three.js / React Three Fiber (WebGL temps réel), avec ombres et matériaux PBR (metalness/roughness)." },
     ],
