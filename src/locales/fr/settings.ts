@@ -1,0 +1,30 @@
+export default {
+  title: 'Paramètres',
+  subtitle: "Préférences de l'application et gestion des données stockées sur cet appareil.",
+  general: {
+    heading: 'Général',
+    theme: 'Thème',
+    themeDesc: "Apparence claire ou sombre de l'interface",
+    themeDark: 'Sombre',
+    themeLight: 'Clair',
+    language: 'Langue',
+    languageDesc: "Langue de l'interface",
+    storage: 'Stockage',
+    storageDesc: 'Tous les projets sont enregistrés localement dans ce navigateur (IndexedDB), sans compte ni synchronisation',
+    projectCount_one: '{{count}} projet',
+    projectCount_other: '{{count}} projets',
+  },
+  danger: {
+    heading: 'Zone dangereuse',
+    resetTitle: "Réinitialiser l'application",
+    resetDesc: 'Supprime définitivement tous les projets stockés dans ce navigateur. Cette action est irréversible.',
+    resetButton: 'Réinitialiser',
+  },
+  resetConfirm: {
+    title: "Réinitialiser l'application ?",
+    desc: 'Tous vos projets ({{count}}) seront définitivement supprimés de ce navigateur. Cette action est irréversible.',
+    cancel: 'Annuler',
+    resetting: 'Réinitialisation...',
+    confirm: 'Réinitialiser',
+  },
+};

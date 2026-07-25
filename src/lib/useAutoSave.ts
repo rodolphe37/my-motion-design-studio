@@ -1,8 +1,10 @@
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useEditorStore } from './store';
 import { saveProject } from './db';
 
 export function useAutoSave() {
+  const { i18n } = useTranslation();
   const project = useEditorStore((s) => s.project);
   const saveStatus = useEditorStore((s) => s.saveStatus);
   const setSaveStatus = useEditorStore((s) => s.setSaveStatus);
@@ -24,7 +26,7 @@ export function useAutoSave() {
         await saveProject(project);
         setSaveStatus('saved');
       } catch (err) {
-        console.error('Échec de l\'enregistrement automatique :', err);
+        console.error('Autosave failed:', err);
         setSaveStatus('unsaved');
       }
     }, 2000);
@@ -33,8 +35,9 @@ export function useAutoSave() {
     };
   }, [project, setSaveStatus]);
 
+  const dateLocale = i18n.language === 'en' ? 'en-US' : 'fr-FR';
   const formatTime = (date: Date) =>
-    date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    date.toLocaleTimeString(dateLocale, { hour: '2-digit', minute: '2-digit' });
 
   return {
     saveStatus,

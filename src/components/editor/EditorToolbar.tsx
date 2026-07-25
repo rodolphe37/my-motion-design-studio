@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Play, Pause, Square, Undo2, Redo2, ZoomIn, ZoomOut, Maximize,
   Eye, Download, Plus, ChevronLeft, Check, Loader2, X, Settings,
@@ -17,6 +18,7 @@ interface Props {
 }
 
 export function EditorToolbar({ saveStatus, savedAt, onExport }: Props) {
+  const { t } = useTranslation('editor');
   const project = useEditorStore((s) => s.project);
   const currentSceneId = useEditorStore((s) => s.currentSceneId);
   const isPlaying = useEditorStore((s) => s.isPlaying);
@@ -58,7 +60,7 @@ export function EditorToolbar({ saveStatus, savedAt, onExport }: Props) {
     <header className="h-14 border-b border-ink-700 bg-ink-850 flex items-center px-3 gap-2 shrink-0">
       {/* Left: logo + project name */}
       <div className="flex items-center gap-2 shrink-0">
-        <Link to="/projects" className="icon-btn" title="Retour aux projets">
+        <Link to="/projects" className="icon-btn" title={t('toolbar.backToProjects')}>
           <ChevronLeft className="w-5 h-5" />
         </Link>
         <img src="/icon-96.png" alt="MyMotionStudio" className="w-8 h-8 rounded-lg shrink-0" />
@@ -80,7 +82,7 @@ export function EditorToolbar({ saveStatus, savedAt, onExport }: Props) {
             </span>
           </button>
         )}
-        <button onClick={() => setSettingsOpen(true)} className="icon-btn" title="Réglages du projet">
+        <button onClick={() => setSettingsOpen(true)} className="icon-btn" title={t('toolbar.projectSettings')}>
           <Settings className="w-4 h-4" />
         </button>
       </div>
@@ -124,7 +126,7 @@ export function EditorToolbar({ saveStatus, savedAt, onExport }: Props) {
                 onClick={() => selectScene(scene.id)}
                 onDoubleClick={() => { setRenamingSceneId(scene.id); setSceneNameValue(scene.name); }}
                 className="px-3 py-1.5 cursor-grab active:cursor-grabbing"
-                title="Cliquer pour ouvrir, double-cliquer pour renommer, glisser pour réordonner"
+                title={t('toolbar.sceneTabTitle')}
               >
                 <span className="opacity-50">{i + 1}.</span> {scene.name}
               </button>
@@ -133,14 +135,14 @@ export function EditorToolbar({ saveStatus, savedAt, onExport }: Props) {
               <button
                 onClick={(e) => { e.stopPropagation(); deleteScene(scene.id); }}
                 className="opacity-0 group-hover:opacity-100 p-0.5 mr-1.5 rounded hover:bg-red-500/20 hover:text-red-400 transition-opacity"
-                title="Supprimer la scène"
+                title={t('toolbar.deleteScene')}
               >
                 <X className="w-3 h-3" />
               </button>
             )}
           </div>
         ))}
-        <button onClick={addScene} className="icon-btn w-7 h-7 shrink-0" title="Ajouter une scène">
+        <button onClick={addScene} className="icon-btn w-7 h-7 shrink-0" title={t('toolbar.addScene')}>
           <Plus className="w-4 h-4" />
         </button>
       </div>
@@ -150,39 +152,39 @@ export function EditorToolbar({ saveStatus, savedAt, onExport }: Props) {
         {/* Save status */}
         <div className="hidden lg:flex items-center gap-1.5 px-2 text-xs text-ink-400">
           {saveStatus === 'saving' ? (
-            <><Loader2 className="w-3 h-3 animate-spin" /> Enregistrement...</>
+            <><Loader2 className="w-3 h-3 animate-spin" /> {t('toolbar.saving')}</>
           ) : saveStatus === 'unsaved' ? (
-            <><span className="w-2 h-2 rounded-full bg-amber-400" /> Non enregistré</>
+            <><span className="w-2 h-2 rounded-full bg-amber-400" /> {t('toolbar.unsaved')}</>
           ) : (
-            <><Check className="w-3 h-3 text-emerald-400" /> Enregistré {savedAt && `à ${savedAt}`}</>
+            <><Check className="w-3 h-3 text-emerald-400" /> {t('toolbar.saved')} {savedAt && t('toolbar.savedAt', { time: savedAt })}</>
           )}
         </div>
 
         {/* Playback */}
-        <button onClick={() => setPlaying(!isPlaying)} className="icon-btn" title={isPlaying ? 'Pause' : 'Play'}>
+        <button onClick={() => setPlaying(!isPlaying)} className="icon-btn" title={isPlaying ? t('toolbar.pause') : t('toolbar.play')}>
           {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
         </button>
-        <button onClick={() => { setPlaying(false); setCurrentTime(0); }} className="icon-btn" title="Stop">
+        <button onClick={() => { setPlaying(false); setCurrentTime(0); }} className="icon-btn" title={t('toolbar.stop')}>
           <Square className="w-4 h-4" />
         </button>
 
         {/* Undo/Redo */}
-        <button onClick={undo} disabled={past.length === 0} className="icon-btn disabled:opacity-30" title="Annuler (Ctrl+Z)">
+        <button onClick={undo} disabled={past.length === 0} className="icon-btn disabled:opacity-30" title={t('toolbar.undo')}>
           <Undo2 className="w-4 h-4" />
         </button>
-        <button onClick={redo} disabled={future.length === 0} className="icon-btn disabled:opacity-30" title="Refaire (Ctrl+Y)">
+        <button onClick={redo} disabled={future.length === 0} className="icon-btn disabled:opacity-30" title={t('toolbar.redo')}>
           <Redo2 className="w-4 h-4" />
         </button>
 
         {/* Zoom */}
-        <button onClick={() => setZoom(zoom - 0.1)} className="icon-btn" title="Zoom arrière">
+        <button onClick={() => setZoom(zoom - 0.1)} className="icon-btn" title={t('toolbar.zoomOut')}>
           <ZoomOut className="w-4 h-4" />
         </button>
         <span className="text-xs font-mono text-ink-300 w-10 text-center">{Math.round(zoom * 100)}%</span>
-        <button onClick={() => setZoom(zoom + 0.1)} className="icon-btn" title="Zoom avant">
+        <button onClick={() => setZoom(zoom + 0.1)} className="icon-btn" title={t('toolbar.zoomIn')}>
           <ZoomIn className="w-4 h-4" />
         </button>
-        <button onClick={() => setZoom(1)} className="icon-btn" title="Ajuster">
+        <button onClick={() => setZoom(1)} className="icon-btn" title={t('toolbar.zoomFit')}>
           <Maximize className="w-4 h-4" />
         </button>
 
@@ -190,21 +192,21 @@ export function EditorToolbar({ saveStatus, savedAt, onExport }: Props) {
         <button
           onClick={() => setViewMode(viewMode === 'editor' ? 'preview' : 'editor')}
           className="btn-outline text-xs px-3 py-1.5"
-          title="Visualisateur"
+          title={t('toolbar.preview')}
         >
           <Eye className="w-4 h-4" />
-          <span className="hidden xl:inline">Preview</span>
+          <span className="hidden xl:inline">{t('toolbar.previewShort')}</span>
         </button>
 
         {/* Theme toggle */}
-        <button onClick={toggleTheme} className="icon-btn" title="Thème">
+        <button onClick={toggleTheme} className="icon-btn" title={t('toolbar.theme')}>
           {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
         </button>
 
         {/* Export */}
         <button onClick={onExport} className="btn-primary text-xs px-3 py-1.5">
           <Download className="w-4 h-4" />
-          <span className="hidden xl:inline">Exporter</span>
+          <span className="hidden xl:inline">{t('toolbar.export')}</span>
         </button>
       </div>
 

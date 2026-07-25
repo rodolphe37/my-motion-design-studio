@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X, Download, FileVideo, Check, Loader2, AlertTriangle } from 'lucide-react';
 import { useEditorStore } from '@/lib/store';
 import { getExportResolution } from '@/lib/factories';
@@ -11,28 +12,8 @@ interface Props {
   onClose: () => void;
 }
 
-const FORMATS: { value: ExportDefaults['format']; label: string; desc: string }[] = [
-  { value: 'mp4', label: 'MP4 (H.264)', desc: 'Compatibilité maximale, recommandé par défaut' },
-  { value: 'webm', label: 'WebM (VP9)', desc: 'Fichier plus léger, idéal usage web' },
-  { value: 'gif', label: 'GIF animé', desc: 'Extraits courts/loop, sans son' },
-  { value: 'mov', label: 'MOV', desc: 'Usage montage pro (via ffmpeg.wasm)' },
-];
-
-const RESOLUTIONS: { value: ExportDefaults['resolutionPreset']; label: string }[] = [
-  { value: '480p', label: '480p' },
-  { value: '720p', label: '720p HD' },
-  { value: '1080p', label: '1080p Full HD' },
-  { value: '1440p', label: '1440p 2K' },
-  { value: '2160p', label: '2160p 4K' },
-];
-
-const QUALITIES: { value: ExportDefaults['quality']; label: string; bitrate: number }[] = [
-  { value: 'standard', label: 'Standard', bitrate: 4_000_000 },
-  { value: 'high', label: 'Haute', bitrate: 8_000_000 },
-  { value: 'max', label: 'Maximale', bitrate: 16_000_000 },
-];
-
 export function ExportModal({ open, onClose }: Props) {
+  const { t } = useTranslation('editor');
   const project = useEditorStore((s) => s.project);
   const updateProjectSettings = useEditorStore((s) => s.updateProjectSettings);
   const setThumbnail = useEditorStore((s) => s.setThumbnail);
@@ -48,6 +29,27 @@ export function ExportModal({ open, onClose }: Props) {
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const cancelRef = useRef(false);
+
+  const FORMATS: { value: ExportDefaults['format']; label: string; desc: string }[] = [
+    { value: 'mp4', label: t('exportModal.formats.mp4.label'), desc: t('exportModal.formats.mp4.desc') },
+    { value: 'webm', label: t('exportModal.formats.webm.label'), desc: t('exportModal.formats.webm.desc') },
+    { value: 'gif', label: t('exportModal.formats.gif.label'), desc: t('exportModal.formats.gif.desc') },
+    { value: 'mov', label: t('exportModal.formats.mov.label'), desc: t('exportModal.formats.mov.desc') },
+  ];
+
+  const RESOLUTIONS: { value: ExportDefaults['resolutionPreset']; label: string }[] = [
+    { value: '480p', label: t('exportModal.resolutions.480p') },
+    { value: '720p', label: t('exportModal.resolutions.720p') },
+    { value: '1080p', label: t('exportModal.resolutions.1080p') },
+    { value: '1440p', label: t('exportModal.resolutions.1440p') },
+    { value: '2160p', label: t('exportModal.resolutions.2160p') },
+  ];
+
+  const QUALITIES: { value: ExportDefaults['quality']; label: string; bitrate: number }[] = [
+    { value: 'standard', label: t('exportModal.quality.standard'), bitrate: 4_000_000 },
+    { value: 'high', label: t('exportModal.quality.high'), bitrate: 8_000_000 },
+    { value: 'max', label: t('exportModal.quality.max'), bitrate: 16_000_000 },
+  ];
 
   if (!open || !project) return null;
 
@@ -71,7 +73,7 @@ export function ExportModal({ open, onClose }: Props) {
 
     try {
       const canvases = document.querySelectorAll('canvas');
-      if (canvases.length === 0) throw new Error('Canvas introuvable');
+      if (canvases.length === 0) throw new Error(t('exportModal.canvasNotFound'));
 
       // Precompute each scene's start offset in the timeline
       const sceneOffsets: { sceneId: string; start: number; duration: number }[] = [];
@@ -193,7 +195,7 @@ export function ExportModal({ open, onClose }: Props) {
       recorder.stop();
     } catch (err) {
       useEditorStore.setState({ ...restoreState, isExporting: false });
-      setError(err instanceof Error ? err.message : 'Erreur lors de l\'export');
+      setError(err instanceof Error ? err.message : t('exportModal.genericError'));
       setExporting(false);
     }
   };
@@ -217,7 +219,7 @@ export function ExportModal({ open, onClose }: Props) {
         <div className="flex items-center justify-between p-5 border-b border-ink-700">
           <h2 className="text-lg font-semibold flex items-center gap-2">
             <FileVideo className="w-5 h-5 text-accent-violet" />
-            Exporter en vidéo
+            {t('exportModal.title')}
           </h2>
           <button onClick={handleClose} className="icon-btn"><X className="w-5 h-5" /></button>
         </div>
@@ -227,22 +229,22 @@ export function ExportModal({ open, onClose }: Props) {
             <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-4">
               <Check className="w-8 h-8 text-emerald-400" />
             </div>
-            <h3 className="font-semibold text-lg mb-1">Export terminé !</h3>
-            <p className="text-sm text-ink-300 mb-4">Votre vidéo a été téléchargée.</p>
-            <button onClick={handleClose} className="btn-primary">Fermer</button>
+            <h3 className="font-semibold text-lg mb-1">{t('exportModal.doneTitle')}</h3>
+            <p className="text-sm text-ink-300 mb-4">{t('exportModal.doneDesc')}</p>
+            <button onClick={handleClose} className="btn-primary">{t('exportModal.close')}</button>
           </div>
         ) : exporting ? (
           <div className="p-6">
             <div className="text-center mb-4">
               <Loader2 className="w-10 h-10 text-accent-violet animate-spin mx-auto mb-3" />
-              <h3 className="font-semibold mb-1">Rendu en cours...</h3>
+              <h3 className="font-semibold mb-1">{t('exportModal.renderingTitle')}</h3>
               <p className="text-sm text-ink-300">{Math.round(progress)}%</p>
             </div>
             <div className="w-full h-2 bg-ink-700 rounded-full overflow-hidden mb-4">
               <div className="h-full bg-gradient-to-r from-accent-violet to-accent-blue transition-all" style={{ width: `${progress}%` }} />
             </div>
             <button onClick={() => { cancelRef.current = true; }} className="btn-outline w-full">
-              Annuler
+              {t('exportModal.cancel')}
             </button>
           </div>
         ) : step === 0 ? (
@@ -250,7 +252,7 @@ export function ExportModal({ open, onClose }: Props) {
             <div className="p-5 space-y-4">
               {/* Format */}
               <div>
-                <label className="label mb-2 block">Format de fichier</label>
+                <label className="label mb-2 block">{t('exportModal.fileFormat')}</label>
                 <div className="grid grid-cols-2 gap-2">
                   {FORMATS.map((f) => (
                     <button
@@ -267,7 +269,7 @@ export function ExportModal({ open, onClose }: Props) {
 
               {/* Resolution */}
               <div>
-                <label className="label mb-2 block">Définition</label>
+                <label className="label mb-2 block">{t('exportModal.resolution')}</label>
                 <div className="flex flex-wrap gap-2">
                   {RESOLUTIONS.map((r) => (
                     <button
@@ -281,15 +283,15 @@ export function ExportModal({ open, onClose }: Props) {
                 </div>
                 {resolution === 'custom' && (
                   <div className="flex gap-2 mt-2">
-                    <input type="number" value={customW} onChange={(e) => setCustomW(parseInt(e.target.value) || 0)} className="input text-sm" placeholder="Largeur" />
-                    <input type="number" value={customH} onChange={(e) => setCustomH(parseInt(e.target.value) || 0)} className="input text-sm" placeholder="Hauteur" />
+                    <input type="number" value={customW} onChange={(e) => setCustomW(parseInt(e.target.value) || 0)} className="input text-sm" placeholder={t('exportModal.widthPlaceholder')} />
+                    <input type="number" value={customH} onChange={(e) => setCustomH(parseInt(e.target.value) || 0)} className="input text-sm" placeholder={t('exportModal.heightPlaceholder')} />
                   </div>
                 )}
               </div>
 
               {/* FPS */}
               <div>
-                <label className="label mb-2 block">FPS</label>
+                <label className="label mb-2 block">{t('exportModal.fps')}</label>
                 <div className="flex gap-2">
                   {([24, 30, 60] as const).map((f) => (
                     <button key={f} onClick={() => setFps(f)} className={`flex-1 py-2 rounded-lg border-2 text-sm transition-all ${fps === f ? 'border-accent-violet bg-accent-violet/10 text-accent-violet' : 'border-ink-600 text-ink-300'}`}>
@@ -301,7 +303,7 @@ export function ExportModal({ open, onClose }: Props) {
 
               {/* Quality */}
               <div>
-                <label className="label mb-2 block">Qualité</label>
+                <label className="label mb-2 block">{t('exportModal.qualityLabel')}</label>
                 <div className="flex gap-2">
                   {QUALITIES.map((q) => (
                     <button key={q.value} onClick={() => setQuality(q.value)} className={`flex-1 py-2 rounded-lg border-2 text-sm transition-all ${quality === q.value ? 'border-accent-violet bg-accent-violet/10 text-accent-violet' : 'border-ink-600 text-ink-300'}`}>
@@ -313,21 +315,21 @@ export function ExportModal({ open, onClose }: Props) {
 
               {/* Info */}
               <div className="p-3 bg-ink-900 rounded-lg border border-ink-600 space-y-1 text-sm">
-                <div className="flex justify-between"><span className="text-ink-400">Résolution</span><span className="font-mono">{res.width}×{res.height}</span></div>
-                <div className="flex justify-between"><span className="text-ink-400">Durée</span><span className="font-mono">{totalDuration.toFixed(1)}s</span></div>
-                <div className="flex justify-between"><span className="text-ink-400">Taille estimée</span><span className="font-mono">~{formatBytes(estimatedSize)}</span></div>
+                <div className="flex justify-between"><span className="text-ink-400">{t('exportModal.infoResolution')}</span><span className="font-mono">{res.width}×{res.height}</span></div>
+                <div className="flex justify-between"><span className="text-ink-400">{t('exportModal.infoDuration')}</span><span className="font-mono">{totalDuration.toFixed(1)}s</span></div>
+                <div className="flex justify-between"><span className="text-ink-400">{t('exportModal.infoEstimatedSize')}</span><span className="font-mono">~{formatBytes(estimatedSize)}</span></div>
               </div>
 
               {isHeavy && (
                 <div className="flex items-start gap-2 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg text-sm text-amber-300">
                   <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-                  <span>Rendu potentiellement long : résolution élevée ou scène 3D complexe. Prévoyez suffisamment de temps et de mémoire.</span>
+                  <span>{t('exportModal.heavyWarning')}</span>
                 </div>
               )}
             </div>
             <div className="flex justify-end p-5 border-t border-ink-700">
               <button onClick={handleExport} className="btn-primary">
-                <Download className="w-4 h-4" /> Exporter
+                <Download className="w-4 h-4" /> {t('exportModal.exportButton')}
               </button>
             </div>
           </>

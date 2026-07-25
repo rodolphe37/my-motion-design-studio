@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   MousePointer2, Square, Circle, Triangle, Star, Type, Image, Minus,
   Box, Disc, Cone, Cylinder, Plane, Lightbulb, Camera, Move, RotateCw,
@@ -37,30 +38,22 @@ function readModelFile(file: File): Promise<{ src: string; format: ImportedMeshF
 type Tool2D = 'select' | 'rectangle' | 'ellipse' | 'line' | 'polygon' | 'star' | 'text' | 'image';
 type Tool3D = 'select' | 'move' | 'rotate' | 'scale';
 
-const TOOLS_2D: { id: Tool2D; icon: typeof Square; label: string; shortcut: string }[] = [
-  { id: 'select', icon: MousePointer2, label: 'Sélection', shortcut: 'V' },
-  { id: 'rectangle', icon: Square, label: 'Rectangle', shortcut: 'R' },
-  { id: 'ellipse', icon: Circle, label: 'Ellipse', shortcut: 'O' },
-  { id: 'line', icon: Minus, label: 'Ligne', shortcut: 'L' },
-  { id: 'polygon', icon: Triangle, label: 'Polygone', shortcut: 'P' },
-  { id: 'star', icon: Star, label: 'Étoile', shortcut: 'S' },
-  { id: 'text', icon: Type, label: 'Texte', shortcut: 'T' },
-  { id: 'image', icon: Image, label: 'Image', shortcut: 'I' },
-];
-
-const MESHES: { kind: MeshKind; icon: typeof Box; label: string }[] = [
-  { kind: 'box', icon: Box, label: 'Cube' },
-  { kind: 'sphere', icon: Disc, label: 'Sphère' },
-  { kind: 'cone', icon: Cone, label: 'Cône' },
-  { kind: 'cylinder', icon: Cylinder, label: 'Cylindre' },
-  { kind: 'plane', icon: Plane, label: 'Plan' },
-  { kind: 'torus', icon: Sparkles, label: 'Tore' },
-];
-
 export function LeftToolbar2D() {
+  const { t } = useTranslation('editor');
   const [tool, setTool] = useState<Tool2D>('select');
   const addLayer = useEditorStore((s) => s.addLayer);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const TOOLS_2D: { id: Tool2D; icon: typeof Square; label: string; shortcut: string }[] = [
+    { id: 'select', icon: MousePointer2, label: t('leftToolbar.tools2d.select'), shortcut: 'V' },
+    { id: 'rectangle', icon: Square, label: t('leftToolbar.tools2d.rectangle'), shortcut: 'R' },
+    { id: 'ellipse', icon: Circle, label: t('leftToolbar.tools2d.ellipse'), shortcut: 'O' },
+    { id: 'line', icon: Minus, label: t('leftToolbar.tools2d.line'), shortcut: 'L' },
+    { id: 'polygon', icon: Triangle, label: t('leftToolbar.tools2d.polygon'), shortcut: 'P' },
+    { id: 'star', icon: Star, label: t('leftToolbar.tools2d.star'), shortcut: 'S' },
+    { id: 'text', icon: Type, label: t('leftToolbar.tools2d.text'), shortcut: 'T' },
+    { id: 'image', icon: Image, label: t('leftToolbar.tools2d.image'), shortcut: 'I' },
+  ];
 
   const handleSelect = (id: Tool2D) => {
     if (id === 'image') {
@@ -72,24 +65,24 @@ export function LeftToolbar2D() {
     else if (id === 'ellipse') {
       const l = createShapeLayer();
       l.shape = 'ellipse';
-      l.name = 'Ellipse';
+      l.name = t('leftToolbar.tools2d.ellipse');
       addLayer(l);
     } else if (id === 'line') {
       const l = createShapeLayer();
       l.shape = 'line';
-      l.name = 'Ligne';
+      l.name = t('leftToolbar.tools2d.line');
       l.height = 2;
       addLayer(l);
     } else if (id === 'polygon') {
       const l = createShapeLayer();
       l.shape = 'polygon';
-      l.name = 'Polygone';
+      l.name = t('leftToolbar.tools2d.polygon');
       l.sides = 6;
       addLayer(l);
     } else if (id === 'star') {
       const l = createShapeLayer();
       l.shape = 'star';
-      l.name = 'Étoile';
+      l.name = t('leftToolbar.tools2d.star');
       addLayer(l);
     } else if (id === 'text') addLayer(createTextLayer());
   };
@@ -118,14 +111,14 @@ export function LeftToolbar2D() {
         className="hidden"
         onChange={handleFileChange}
       />
-      {TOOLS_2D.map((t) => (
+      {TOOLS_2D.map((tool2d) => (
         <button
-          key={t.id}
-          onClick={() => handleSelect(t.id)}
-          title={`${t.label} (${t.shortcut})`}
-          className={`icon-btn ${tool === t.id ? 'icon-btn-active' : ''}`}
+          key={tool2d.id}
+          onClick={() => handleSelect(tool2d.id)}
+          title={`${tool2d.label} (${tool2d.shortcut})`}
+          className={`icon-btn ${tool === tool2d.id ? 'icon-btn-active' : ''}`}
         >
-          <t.icon className="w-5 h-5" />
+          <tool2d.icon className="w-5 h-5" />
         </button>
       ))}
     </div>
@@ -140,12 +133,22 @@ const TRANSFORM_MODE_BY_TOOL: Record<Tool3D, 'translate' | 'rotate' | 'scale' | 
 };
 
 export function LeftToolbar3D() {
+  const { t } = useTranslation('editor');
   const transformMode = useEditorStore((s) => s.transformMode);
   const setTransformMode = useEditorStore((s) => s.setTransformMode);
   const tool: Tool3D = transformMode === 'translate' ? 'move' : transformMode === 'rotate' ? 'rotate' : transformMode === 'scale' ? 'scale' : 'select';
-  const setTool = (t: Tool3D) => setTransformMode(TRANSFORM_MODE_BY_TOOL[t]);
+  const setTool = (tool: Tool3D) => setTransformMode(TRANSFORM_MODE_BY_TOOL[tool]);
   const addLayer = useEditorStore((s) => s.addLayer);
   const modelInputRef = useRef<HTMLInputElement>(null);
+
+  const MESHES: { kind: MeshKind; icon: typeof Box; label: string }[] = [
+    { kind: 'box', icon: Box, label: t('leftToolbar.meshes.box') },
+    { kind: 'sphere', icon: Disc, label: t('leftToolbar.meshes.sphere') },
+    { kind: 'cone', icon: Cone, label: t('leftToolbar.meshes.cone') },
+    { kind: 'cylinder', icon: Cylinder, label: t('leftToolbar.meshes.cylinder') },
+    { kind: 'plane', icon: Plane, label: t('leftToolbar.meshes.plane') },
+    { kind: 'torus', icon: Sparkles, label: t('leftToolbar.meshes.torus') },
+  ];
 
   const handleAddMesh = (kind: MeshKind) => {
     addLayer(createMeshLayer(kind));
@@ -170,7 +173,7 @@ export function LeftToolbar3D() {
     try {
       const { src, format } = await readModelFile(file);
       const name = file.name.replace(/\.(gltf|glb|obj)$/i, '');
-      addLayer(createImportedMeshLayer(name || 'Modèle importé', src, format));
+      addLayer(createImportedMeshLayer(name || t('defaultNames.importedModel'), src, format));
     } catch {
       // ignore invalid/unreadable file
     }
@@ -179,16 +182,16 @@ export function LeftToolbar3D() {
   return (
     <div className="w-14 shrink-0 border-r border-ink-700 bg-ink-850 flex flex-col items-center py-2 gap-1 overflow-y-auto scrollbar-thin">
       {/* Transform tools */}
-      <button onClick={() => setTool('select')} title="Sélection" className={`icon-btn ${tool === 'select' ? 'icon-btn-active' : ''}`}>
+      <button onClick={() => setTool('select')} title={t('leftToolbar.select')} className={`icon-btn ${tool === 'select' ? 'icon-btn-active' : ''}`}>
         <MousePointer2 className="w-5 h-5" />
       </button>
-      <button onClick={() => setTool('move')} title="Déplacer (G)" className={`icon-btn ${tool === 'move' ? 'icon-btn-active' : ''}`}>
+      <button onClick={() => setTool('move')} title={t('leftToolbar.move')} className={`icon-btn ${tool === 'move' ? 'icon-btn-active' : ''}`}>
         <Move className="w-5 h-5" />
       </button>
-      <button onClick={() => setTool('rotate')} title="Tourner (R)" className={`icon-btn ${tool === 'rotate' ? 'icon-btn-active' : ''}`}>
+      <button onClick={() => setTool('rotate')} title={t('leftToolbar.rotate')} className={`icon-btn ${tool === 'rotate' ? 'icon-btn-active' : ''}`}>
         <RotateCw className="w-5 h-5" />
       </button>
-      <button onClick={() => setTool('scale')} title="Échelle (S)" className={`icon-btn ${tool === 'scale' ? 'icon-btn-active' : ''}`}>
+      <button onClick={() => setTool('scale')} title={t('leftToolbar.scale')} className={`icon-btn ${tool === 'scale' ? 'icon-btn-active' : ''}`}>
         <Scale3d className="w-5 h-5" />
       </button>
 
@@ -209,26 +212,26 @@ export function LeftToolbar3D() {
         className="hidden"
         onChange={handleImportModel}
       />
-      <button onClick={() => modelInputRef.current?.click()} title="Importer un modèle (glTF/GLB/OBJ)" className="icon-btn">
+      <button onClick={() => modelInputRef.current?.click()} title={t('leftToolbar.importModel')} className="icon-btn">
         <Upload className="w-5 h-5" />
       </button>
 
       <div className="w-8 h-px bg-ink-700 my-1" />
 
       {/* Text 3D */}
-      <button onClick={handleAddText3D} title="Texte 3D" className="icon-btn">
+      <button onClick={handleAddText3D} title={t('leftToolbar.text3d')} className="icon-btn">
         <Type className="w-5 h-5" />
       </button>
 
       <div className="w-8 h-px bg-ink-700 my-1" />
 
       {/* Lights */}
-      <button onClick={() => handleAddLight('directional')} title="Lumière" className="icon-btn">
+      <button onClick={() => handleAddLight('directional')} title={t('leftToolbar.light')} className="icon-btn">
         <Lightbulb className="w-5 h-5" />
       </button>
 
       {/* Camera */}
-      <button onClick={handleAddCamera} title="Caméra" className="icon-btn">
+      <button onClick={handleAddCamera} title={t('leftToolbar.camera')} className="icon-btn">
         <Camera className="w-5 h-5" />
       </button>
     </div>

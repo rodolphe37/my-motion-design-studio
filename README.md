@@ -26,7 +26,7 @@
 
 ## 🇬🇧 English
 
-> **Note:** the application's UI and in-app documentation are **French only** at the moment (see [Internationalization](CONTRIBUTING.md#internationalization)). This README is bilingual — the sections below are in English; jump to the [French version](#-français) further down.
+> **Note:** the application's UI and in-app documentation are available in **French and English**, with automatic detection from your browser's language and a manual switcher (see [Internationalization](CONTRIBUTING.md#internationalization)). This README is bilingual — the sections below are in English; jump to the [French version](#-français) further down.
 
 ### Table of contents
 
@@ -110,6 +110,7 @@ The three source projects behind these are available as `public/demos/*.json` an
 | Styling | [Tailwind CSS](https://tailwindcss.com/) |
 | Icons | [lucide-react](https://lucide.dev/) |
 | Video export | [MediaRecorder API](https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder) |
+| Internationalization | [react-i18next](https://react.i18next.com/) / [i18next-browser-languagedetector](https://github.com/i18next/i18next-browser-languageDetector) |
 
 ### Getting started
 
@@ -219,7 +220,6 @@ The app is a static site — `npm run build` outputs a self-contained `dist/` fo
 A few things that are honestly still missing or rough, in no particular order:
 
 - Test coverage is limited to `src/lib/` (store, animation, persistence, autosave) — no component tests for `Canvas2D`/`Canvas3D` yet.
-- No internationalization — UI and docs are French only (see [Internationalization](CONTRIBUTING.md#internationalization)).
 - The 3D toolbar currently only adds **directional** lights; point/spot/ambient exist in the data model and are fully editable once present, but aren't reachable as a distinct "add" action yet.
 - Layer grouping is defined in the data model (`GroupLayer`) but has no creation UI yet — nothing produces a group today.
 - No cloud sync or multi-user collaboration — see [Data & privacy](#data--privacy).
@@ -248,7 +248,7 @@ This project wouldn't exist without these open-source projects:
 
 ## 🇫🇷 Français
 
-> **Remarque :** l'interface de l'application et sa documentation intégrée sont **exclusivement en français** pour l'instant. Ce README, lui, est bilingue — cette section reprend en français l'essentiel de la section anglaise ci-dessus ; pour les commandes shell et l'arborescence du projet (identiques quelle que soit la langue), on renvoie directement aux blocs déjà donnés plus haut plutôt que de les dupliquer.
+> **Remarque :** l'interface de l'application et sa documentation intégrée sont disponibles en **français et en anglais**, avec détection automatique de la langue du navigateur et un sélecteur manuel (voir [Internationalization](CONTRIBUTING.md#internationalization)). Ce README, lui, est bilingue — cette section reprend en français l'essentiel de la section anglaise ci-dessus ; pour les commandes shell et l'arborescence du projet (identiques quelle que soit la langue), on renvoie directement aux blocs déjà donnés plus haut plutôt que de les dupliquer.
 
 ### Table des matières
 
@@ -361,7 +361,6 @@ L'application est un site statique — `npm run build` génère un dossier `dist
 Quelques points honnêtement encore manquants ou perfectibles, sans ordre particulier :
 
 - Couverture de tests limitée à `src/lib/` (store, animation, persistance, autosave) — pas encore de tests de composants pour `Canvas2D`/`Canvas3D`.
-- Pas d'internationalisation — l'interface et la documentation sont exclusivement en français (voir [Internationalization](CONTRIBUTING.md#internationalization)).
 - La barre d'outils 3D n'ajoute aujourd'hui que des lumières **directionnelles** ; les types point/spot/ambiante existent dans le modèle de données et sont pleinement éditables une fois présents, mais ne sont pas encore accessibles comme action d'ajout dédiée.
 - Le regroupement de calques existe dans le modèle de données (`GroupLayer`) mais n'a pas encore d'interface de création — rien ne produit de groupe aujourd'hui.
 - Pas de synchronisation cloud ni de collaboration multi-utilisateur — voir [Données & confidentialité](#données--confidentialité).

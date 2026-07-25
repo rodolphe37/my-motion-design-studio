@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Plus, Search, MoreVertical, FolderOpen, Copy, Trash2, Edit3, Download, Upload, Film, Box, Square, Clock, Monitor } from 'lucide-react';
 import { db, getAllProjects, deleteProject, duplicateProject } from '@/lib/db';
 import type { Project } from '@/lib/types';
@@ -8,6 +9,7 @@ import { NewProjectModal } from '@/components/NewProjectModal';
 import { downloadJSON, formatDuration } from '@/lib/download';
 
 export default function ProjectsPage() {
+  const { t, i18n } = useTranslation('projects');
   const projects = useLiveQuery(() => getAllProjects(), [], [] as Project[]);
   const [modalOpen, setModalOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -28,7 +30,7 @@ export default function ProjectsPage() {
   const handleRename = async (id: string) => {
     const p = await db.projects.get(id);
     if (p) {
-      p.name = renameValue || 'Projet sans titre';
+      p.name = renameValue || t('untitledProject');
       p.updatedAt = Date.now();
       await db.projects.put(p);
     }
@@ -51,7 +53,7 @@ export default function ProjectsPage() {
         data.updatedAt = Date.now();
         await db.projects.put(data);
       } catch {
-        alert('Fichier de projet invalide');
+        alert(t('invalidProjectFile'));
       }
     };
     reader.readAsText(file);
@@ -59,6 +61,7 @@ export default function ProjectsPage() {
   };
 
   const totalDuration = (p: Project) => p.scenes.reduce((sum, s) => sum + s.duration, 0);
+  const dateLocale = i18n.language === 'en' ? 'en-US' : 'fr-FR';
 
   return (
     <>
@@ -70,59 +73,59 @@ export default function ProjectsPage() {
         <div className="w-16 h-16 rounded-2xl bg-ink-800 flex items-center justify-center mb-4">
           <Monitor className="w-8 h-8 text-accent-violet" />
         </div>
-        <h2 className="font-semibold text-lg mb-1">Disponible sur desktop uniquement</h2>
+        <h2 className="font-semibold text-lg mb-1">{t('mobileGate.title')}</h2>
         <p className="text-sm text-ink-400 max-w-xs">
-          La gestion de projets est optimisée pour un grand écran. Ouvrez MyMotionStudio sur un ordinateur pour créer et gérer vos projets.
+          {t('mobileGate.desc')}
         </p>
       </div>
       <div className="hidden md:block max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-bold">Mes projets</h1>
-            <p className="text-sm text-ink-300 mt-1">{filtered.length} projet{filtered.length !== 1 ? 's' : ''}</p>
+            <h1 className="text-2xl font-bold">{t('header.title')}</h1>
+            <p className="text-sm text-ink-300 mt-1">{t('header.count', { count: filtered.length })}</p>
           </div>
           <div className="flex items-center gap-2">
             <label className="btn-outline cursor-pointer">
               <Upload className="w-4 h-4" />
-              <span className="hidden sm:inline">Importer</span>
+              <span className="hidden sm:inline">{t('import')}</span>
               <input type="file" accept=".json" onChange={handleImport} className="hidden" />
             </label>
             <button onClick={() => setModalOpen(true)} className="btn-primary">
               <Plus className="w-4 h-4" />
-              Nouveau projet
+              {t('newProject')}
             </button>
           </div>
         </div>
-  
+
         {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
             <input
               type="text"
-              placeholder="Rechercher un projet..."
+              placeholder={t('searchPlaceholder')}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="input pl-9"
             />
           </div>
           <select value={sortBy} onChange={(e) => setSortBy(e.target.value as typeof sortBy)} className="input sm:w-48">
-            <option value="date">Trier par date</option>
-            <option value="name">Trier par nom</option>
-            <option value="mode">Trier par mode</option>
+            <option value="date">{t('sort.date')}</option>
+            <option value="name">{t('sort.name')}</option>
+            <option value="mode">{t('sort.mode')}</option>
           </select>
         </div>
-  
+
         {/* Grid */}
         {filtered.length === 0 ? (
           <div className="text-center py-20">
             <div className="w-16 h-16 rounded-2xl bg-ink-800 flex items-center justify-center mx-auto mb-4">
               <Film className="w-8 h-8 text-ink-400" />
             </div>
-            <h3 className="font-semibold text-lg mb-1">Aucun projet</h3>
-            <p className="text-sm text-ink-400 mb-4">Créez votre premier projet de motion design.</p>
+            <h3 className="font-semibold text-lg mb-1">{t('emptyState.title')}</h3>
+            <p className="text-sm text-ink-400 mb-4">{t('emptyState.desc')}</p>
             <button onClick={() => setModalOpen(true)} className="btn-primary">
-              <Plus className="w-4 h-4" /> Nouveau projet
+              <Plus className="w-4 h-4" /> {t('newProject')}
             </button>
           </div>
         ) : (
@@ -173,19 +176,19 @@ export default function ProjectsPage() {
                             <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(null)} />
                             <div className="absolute right-0 top-8 z-20 w-44 panel py-1 shadow-xl animate-scale-in">
                               <Link to={`/editor/${p.id}`} className="flex items-center gap-2 px-3 py-1.5 text-sm hover:bg-ink-700">
-                                <FolderOpen className="w-4 h-4" /> Ouvrir
+                                <FolderOpen className="w-4 h-4" /> {t('card.open')}
                               </Link>
                               <button onClick={() => { setRenameId(p.id); setRenameValue(p.name); setMenuOpen(null); }} className="w-full flex items-center gap-2 px-3 py-1.5 text-sm hover:bg-ink-700 text-left">
-                                <Edit3 className="w-4 h-4" /> Renommer
+                                <Edit3 className="w-4 h-4" /> {t('card.rename')}
                               </button>
                               <button onClick={async () => { await duplicateProject(p.id); setMenuOpen(null); }} className="w-full flex items-center gap-2 px-3 py-1.5 text-sm hover:bg-ink-700 text-left">
-                                <Copy className="w-4 h-4" /> Dupliquer
+                                <Copy className="w-4 h-4" /> {t('card.duplicate')}
                               </button>
                               <button onClick={() => { handleExport(p); setMenuOpen(null); }} className="w-full flex items-center gap-2 px-3 py-1.5 text-sm hover:bg-ink-700 text-left">
-                                <Download className="w-4 h-4" /> Exporter JSON
+                                <Download className="w-4 h-4" /> {t('card.exportJson')}
                               </button>
                               <button onClick={() => { setConfirmDelete(p.id); setMenuOpen(null); }} className="w-full flex items-center gap-2 px-3 py-1.5 text-sm hover:bg-red-500/10 text-red-400 text-left">
-                                <Trash2 className="w-4 h-4" /> Supprimer
+                                <Trash2 className="w-4 h-4" /> {t('card.deleteAction')}
                               </button>
                             </div>
                           </>
@@ -196,27 +199,27 @@ export default function ProjectsPage() {
                   <div className="flex items-center gap-3 mt-2 text-xs text-ink-400">
                     <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {formatDuration(totalDuration(p))}</span>
                     <span>•</span>
-                    <span>{new Date(p.updatedAt).toLocaleDateString('fr-FR')}</span>
+                    <span>{new Date(p.updatedAt).toLocaleDateString(dateLocale)}</span>
                   </div>
                 </div>
               </div>
             ))}
           </div>
         )}
-  
+
         <NewProjectModal open={modalOpen} onClose={() => setModalOpen(false)} />
-  
+
         {/* Delete confirmation */}
         {confirmDelete && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
             <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setConfirmDelete(null)} />
             <div className="relative panel p-6 max-w-sm w-full animate-scale-in">
-              <h3 className="font-semibold text-lg mb-2">Supprimer ce projet ?</h3>
-              <p className="text-sm text-ink-300 mb-4">Cette action est irréversible. Le projet et toutes ses scènes seront définitivement supprimés.</p>
+              <h3 className="font-semibold text-lg mb-2">{t('deleteConfirm.title')}</h3>
+              <p className="text-sm text-ink-300 mb-4">{t('deleteConfirm.desc')}</p>
               <div className="flex gap-2 justify-end">
-                <button onClick={() => setConfirmDelete(null)} className="btn-ghost">Annuler</button>
+                <button onClick={() => setConfirmDelete(null)} className="btn-ghost">{t('deleteConfirm.cancel')}</button>
                 <button onClick={async () => { await deleteProject(confirmDelete); setConfirmDelete(null); }} className="btn bg-red-500 hover:bg-red-600 text-white">
-                  <Trash2 className="w-4 h-4" /> Supprimer
+                  <Trash2 className="w-4 h-4" /> {t('deleteConfirm.confirm')}
                 </button>
               </div>
             </div>

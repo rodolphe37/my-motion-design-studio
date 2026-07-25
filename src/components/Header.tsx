@@ -1,18 +1,21 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Moon, Sun, BookOpen, FolderOpen } from 'lucide-react';
 import { useTheme } from '@/lib/useTheme';
 
 export function Header() {
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
+  const { t, i18n } = useTranslation('common');
+  const toggleLanguage = () => i18n.changeLanguage(i18n.language === 'fr' ? 'en' : 'fr');
 
   // No direct link to the editor: a project must be created (or opened) via
   // the "Nouveau projet" modal on /projects, which is what actually creates
   // a valid project id — /editor/new isn't a real project and just bounces
   // back to /projects.
   const navItems = [
-    { to: '/docs', label: 'Documentation', icon: BookOpen },
-    { to: '/projects', label: 'Mes projets', icon: FolderOpen },
+    { to: '/docs', label: t('nav.docs'), icon: BookOpen },
+    { to: '/projects', label: t('nav.projects'), icon: FolderOpen },
   ];
 
   return (
@@ -48,12 +51,15 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2 shrink-0">
-          <button onClick={toggleTheme} className="icon-btn" aria-label="Toggle theme">
+          <button onClick={toggleLanguage} className="icon-btn text-xs font-bold" aria-label={t('language.toggleAria')}>
+            {i18n.language === 'fr' ? 'EN' : 'FR'}
+          </button>
+          <button onClick={toggleTheme} className="icon-btn" aria-label={t('theme.toggleAria')}>
             {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
           <Link
             to="/settings"
-            title="Paramètres"
+            title={t('settingsLink')}
             className="w-8 h-8 rounded-full bg-gradient-to-br from-accent-pink to-accent-violet flex items-center justify-center text-xs font-bold text-white hover:opacity-85 transition-opacity"
           >
             MM

@@ -62,7 +62,11 @@ export default defineConfig({
           },
         ],
         categories: ["education", "productivity"],
-        lang: "fr-FR",
+        // Build-time only, can't follow the runtime language switch — kept in
+        // sync with index.html's static <html lang="en"> instead of the app's
+        // actual fallback language (fr), which only the JS-side i18n setup
+        // (src/lib/i18n.ts) can apply dynamically once the page has loaded.
+        lang: "en",
       },
       workbox: {
         // json/jpg cover the Text3D font (public/fonts) and the landing-page

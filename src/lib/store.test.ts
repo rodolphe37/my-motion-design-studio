@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { useEditorStore } from './store';
 import { createProject, createShapeLayer } from './factories';
 import type { Project, ShapeLayer } from './types';
+import i18n from './i18n';
 
 function freshProject(): Project {
   return createProject('Test project', '2d', '16:9');
@@ -74,7 +75,7 @@ describe('addLayer / updateLayer / deleteLayer / duplicateLayer', () => {
     expect(scene.layers).toHaveLength(2);
     const copy = scene.layers[1];
     expect(copy.id).not.toBe(layer.id);
-    expect(copy.name).toBe(`${layer.name} copy`);
+    expect(copy.name).toBe(i18n.t('defaultNames.copySuffix', { ns: 'editor', name: layer.name }));
     expect(s.selectedLayerIds).toEqual([copy.id]);
   });
 });

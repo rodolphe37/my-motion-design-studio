@@ -1,10 +1,12 @@
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X, Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 import { useEditorStore } from '@/lib/store';
 import { Canvas2D } from './Canvas2D';
 import { Canvas3D } from './Canvas3D';
 
 export function PreviewMode({ onExit }: { onExit: () => void }) {
+  const { t } = useTranslation('editor');
   const project = useEditorStore((s) => s.project);
   const currentSceneId = useEditorStore((s) => s.currentSceneId);
   const selectScene = useEditorStore((s) => s.selectScene);
@@ -35,8 +37,8 @@ export function PreviewMode({ onExit }: { onExit: () => void }) {
       {/* Top bar */}
       <div className="h-12 flex items-center justify-between px-4 border-b border-ink-700 bg-ink-850">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium">Visualisateur</span>
-          <span className="text-xs text-ink-400">Scène {sceneIndex + 1} / {project.scenes.length}</span>
+          <span className="text-sm font-medium">{t('previewMode.title')}</span>
+          <span className="text-xs text-ink-400">{t('previewMode.sceneCounter', { current: sceneIndex + 1, total: project.scenes.length })}</span>
         </div>
         <button onClick={onExit} className="icon-btn"><X className="w-5 h-5" /></button>
       </div>

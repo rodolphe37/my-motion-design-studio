@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { useEditorStore } from '@/lib/store';
 import type { AspectRatioPreset } from '@/lib/types';
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export function ProjectSettingsModal({ open, onClose }: Props) {
+  const { t } = useTranslation('editor');
   const project = useEditorStore((s) => s.project);
   const updateProjectSettings = useEditorStore((s) => s.updateProjectSettings);
 
@@ -30,13 +32,13 @@ export function ProjectSettingsModal({ open, onClose }: Props) {
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div className="relative panel w-full max-w-lg max-h-[85vh] overflow-y-auto scrollbar-thin animate-scale-in shadow-2xl">
         <div className="flex items-center justify-between p-5 border-b border-ink-700 sticky top-0 bg-ink-850 z-10">
-          <h2 className="text-lg font-semibold">Réglages du projet</h2>
+          <h2 className="text-lg font-semibold">{t('projectSettingsModal.title')}</h2>
           <button onClick={onClose} className="icon-btn"><X className="w-5 h-5" /></button>
         </div>
 
         <div className="p-5 space-y-4">
           <div className="space-y-2">
-            <label className="label">Format de la zone de travail</label>
+            <label className="label">{t('projectSettingsModal.format')}</label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {ASPECT_RATIOS.map((r) => (
                 <button
@@ -56,12 +58,12 @@ export function ProjectSettingsModal({ open, onClose }: Props) {
                   settings.aspectRatioPreset === 'custom' ? 'border-accent-violet bg-accent-violet/10 text-accent-violet' : 'border-ink-600 text-ink-300 hover:border-ink-500'
                 }`}
               >
-                <div className="font-medium">Personnalisé</div>
+                <div className="font-medium">{t('projectSettingsModal.custom')}</div>
               </button>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="label">Largeur (px)</label>
+                <label className="label">{t('projectSettingsModal.width')}</label>
                 <input
                   type="number"
                   value={settings.width}
@@ -70,7 +72,7 @@ export function ProjectSettingsModal({ open, onClose }: Props) {
                 />
               </div>
               <div>
-                <label className="label">Hauteur (px)</label>
+                <label className="label">{t('projectSettingsModal.height')}</label>
                 <input
                   type="number"
                   value={settings.height}
@@ -79,11 +81,11 @@ export function ProjectSettingsModal({ open, onClose }: Props) {
                 />
               </div>
             </div>
-            <p className="text-xs text-ink-400">Modifier le format ne redimensionne pas les calques existants — repositionnez-les si besoin.</p>
+            <p className="text-xs text-ink-400">{t('projectSettingsModal.formatHint')}</p>
           </div>
 
           <div className="space-y-2">
-            <label className="label">FPS de travail</label>
+            <label className="label">{t('projectSettingsModal.fps')}</label>
             <div className="flex gap-2">
               {([24, 30, 60] as const).map((f) => (
                 <button
@@ -100,18 +102,18 @@ export function ProjectSettingsModal({ open, onClose }: Props) {
           </div>
 
           <div className="space-y-2">
-            <label className="label">Couleur de fond par défaut</label>
+            <label className="label">{t('projectSettingsModal.bgColor')}</label>
             <div className="flex items-center gap-2">
               <input type="color" value={settings.backgroundColor} onChange={(e) => updateProjectSettings({ backgroundColor: e.target.value })} className="w-12 h-10" />
               <input type="text" value={settings.backgroundColor} onChange={(e) => updateProjectSettings({ backgroundColor: e.target.value })} className="input font-mono text-sm" />
             </div>
-            <p className="text-xs text-ink-400">Utilisée par les scènes qui n'ont pas de fond spécifique (onglet Scène — uni, dégradé ou spots).</p>
+            <p className="text-xs text-ink-400">{t('projectSettingsModal.bgColorHint')}</p>
           </div>
 
           {is3D && (
             <>
               <div className="space-y-2">
-                <label className="label">Reflets (environnement)</label>
+                <label className="label">{t('projectSettingsModal.reflections')}</label>
                 <div className="flex gap-2">
                   {(['color', 'gradient', 'hdri'] as const).map((env) => (
                     <button
@@ -121,16 +123,16 @@ export function ProjectSettingsModal({ open, onClose }: Props) {
                         settings.environment === env ? 'border-accent-blue bg-accent-blue/10 text-accent-blue' : 'border-ink-600 text-ink-300 hover:border-ink-500'
                       }`}
                     >
-                      {env === 'hdri' ? 'HDRI Studio' : env === 'gradient' ? 'Ville' : 'Aucun'}
+                      {env === 'hdri' ? t('projectSettingsModal.reflectionsHdri') : env === 'gradient' ? t('projectSettingsModal.reflectionsCity') : t('projectSettingsModal.reflectionsNone')}
                     </button>
                   ))}
                 </div>
-                <p className="text-xs text-ink-400">Préréglage utilisé pour les reflets sur les matériaux métalliques/lisses — n'affecte pas le fond visible (réglé ci-dessus et dans l'onglet Scène).</p>
+                <p className="text-xs text-ink-400">{t('projectSettingsModal.reflectionsHint')}</p>
               </div>
               <div className="flex items-center justify-between p-3 bg-ink-900 rounded-lg border border-ink-600">
                 <div>
-                  <div className="text-sm font-medium">Ombres</div>
-                  <div className="text-xs text-ink-400">Activer les ombres portées</div>
+                  <div className="text-sm font-medium">{t('projectSettingsModal.shadows')}</div>
+                  <div className="text-xs text-ink-400">{t('projectSettingsModal.shadowsDesc')}</div>
                 </div>
                 <button
                   onClick={() => updateProjectSettings({ shadows: !settings.shadows })}
@@ -143,7 +145,7 @@ export function ProjectSettingsModal({ open, onClose }: Props) {
           )}
 
           <div>
-            <label className="label">Durée par défaut d'une nouvelle scène (secondes)</label>
+            <label className="label">{t('projectSettingsModal.sceneDuration')}</label>
             <input
               type="number"
               value={settings.defaultSceneDuration}

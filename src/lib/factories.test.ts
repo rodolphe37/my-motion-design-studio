@@ -5,6 +5,7 @@ import {
   createCamera3DLayer, createScene, createProject, getAspectRatio, getExportResolution,
 } from './factories';
 import { ASPECT_RATIOS } from './types';
+import editorFr from '../locales/fr/editor';
 
 describe('getAspectRatio', () => {
   it.each(ASPECT_RATIOS)('resolves the known dimensions for preset "%s"', (r) => {
@@ -63,7 +64,7 @@ describe('layer factories', () => {
   });
 
   it('createMeshLayer names the layer after its primitive kind', () => {
-    expect(createMeshLayer('sphere').name).toBe('Sphère');
+    expect(createMeshLayer('sphere').name).toBe(editorFr.defaultNames.sphere);
     expect(createMeshLayer('box').mesh).toBe('box');
   });
 

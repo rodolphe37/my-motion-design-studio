@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Eye, EyeOff, Lock, Unlock, Trash2, Copy, ChevronDown, ChevronRight,
   Square, Type, Box, Lightbulb, Camera, Image, Layers as LayersIcon,
@@ -21,6 +22,7 @@ function layerIcon(layer: Layer) {
 }
 
 export function LayersPanel() {
+  const { t } = useTranslation('editor');
   const project = useEditorStore((s) => s.project);
   const currentSceneId = useEditorStore((s) => s.currentSceneId);
   const selectedLayerIds = useEditorStore((s) => s.selectedLayerIds);
@@ -49,7 +51,7 @@ export function LayersPanel() {
       {scene.layers.length === 0 && (
         <div className="text-center py-8 text-sm text-ink-400">
           <LayersIcon className="w-8 h-8 mx-auto mb-2 opacity-50" />
-          Aucun calque. Utilisez la barre d'outils à gauche pour ajouter des éléments.
+          {t('layersPanel.empty')}
         </div>
       )}
       {[...scene.layers].reverse().map((layer, displayIndex) => {
@@ -82,14 +84,14 @@ export function LayersPanel() {
               <button
                 onClick={(e) => { e.stopPropagation(); duplicateLayer(layer.id); }}
                 className="p-1 hover:bg-ink-600 rounded"
-                title="Dupliquer"
+                title={t('layersPanel.duplicate')}
               >
                 <Copy className="w-3 h-3" />
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); deleteLayer(layer.id); }}
                 className="p-1 hover:bg-red-500/20 hover:text-red-400 rounded"
-                title="Supprimer"
+                title={t('layersPanel.deleteAction')}
               >
                 <Trash2 className="w-3 h-3" />
               </button>
@@ -97,14 +99,14 @@ export function LayersPanel() {
             <button
               onClick={(e) => { e.stopPropagation(); setLayerLocked(layer.id, !layer.locked); }}
               className="p-1 hover:bg-ink-600 rounded"
-              title={layer.locked ? 'Déverrouiller' : 'Verrouiller'}
+              title={layer.locked ? t('layersPanel.unlock') : t('layersPanel.lock')}
             >
               {layer.locked ? <Lock className="w-3 h-3 text-amber-400" /> : <Unlock className="w-3 h-3 opacity-50" />}
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); setLayerVisibility(layer.id, !layer.visible); }}
               className="p-1 hover:bg-ink-600 rounded"
-              title={layer.visible ? 'Masquer' : 'Afficher'}
+              title={layer.visible ? t('layersPanel.hide') : t('layersPanel.show')}
             >
               {layer.visible ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3 opacity-50" />}
             </button>
@@ -116,6 +118,7 @@ export function LayersPanel() {
 }
 
 export function PropertiesPanel() {
+  const { t } = useTranslation('editor');
   const project = useEditorStore((s) => s.project);
   const currentSceneId = useEditorStore((s) => s.currentSceneId);
   const selectedLayerIds = useEditorStore((s) => s.selectedLayerIds);
@@ -128,7 +131,7 @@ export function PropertiesPanel() {
   if (!layer) {
     return (
       <div className="p-4 text-center text-sm text-ink-400">
-        Sélectionnez un élément pour voir ses propriétés.
+        {t('propertiesPanel.empty')}
       </div>
     );
   }
@@ -138,7 +141,7 @@ export function PropertiesPanel() {
   return (
     <div className="p-3 space-y-3">
       <div>
-        <label className="label">Nom</label>
+        <label className="label">{t('propertiesPanel.name')}</label>
         <input
           type="text"
           value={layer.name}
@@ -198,26 +201,27 @@ function ToggleField({ label, description, value, onChange }: { label: string; d
 }
 
 function Properties2D({ layer, updateLayer }: { layer: Layer; updateLayer: (id: string, patch: Partial<Layer>) => void }) {
+  const { t } = useTranslation('editor');
   if (layer.type === 'shape') {
     return (
       <>
         <div className="grid grid-cols-2 gap-2">
-          <NumberField label="X" value={layer.x} onChange={(v) => updateLayer(layer.id, { x: v } as Partial<Layer>)} />
-          <NumberField label="Y" value={layer.y} onChange={(v) => updateLayer(layer.id, { y: v } as Partial<Layer>)} />
-          <NumberField label="Largeur" value={layer.width} onChange={(v) => updateLayer(layer.id, { width: v } as Partial<Layer>)} />
-          <NumberField label="Hauteur" value={layer.height} onChange={(v) => updateLayer(layer.id, { height: v } as Partial<Layer>)} />
-          <NumberField label="Rotation" value={layer.rotation} onChange={(v) => updateLayer(layer.id, { rotation: v } as Partial<Layer>)} />
-          <NumberField label="Opacité" value={layer.opacity} onChange={(v) => updateLayer(layer.id, { opacity: v } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.x')} value={layer.x} onChange={(v) => updateLayer(layer.id, { x: v } as Partial<Layer>)} />
+          <NumberField label={t('propertiesPanel.y')} value={layer.y} onChange={(v) => updateLayer(layer.id, { y: v } as Partial<Layer>)} />
+          <NumberField label={t('propertiesPanel.width')} value={layer.width} onChange={(v) => updateLayer(layer.id, { width: v } as Partial<Layer>)} />
+          <NumberField label={t('propertiesPanel.height')} value={layer.height} onChange={(v) => updateLayer(layer.id, { height: v } as Partial<Layer>)} />
+          <NumberField label={t('propertiesPanel.rotation')} value={layer.rotation} onChange={(v) => updateLayer(layer.id, { rotation: v } as Partial<Layer>)} />
+          <NumberField label={t('propertiesPanel.opacity')} value={layer.opacity} onChange={(v) => updateLayer(layer.id, { opacity: v } as Partial<Layer>)} step={0.1} />
         </div>
-        <ColorField label="Remplissage" value={layer.fill} onChange={(v) => updateLayer(layer.id, { fill: v } as Partial<Layer>)} />
-        <ColorField label="Contour" value={layer.stroke} onChange={(v) => updateLayer(layer.id, { stroke: v } as Partial<Layer>)} />
-        <NumberField label="Épaisseur contour" value={layer.strokeWidth} onChange={(v) => updateLayer(layer.id, { strokeWidth: v } as Partial<Layer>)} />
+        <ColorField label={t('propertiesPanel.fill')} value={layer.fill} onChange={(v) => updateLayer(layer.id, { fill: v } as Partial<Layer>)} />
+        <ColorField label={t('propertiesPanel.stroke')} value={layer.stroke} onChange={(v) => updateLayer(layer.id, { stroke: v } as Partial<Layer>)} />
+        <NumberField label={t('propertiesPanel.strokeWidth')} value={layer.strokeWidth} onChange={(v) => updateLayer(layer.id, { strokeWidth: v } as Partial<Layer>)} />
         {layer.shape === 'rectangle' && (
-          <NumberField label="Rayon coins" value={layer.cornerRadius} onChange={(v) => updateLayer(layer.id, { cornerRadius: v } as Partial<Layer>)} />
+          <NumberField label={t('propertiesPanel.cornerRadius')} value={layer.cornerRadius} onChange={(v) => updateLayer(layer.id, { cornerRadius: v } as Partial<Layer>)} />
         )}
         {(layer.shape === 'polygon' || layer.shape === 'star') && (
           <NumberField
-            label={layer.shape === 'star' ? 'Branches' : 'Côtés'}
+            label={layer.shape === 'star' ? t('propertiesPanel.branches') : t('propertiesPanel.sides')}
             value={layer.sides}
             onChange={(v) => updateLayer(layer.id, { sides: Math.max(3, Math.round(v)) } as Partial<Layer>)}
           />
@@ -229,18 +233,18 @@ function Properties2D({ layer, updateLayer }: { layer: Layer; updateLayer: (id: 
     return (
       <>
         <div>
-          <label className="label">Texte</label>
+          <label className="label">{t('propertiesPanel.text')}</label>
           <textarea value={layer.text} onChange={(e) => updateLayer(layer.id, { text: e.target.value } as Partial<Layer>)} className="input text-sm" rows={2} />
         </div>
         <div className="grid grid-cols-2 gap-2">
-          <NumberField label="X" value={layer.x} onChange={(v) => updateLayer(layer.id, { x: v } as Partial<Layer>)} />
-          <NumberField label="Y" value={layer.y} onChange={(v) => updateLayer(layer.id, { y: v } as Partial<Layer>)} />
-          <NumberField label="Taille" value={layer.fontSize} onChange={(v) => updateLayer(layer.id, { fontSize: v } as Partial<Layer>)} />
-          <NumberField label="Rotation" value={layer.rotation} onChange={(v) => updateLayer(layer.id, { rotation: v } as Partial<Layer>)} />
+          <NumberField label={t('propertiesPanel.x')} value={layer.x} onChange={(v) => updateLayer(layer.id, { x: v } as Partial<Layer>)} />
+          <NumberField label={t('propertiesPanel.y')} value={layer.y} onChange={(v) => updateLayer(layer.id, { y: v } as Partial<Layer>)} />
+          <NumberField label={t('propertiesPanel.size')} value={layer.fontSize} onChange={(v) => updateLayer(layer.id, { fontSize: v } as Partial<Layer>)} />
+          <NumberField label={t('propertiesPanel.rotation')} value={layer.rotation} onChange={(v) => updateLayer(layer.id, { rotation: v } as Partial<Layer>)} />
         </div>
-        <ColorField label="Couleur" value={layer.fill} onChange={(v) => updateLayer(layer.id, { fill: v } as Partial<Layer>)} />
+        <ColorField label={t('propertiesPanel.color')} value={layer.fill} onChange={(v) => updateLayer(layer.id, { fill: v } as Partial<Layer>)} />
         <div>
-          <label className="label">Police</label>
+          <label className="label">{t('propertiesPanel.font')}</label>
           <select value={layer.fontFamily} onChange={(e) => updateLayer(layer.id, { fontFamily: e.target.value } as Partial<Layer>)} className="input text-sm">
             <option value="Inter">Inter</option>
             <option value="Georgia">Georgia</option>
@@ -248,19 +252,19 @@ function Properties2D({ layer, updateLayer }: { layer: Layer; updateLayer: (id: 
           </select>
         </div>
         <div>
-          <label className="label">Graisse</label>
+          <label className="label">{t('propertiesPanel.weight')}</label>
           <select value={layer.fontWeight} onChange={(e) => updateLayer(layer.id, { fontWeight: parseInt(e.target.value) } as Partial<Layer>)} className="input text-sm">
-            <option value={400}>Normal</option>
-            <option value={600}>Semi-bold</option>
-            <option value={700}>Bold</option>
+            <option value={400}>{t('propertiesPanel.weightNormal')}</option>
+            <option value={600}>{t('propertiesPanel.weightSemiBold')}</option>
+            <option value={700}>{t('propertiesPanel.weightBold')}</option>
           </select>
         </div>
         <div>
-          <label className="label">Alignement</label>
+          <label className="label">{t('propertiesPanel.align')}</label>
           <select value={layer.align} onChange={(e) => updateLayer(layer.id, { align: e.target.value as never } as Partial<Layer>)} className="input text-sm">
-            <option value="left">Gauche</option>
-            <option value="center">Centre</option>
-            <option value="right">Droite</option>
+            <option value="left">{t('propertiesPanel.alignLeft')}</option>
+            <option value="center">{t('propertiesPanel.alignCenter')}</option>
+            <option value="right">{t('propertiesPanel.alignRight')}</option>
           </select>
         </div>
       </>
@@ -269,12 +273,12 @@ function Properties2D({ layer, updateLayer }: { layer: Layer; updateLayer: (id: 
   if (layer.type === 'image') {
     return (
       <div className="grid grid-cols-2 gap-2">
-        <NumberField label="X" value={layer.x} onChange={(v) => updateLayer(layer.id, { x: v } as Partial<Layer>)} />
-        <NumberField label="Y" value={layer.y} onChange={(v) => updateLayer(layer.id, { y: v } as Partial<Layer>)} />
-        <NumberField label="Largeur" value={layer.width} onChange={(v) => updateLayer(layer.id, { width: v } as Partial<Layer>)} />
-        <NumberField label="Hauteur" value={layer.height} onChange={(v) => updateLayer(layer.id, { height: v } as Partial<Layer>)} />
-        <NumberField label="Rotation" value={layer.rotation} onChange={(v) => updateLayer(layer.id, { rotation: v } as Partial<Layer>)} />
-        <NumberField label="Opacité" value={layer.opacity} onChange={(v) => updateLayer(layer.id, { opacity: v } as Partial<Layer>)} step={0.1} />
+        <NumberField label={t('propertiesPanel.x')} value={layer.x} onChange={(v) => updateLayer(layer.id, { x: v } as Partial<Layer>)} />
+        <NumberField label={t('propertiesPanel.y')} value={layer.y} onChange={(v) => updateLayer(layer.id, { y: v } as Partial<Layer>)} />
+        <NumberField label={t('propertiesPanel.width')} value={layer.width} onChange={(v) => updateLayer(layer.id, { width: v } as Partial<Layer>)} />
+        <NumberField label={t('propertiesPanel.height')} value={layer.height} onChange={(v) => updateLayer(layer.id, { height: v } as Partial<Layer>)} />
+        <NumberField label={t('propertiesPanel.rotation')} value={layer.rotation} onChange={(v) => updateLayer(layer.id, { rotation: v } as Partial<Layer>)} />
+        <NumberField label={t('propertiesPanel.opacity')} value={layer.opacity} onChange={(v) => updateLayer(layer.id, { opacity: v } as Partial<Layer>)} step={0.1} />
       </div>
     );
   }
@@ -282,43 +286,44 @@ function Properties2D({ layer, updateLayer }: { layer: Layer; updateLayer: (id: 
 }
 
 function Properties3D({ layer, updateLayer }: { layer: Layer; updateLayer: (id: string, patch: Partial<Layer>) => void }) {
+  const { t } = useTranslation('editor');
   if (layer.type === 'mesh') {
     const isImported = layer.mesh === 'imported';
     return (
       <>
         {isImported && (
           <p className="text-xs text-ink-400 -mt-1">
-            Modèle importé ({layer.importedFormat === 'obj' ? 'OBJ' : 'glTF/GLB'}) — conserve ses propres matériaux.
+            {t('propertiesPanel.importedNote', { format: layer.importedFormat === 'obj' ? 'OBJ' : 'glTF/GLB' })}
           </p>
         )}
         <div className="grid grid-cols-3 gap-2">
-          <NumberField label="Pos X" value={layer.position.x} onChange={(v) => updateLayer(layer.id, { position: { ...layer.position, x: v } } as Partial<Layer>)} step={0.1} />
-          <NumberField label="Pos Y" value={layer.position.y} onChange={(v) => updateLayer(layer.id, { position: { ...layer.position, y: v } } as Partial<Layer>)} step={0.1} />
-          <NumberField label="Pos Z" value={layer.position.z} onChange={(v) => updateLayer(layer.id, { position: { ...layer.position, z: v } } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.posX')} value={layer.position.x} onChange={(v) => updateLayer(layer.id, { position: { ...layer.position, x: v } } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.posY')} value={layer.position.y} onChange={(v) => updateLayer(layer.id, { position: { ...layer.position, y: v } } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.posZ')} value={layer.position.z} onChange={(v) => updateLayer(layer.id, { position: { ...layer.position, z: v } } as Partial<Layer>)} step={0.1} />
         </div>
         <div className="grid grid-cols-3 gap-2">
-          <NumberField label="Rot X" value={layer.rotation.x} onChange={(v) => updateLayer(layer.id, { rotation: { ...layer.rotation, x: v } } as Partial<Layer>)} step={0.1} />
-          <NumberField label="Rot Y" value={layer.rotation.y} onChange={(v) => updateLayer(layer.id, { rotation: { ...layer.rotation, y: v } } as Partial<Layer>)} step={0.1} />
-          <NumberField label="Rot Z" value={layer.rotation.z} onChange={(v) => updateLayer(layer.id, { rotation: { ...layer.rotation, z: v } } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.rotX')} value={layer.rotation.x} onChange={(v) => updateLayer(layer.id, { rotation: { ...layer.rotation, x: v } } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.rotY')} value={layer.rotation.y} onChange={(v) => updateLayer(layer.id, { rotation: { ...layer.rotation, y: v } } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.rotZ')} value={layer.rotation.z} onChange={(v) => updateLayer(layer.id, { rotation: { ...layer.rotation, z: v } } as Partial<Layer>)} step={0.1} />
         </div>
         <div className="grid grid-cols-3 gap-2">
-          <NumberField label="Scale X" value={layer.scale.x} onChange={(v) => updateLayer(layer.id, { scale: { ...layer.scale, x: v } } as Partial<Layer>)} step={0.1} />
-          <NumberField label="Scale Y" value={layer.scale.y} onChange={(v) => updateLayer(layer.id, { scale: { ...layer.scale, y: v } } as Partial<Layer>)} step={0.1} />
-          <NumberField label="Scale Z" value={layer.scale.z} onChange={(v) => updateLayer(layer.id, { scale: { ...layer.scale, z: v } } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.scaleX')} value={layer.scale.x} onChange={(v) => updateLayer(layer.id, { scale: { ...layer.scale, x: v } } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.scaleY')} value={layer.scale.y} onChange={(v) => updateLayer(layer.id, { scale: { ...layer.scale, y: v } } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.scaleZ')} value={layer.scale.z} onChange={(v) => updateLayer(layer.id, { scale: { ...layer.scale, z: v } } as Partial<Layer>)} step={0.1} />
         </div>
         {!isImported && (
           <>
-            <ColorField label="Couleur" value={layer.color} onChange={(v) => updateLayer(layer.id, { color: v } as Partial<Layer>)} />
+            <ColorField label={t('propertiesPanel.color')} value={layer.color} onChange={(v) => updateLayer(layer.id, { color: v } as Partial<Layer>)} />
             <div className="grid grid-cols-2 gap-2">
-              <NumberField label="Metalness" value={layer.metalness} onChange={(v) => updateLayer(layer.id, { metalness: v } as Partial<Layer>)} step={0.1} />
-              <NumberField label="Roughness" value={layer.roughness} onChange={(v) => updateLayer(layer.id, { roughness: v } as Partial<Layer>)} step={0.1} />
+              <NumberField label={t('propertiesPanel.metalness')} value={layer.metalness} onChange={(v) => updateLayer(layer.id, { metalness: v } as Partial<Layer>)} step={0.1} />
+              <NumberField label={t('propertiesPanel.roughness')} value={layer.roughness} onChange={(v) => updateLayer(layer.id, { roughness: v } as Partial<Layer>)} step={0.1} />
             </div>
           </>
         )}
-        <NumberField label="Opacité" value={layer.opacity} onChange={(v) => updateLayer(layer.id, { opacity: v } as Partial<Layer>)} step={0.1} />
+        <NumberField label={t('propertiesPanel.opacity')} value={layer.opacity} onChange={(v) => updateLayer(layer.id, { opacity: v } as Partial<Layer>)} step={0.1} />
         <ToggleField
-          label="Ombre portée"
-          description="Cet objet projette une ombre"
+          label={t('propertiesPanel.castShadow')}
+          description={t('propertiesPanel.castShadowDesc')}
           value={layer.castShadow}
           onChange={(v) => updateLayer(layer.id, { castShadow: v } as Partial<Layer>)}
         />
@@ -329,15 +334,15 @@ function Properties3D({ layer, updateLayer }: { layer: Layer; updateLayer: (id: 
     return (
       <>
         <div className="grid grid-cols-3 gap-2">
-          <NumberField label="Pos X" value={layer.position.x} onChange={(v) => updateLayer(layer.id, { position: { ...layer.position, x: v } } as Partial<Layer>)} step={0.1} />
-          <NumberField label="Pos Y" value={layer.position.y} onChange={(v) => updateLayer(layer.id, { position: { ...layer.position, y: v } } as Partial<Layer>)} step={0.1} />
-          <NumberField label="Pos Z" value={layer.position.z} onChange={(v) => updateLayer(layer.id, { position: { ...layer.position, z: v } } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.posX')} value={layer.position.x} onChange={(v) => updateLayer(layer.id, { position: { ...layer.position, x: v } } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.posY')} value={layer.position.y} onChange={(v) => updateLayer(layer.id, { position: { ...layer.position, y: v } } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.posZ')} value={layer.position.z} onChange={(v) => updateLayer(layer.id, { position: { ...layer.position, z: v } } as Partial<Layer>)} step={0.1} />
         </div>
-        <ColorField label="Couleur" value={layer.color} onChange={(v) => updateLayer(layer.id, { color: v } as Partial<Layer>)} />
-        <NumberField label="Intensité" value={layer.intensity} onChange={(v) => updateLayer(layer.id, { intensity: v } as Partial<Layer>)} step={0.1} />
+        <ColorField label={t('propertiesPanel.color')} value={layer.color} onChange={(v) => updateLayer(layer.id, { color: v } as Partial<Layer>)} />
+        <NumberField label={t('propertiesPanel.intensity')} value={layer.intensity} onChange={(v) => updateLayer(layer.id, { intensity: v } as Partial<Layer>)} step={0.1} />
         {layer.light === 'point' && (
           <NumberField
-            label="Distance (0 = illimitée)"
+            label={t('propertiesPanel.distance')}
             value={layer.distance}
             onChange={(v) => updateLayer(layer.id, { distance: Math.max(0, v) } as Partial<Layer>)}
             step={0.5}
@@ -345,7 +350,7 @@ function Properties3D({ layer, updateLayer }: { layer: Layer; updateLayer: (id: 
         )}
         {layer.light === 'spot' && (
           <NumberField
-            label="Angle (rad)"
+            label={t('propertiesPanel.angle')}
             value={layer.angle}
             onChange={(v) => updateLayer(layer.id, { angle: v } as Partial<Layer>)}
             step={0.05}
@@ -358,23 +363,23 @@ function Properties3D({ layer, updateLayer }: { layer: Layer; updateLayer: (id: 
     return (
       <>
         <div className="grid grid-cols-3 gap-2">
-          <NumberField label="Pos X" value={layer.position.x} onChange={(v) => updateLayer(layer.id, { position: { ...layer.position, x: v } } as Partial<Layer>)} step={0.1} />
-          <NumberField label="Pos Y" value={layer.position.y} onChange={(v) => updateLayer(layer.id, { position: { ...layer.position, y: v } } as Partial<Layer>)} step={0.1} />
-          <NumberField label="Pos Z" value={layer.position.z} onChange={(v) => updateLayer(layer.id, { position: { ...layer.position, z: v } } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.posX')} value={layer.position.x} onChange={(v) => updateLayer(layer.id, { position: { ...layer.position, x: v } } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.posY')} value={layer.position.y} onChange={(v) => updateLayer(layer.id, { position: { ...layer.position, y: v } } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.posZ')} value={layer.position.z} onChange={(v) => updateLayer(layer.id, { position: { ...layer.position, z: v } } as Partial<Layer>)} step={0.1} />
         </div>
         <div className="grid grid-cols-3 gap-2">
-          <NumberField label="Rot X" value={layer.rotation.x} onChange={(v) => updateLayer(layer.id, { rotation: { ...layer.rotation, x: v } } as Partial<Layer>)} step={0.1} />
-          <NumberField label="Rot Y" value={layer.rotation.y} onChange={(v) => updateLayer(layer.id, { rotation: { ...layer.rotation, y: v } } as Partial<Layer>)} step={0.1} />
-          <NumberField label="Rot Z" value={layer.rotation.z} onChange={(v) => updateLayer(layer.id, { rotation: { ...layer.rotation, z: v } } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.rotX')} value={layer.rotation.x} onChange={(v) => updateLayer(layer.id, { rotation: { ...layer.rotation, x: v } } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.rotY')} value={layer.rotation.y} onChange={(v) => updateLayer(layer.id, { rotation: { ...layer.rotation, y: v } } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.rotZ')} value={layer.rotation.z} onChange={(v) => updateLayer(layer.id, { rotation: { ...layer.rotation, z: v } } as Partial<Layer>)} step={0.1} />
         </div>
-        {!layer.orthographic && <NumberField label="FOV" value={layer.fov} onChange={(v) => updateLayer(layer.id, { fov: v } as Partial<Layer>)} />}
+        {!layer.orthographic && <NumberField label={t('propertiesPanel.fov')} value={layer.fov} onChange={(v) => updateLayer(layer.id, { fov: v } as Partial<Layer>)} />}
         <div className="grid grid-cols-2 gap-2">
-          <NumberField label="Near" value={layer.near} onChange={(v) => updateLayer(layer.id, { near: v } as Partial<Layer>)} step={0.1} />
-          <NumberField label="Far" value={layer.far} onChange={(v) => updateLayer(layer.id, { far: v } as Partial<Layer>)} />
+          <NumberField label={t('propertiesPanel.near')} value={layer.near} onChange={(v) => updateLayer(layer.id, { near: v } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.far')} value={layer.far} onChange={(v) => updateLayer(layer.id, { far: v } as Partial<Layer>)} />
         </div>
         <ToggleField
-          label="Orthographique"
-          description="Projection sans perspective (au lieu de perspective)"
+          label={t('propertiesPanel.orthographic')}
+          description={t('propertiesPanel.orthographicDesc')}
           value={layer.orthographic}
           onChange={(v) => updateLayer(layer.id, { orthographic: v } as Partial<Layer>)}
         />
@@ -385,30 +390,30 @@ function Properties3D({ layer, updateLayer }: { layer: Layer; updateLayer: (id: 
     return (
       <>
         <div>
-          <label className="label">Texte</label>
+          <label className="label">{t('propertiesPanel.text')}</label>
           <textarea value={layer.text} onChange={(e) => updateLayer(layer.id, { text: e.target.value } as Partial<Layer>)} className="input text-sm" rows={2} />
         </div>
         <div className="grid grid-cols-3 gap-2">
-          <NumberField label="Pos X" value={layer.position.x} onChange={(v) => updateLayer(layer.id, { position: { ...layer.position, x: v } } as Partial<Layer>)} step={0.1} />
-          <NumberField label="Pos Y" value={layer.position.y} onChange={(v) => updateLayer(layer.id, { position: { ...layer.position, y: v } } as Partial<Layer>)} step={0.1} />
-          <NumberField label="Pos Z" value={layer.position.z} onChange={(v) => updateLayer(layer.id, { position: { ...layer.position, z: v } } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.posX')} value={layer.position.x} onChange={(v) => updateLayer(layer.id, { position: { ...layer.position, x: v } } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.posY')} value={layer.position.y} onChange={(v) => updateLayer(layer.id, { position: { ...layer.position, y: v } } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.posZ')} value={layer.position.z} onChange={(v) => updateLayer(layer.id, { position: { ...layer.position, z: v } } as Partial<Layer>)} step={0.1} />
         </div>
         <div className="grid grid-cols-3 gap-2">
-          <NumberField label="Rot X" value={layer.rotation.x} onChange={(v) => updateLayer(layer.id, { rotation: { ...layer.rotation, x: v } } as Partial<Layer>)} step={0.1} />
-          <NumberField label="Rot Y" value={layer.rotation.y} onChange={(v) => updateLayer(layer.id, { rotation: { ...layer.rotation, y: v } } as Partial<Layer>)} step={0.1} />
-          <NumberField label="Rot Z" value={layer.rotation.z} onChange={(v) => updateLayer(layer.id, { rotation: { ...layer.rotation, z: v } } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.rotX')} value={layer.rotation.x} onChange={(v) => updateLayer(layer.id, { rotation: { ...layer.rotation, x: v } } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.rotY')} value={layer.rotation.y} onChange={(v) => updateLayer(layer.id, { rotation: { ...layer.rotation, y: v } } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.rotZ')} value={layer.rotation.z} onChange={(v) => updateLayer(layer.id, { rotation: { ...layer.rotation, z: v } } as Partial<Layer>)} step={0.1} />
         </div>
         <div className="grid grid-cols-3 gap-2">
-          <NumberField label="Scale X" value={layer.scale.x} onChange={(v) => updateLayer(layer.id, { scale: { ...layer.scale, x: v } } as Partial<Layer>)} step={0.1} />
-          <NumberField label="Scale Y" value={layer.scale.y} onChange={(v) => updateLayer(layer.id, { scale: { ...layer.scale, y: v } } as Partial<Layer>)} step={0.1} />
-          <NumberField label="Scale Z" value={layer.scale.z} onChange={(v) => updateLayer(layer.id, { scale: { ...layer.scale, z: v } } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.scaleX')} value={layer.scale.x} onChange={(v) => updateLayer(layer.id, { scale: { ...layer.scale, x: v } } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.scaleY')} value={layer.scale.y} onChange={(v) => updateLayer(layer.id, { scale: { ...layer.scale, y: v } } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.scaleZ')} value={layer.scale.z} onChange={(v) => updateLayer(layer.id, { scale: { ...layer.scale, z: v } } as Partial<Layer>)} step={0.1} />
         </div>
-        <ColorField label="Couleur" value={layer.color} onChange={(v) => updateLayer(layer.id, { color: v } as Partial<Layer>)} />
+        <ColorField label={t('propertiesPanel.color')} value={layer.color} onChange={(v) => updateLayer(layer.id, { color: v } as Partial<Layer>)} />
         <div className="grid grid-cols-2 gap-2">
-          <NumberField label="Taille" value={layer.fontSize} onChange={(v) => updateLayer(layer.id, { fontSize: v } as Partial<Layer>)} step={0.1} />
-          <NumberField label="Extrusion" value={layer.height} onChange={(v) => updateLayer(layer.id, { height: v } as Partial<Layer>)} step={0.05} />
+          <NumberField label={t('propertiesPanel.size')} value={layer.fontSize} onChange={(v) => updateLayer(layer.id, { fontSize: v } as Partial<Layer>)} step={0.1} />
+          <NumberField label={t('propertiesPanel.extrusion')} value={layer.height} onChange={(v) => updateLayer(layer.id, { height: v } as Partial<Layer>)} step={0.05} />
         </div>
-        <NumberField label="Opacité" value={layer.opacity} onChange={(v) => updateLayer(layer.id, { opacity: v } as Partial<Layer>)} step={0.1} />
+        <NumberField label={t('propertiesPanel.opacity')} value={layer.opacity} onChange={(v) => updateLayer(layer.id, { opacity: v } as Partial<Layer>)} step={0.1} />
       </>
     );
   }
@@ -416,6 +421,7 @@ function Properties3D({ layer, updateLayer }: { layer: Layer; updateLayer: (id: 
 }
 
 export function AnimationPanel() {
+  const { t } = useTranslation('editor');
   const project = useEditorStore((s) => s.project);
   const currentSceneId = useEditorStore((s) => s.currentSceneId);
   const selectedLayerIds = useEditorStore((s) => s.selectedLayerIds);
@@ -429,7 +435,7 @@ export function AnimationPanel() {
   if (!scene) return null;
   const layer = scene.layers.find((l) => l.id === selectedLayerIds[0]);
   if (!layer) {
-    return <div className="p-4 text-center text-sm text-ink-400">Sélectionnez un élément pour l'animer.</div>;
+    return <div className="p-4 text-center text-sm text-ink-400">{t('animationPanel.selectElement')}</div>;
   }
 
   const animatableProps = getAnimatableProps(layer);
@@ -447,7 +453,7 @@ export function AnimationPanel() {
 
   return (
     <div className="p-3 space-y-1">
-      <p className="text-xs text-ink-400 mb-2">Temps: {currentTime.toFixed(2)}s</p>
+      <p className="text-xs text-ink-400 mb-2">{t('animationPanel.time', { time: currentTime.toFixed(2) })}</p>
       {animatableProps.map((prop) => {
         const kfs = keyframesByProp[prop] || [];
         const isExpanded = expanded[prop];
@@ -472,7 +478,7 @@ export function AnimationPanel() {
                   });
                 }}
                 className="icon-btn w-6 h-6"
-                title="Ajouter keyframe"
+                title={t('animationPanel.addKeyframe')}
               >
                 +
               </button>
@@ -488,11 +494,11 @@ export function AnimationPanel() {
                       onChange={(e) => useEditorStore.getState().updateKeyframe(layer.id, kf.id, { easing: e.target.value as never })}
                       className="bg-ink-900 border border-ink-600 rounded px-1 py-0.5 text-xs"
                     >
-                      <option value="linear">Linéaire</option>
-                      <option value="easeIn">Ease In</option>
-                      <option value="easeOut">Ease Out</option>
-                      <option value="easeInOut">Ease InOut</option>
-                      <option value="spring">Spring</option>
+                      <option value="linear">{t('animationPanel.easing.linear')}</option>
+                      <option value="easeIn">{t('animationPanel.easing.easeIn')}</option>
+                      <option value="easeOut">{t('animationPanel.easing.easeOut')}</option>
+                      <option value="easeInOut">{t('animationPanel.easing.easeInOut')}</option>
+                      <option value="spring">{t('animationPanel.easing.spring')}</option>
                     </select>
                     <button
                       onClick={() => deleteKeyframe(layer.id, kf.id)}
@@ -502,7 +508,7 @@ export function AnimationPanel() {
                     </button>
                   </div>
                 ))}
-                {kfs.length === 0 && <p className="text-xs text-ink-400 px-2 py-1">Aucun keyframe</p>}
+                {kfs.length === 0 && <p className="text-xs text-ink-400 px-2 py-1">{t('animationPanel.noKeyframes')}</p>}
               </div>
             )}
           </div>
@@ -522,6 +528,7 @@ function getAnimatableProps(layer: Layer): string[] {
 }
 
 export function TransitionsPanel() {
+  const { t } = useTranslation('editor');
   const project = useEditorStore((s) => s.project);
   const currentSceneId = useEditorStore((s) => s.currentSceneId);
   const setSceneTransition = useEditorStore((s) => s.setSceneTransition);
@@ -532,18 +539,18 @@ export function TransitionsPanel() {
 
   const transition = scene.transitionToNext;
   const types: { value: string; label: string }[] = [
-    { value: 'none', label: 'Aucune' },
-    { value: 'fade', label: 'Fondu' },
-    { value: 'slide', label: 'Glissement' },
-    { value: 'zoom', label: 'Zoom' },
-    { value: 'dissolve', label: 'Dissolve' },
-    { value: 'wipe', label: 'Wipe' },
+    { value: 'none', label: t('transitionsPanel.types.none') },
+    { value: 'fade', label: t('transitionsPanel.types.fade') },
+    { value: 'slide', label: t('transitionsPanel.types.slide') },
+    { value: 'zoom', label: t('transitionsPanel.types.zoom') },
+    { value: 'dissolve', label: t('transitionsPanel.types.dissolve') },
+    { value: 'wipe', label: t('transitionsPanel.types.wipe') },
   ];
 
   return (
     <div className="p-3 space-y-3">
       <div>
-        <label className="label">Transition vers la scène suivante</label>
+        <label className="label">{t('transitionsPanel.label')}</label>
         <div className="grid grid-cols-2 gap-2">
           {types.map((t) => (
             <button
@@ -561,23 +568,23 @@ export function TransitionsPanel() {
       {transition && (
         <>
           <NumberField
-            label="Durée (s)"
+            label={t('transitionsPanel.duration')}
             value={transition.duration}
             onChange={(v) => setSceneTransition(scene.id, { ...transition, duration: v })}
             step={0.1}
           />
           <div>
-            <label className="label">Easing</label>
+            <label className="label">{t('transitionsPanel.easing')}</label>
             <select
               value={transition.easing}
               onChange={(e) => setSceneTransition(scene.id, { ...transition, easing: e.target.value as never })}
               className="input text-sm"
             >
-              <option value="linear">Linéaire</option>
-              <option value="easeIn">Ease In</option>
-              <option value="easeOut">Ease Out</option>
-              <option value="easeInOut">Ease InOut</option>
-              <option value="spring">Spring</option>
+              <option value="linear">{t('animationPanel.easing.linear')}</option>
+              <option value="easeIn">{t('animationPanel.easing.easeIn')}</option>
+              <option value="easeOut">{t('animationPanel.easing.easeOut')}</option>
+              <option value="easeInOut">{t('animationPanel.easing.easeInOut')}</option>
+              <option value="spring">{t('animationPanel.easing.spring')}</option>
             </select>
           </div>
         </>
@@ -587,6 +594,7 @@ export function TransitionsPanel() {
 }
 
 export function ScenePanel() {
+  const { t } = useTranslation('editor');
   const project = useEditorStore((s) => s.project);
   const currentSceneId = useEditorStore((s) => s.currentSceneId);
   const setSceneBackground = useEditorStore((s) => s.setSceneBackground);
@@ -600,10 +608,10 @@ export function ScenePanel() {
   const mode: 'default' | 'solid' | 'gradient' | 'spots' = bg?.type ?? 'default';
 
   const modes: { value: typeof mode; label: string }[] = [
-    { value: 'default', label: 'Projet (défaut)' },
-    { value: 'solid', label: 'Uni' },
-    { value: 'gradient', label: 'Dégradé' },
-    { value: 'spots', label: 'Spots' },
+    { value: 'default', label: t('scenePanel.modes.default') },
+    { value: 'solid', label: t('scenePanel.modes.solid') },
+    { value: 'gradient', label: t('scenePanel.modes.gradient') },
+    { value: 'spots', label: t('scenePanel.modes.spots') },
   ];
 
   const setMode = (m: typeof mode) => {
@@ -620,14 +628,14 @@ export function ScenePanel() {
   return (
     <div className="p-3 space-y-3">
       <NumberField
-        label="Durée de la scène (s)"
+        label={t('scenePanel.duration')}
         value={scene.duration}
         step={0.1}
         onChange={(v) => updateScene(scene.id, { duration: Math.max(0.1, v) })}
       />
 
       <div>
-        <label className="label">Fond de la scène</label>
+        <label className="label">{t('scenePanel.background')}</label>
         <div className="grid grid-cols-2 gap-2 mt-1">
           {modes.map((opt) => (
             <button
@@ -642,35 +650,35 @@ export function ScenePanel() {
           ))}
         </div>
         {mode === 'default' && (
-          <p className="text-xs text-ink-400 mt-2">Utilise la couleur de fond définie dans les Réglages du projet.</p>
+          <p className="text-xs text-ink-400 mt-2">{t('scenePanel.defaultHint')}</p>
         )}
       </div>
 
       {bg?.type === 'solid' && (
-        <ColorField label="Couleur" value={bg.color} onChange={(v) => setSceneBackground(scene.id, { ...bg, color: v })} />
+        <ColorField label={t('scenePanel.color')} value={bg.color} onChange={(v) => setSceneBackground(scene.id, { ...bg, color: v })} />
       )}
 
       {bg?.type === 'gradient' && (
         <>
-          <ColorField label="Couleur de départ" value={bg.from} onChange={(v) => setSceneBackground(scene.id, { ...bg, from: v })} />
-          <ColorField label="Couleur d'arrivée" value={bg.to} onChange={(v) => setSceneBackground(scene.id, { ...bg, to: v })} />
-          <NumberField label="Angle (°)" value={bg.angle} onChange={(v) => setSceneBackground(scene.id, { ...bg, angle: v })} />
+          <ColorField label={t('scenePanel.startColor')} value={bg.from} onChange={(v) => setSceneBackground(scene.id, { ...bg, from: v })} />
+          <ColorField label={t('scenePanel.endColor')} value={bg.to} onChange={(v) => setSceneBackground(scene.id, { ...bg, to: v })} />
+          <NumberField label={t('scenePanel.angle')} value={bg.angle} onChange={(v) => setSceneBackground(scene.id, { ...bg, angle: v })} />
         </>
       )}
 
       {bg?.type === 'spots' && (
         <>
-          <ColorField label="Couleur de fond" value={bg.base} onChange={(v) => setSceneBackground(scene.id, { ...bg, base: v })} />
+          <ColorField label={t('scenePanel.bgColor')} value={bg.base} onChange={(v) => setSceneBackground(scene.id, { ...bg, base: v })} />
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="label !mb-0">Spots ({bg.spots.length})</label>
+              <label className="label !mb-0">{t('scenePanel.spots', { count: bg.spots.length })}</label>
               <button
                 onClick={() => setSceneBackground(scene.id, {
                   ...bg,
                   spots: [...bg.spots, { color: '#3b82f6', x: project.settings.width / 2, y: project.settings.height / 2, radius: Math.round(project.settings.width / 6), opacity: 0.5 }],
                 })}
                 className="icon-btn w-6 h-6"
-                title="Ajouter un spot"
+                title={t('scenePanel.addSpot')}
               >
                 +
               </button>
@@ -678,38 +686,38 @@ export function ScenePanel() {
             {bg.spots.map((spot, i) => (
               <div key={i} className="p-2 rounded-lg border border-ink-700 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-ink-400">Spot {i + 1}</span>
+                  <span className="text-xs text-ink-400">{t('scenePanel.spot', { n: i + 1 })}</span>
                   <button
                     onClick={() => setSceneBackground(scene.id, { ...bg, spots: bg.spots.filter((_, si) => si !== i) })}
                     className="p-1 hover:bg-red-500/20 hover:text-red-400 rounded"
-                    title="Supprimer ce spot"
+                    title={t('scenePanel.removeSpot')}
                   >
                     <Trash2 className="w-3 h-3" />
                   </button>
                 </div>
                 <ColorField
-                  label="Couleur"
+                  label={t('scenePanel.color')}
                   value={spot.color}
                   onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, color: v } : s)) })}
                 />
                 <div className="grid grid-cols-2 gap-2">
                   <NumberField
-                    label="X"
+                    label={t('propertiesPanel.x')}
                     value={spot.x}
                     onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, x: v } : s)) })}
                   />
                   <NumberField
-                    label="Y"
+                    label={t('propertiesPanel.y')}
                     value={spot.y}
                     onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, y: v } : s)) })}
                   />
                   <NumberField
-                    label="Rayon"
+                    label={t('scenePanel.radius')}
                     value={spot.radius}
                     onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, radius: v } : s)) })}
                   />
                   <NumberField
-                    label="Opacité"
+                    label={t('propertiesPanel.opacity')}
                     value={spot.opacity}
                     step={0.1}
                     onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, opacity: v } : s)) })}
@@ -717,7 +725,7 @@ export function ScenePanel() {
                 </div>
               </div>
             ))}
-            {bg.spots.length === 0 && <p className="text-xs text-ink-400 px-1">Aucun spot — cliquez + pour en ajouter un.</p>}
+            {bg.spots.length === 0 && <p className="text-xs text-ink-400 px-1">{t('scenePanel.noSpots')}</p>}
           </div>
         </>
       )}

@@ -1,0 +1,30 @@
+export default {
+  title: 'Settings',
+  subtitle: 'App preferences and management of data stored on this device.',
+  general: {
+    heading: 'General',
+    theme: 'Theme',
+    themeDesc: 'Light or dark appearance of the interface',
+    themeDark: 'Dark',
+    themeLight: 'Light',
+    language: 'Language',
+    languageDesc: 'Interface language',
+    storage: 'Storage',
+    storageDesc: 'All projects are saved locally in this browser (IndexedDB), with no account or sync',
+    projectCount_one: '{{count}} project',
+    projectCount_other: '{{count}} projects',
+  },
+  danger: {
+    heading: 'Danger zone',
+    resetTitle: 'Reset the app',
+    resetDesc: 'Permanently deletes all projects stored in this browser. This action is irreversible.',
+    resetButton: 'Reset',
+  },
+  resetConfirm: {
+    title: 'Reset the app?',
+    desc: 'All your projects ({{count}}) will be permanently deleted from this browser. This action is irreversible.',
+    cancel: 'Cancel',
+    resetting: 'Resetting...',
+    confirm: 'Reset',
+  },
+};

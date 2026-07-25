@@ -118,9 +118,12 @@ match the existing style:
   self-explanatory, leave it uncommented.
 - **No speculative abstractions.** Don't generalize a component or add a
   config option for a use case that doesn't exist yet.
-- **French, in-app strings only.** Any user-facing text (labels, buttons,
-  docs content) is French, matching the rest of the product. Code
-  identifiers, comments, and commit messages stay in English.
+- **User-facing strings go through i18next, in both languages.** Any new
+  user-facing text (labels, buttons, toasts, aria-labels) needs a key added
+  to *both* `src/locales/fr/<namespace>.ts` and `src/locales/en/<namespace>.ts`
+  in the same PR — see [Internationalization](#internationalization) below
+  for the file layout. Code identifiers, comments, and commit messages stay
+  in English.
 
 ## Commit messages
 
@@ -189,10 +192,51 @@ approach, especially for anything touching the render pipeline (2D/Konva or
 
 ## Internationalization
 
-The app is French-only today (UI copy, in-app documentation, generated
-project names). There's no i18n framework wired in — all strings are
-inlined directly in the components. Adding proper i18n (extracting strings,
-picking a library, wiring a locale switcher) would be a substantial,
-cross-cutting change; if you're interested in tackling it, please open an
-issue first to agree on an approach before starting, since it touches
-nearly every component in `src/`.
+The app supports French and English via [react-i18next](https://react.i18next.com/),
+with automatic detection from the browser (`i18next-browser-languagedetector`,
+falling back to French) and a manual switcher in the header and Settings page.
+The chosen language is persisted to `localStorage` (`ms-lang`), the same
+pattern already used for the theme preference (`src/lib/useTheme.ts`).
+
+**File layout** — `src/lib/i18n.ts` initializes i18next; translation content
+lives in `src/locales/{fr,en}/<namespace>.ts`, one namespace per rough app
+area (`common`, `landing`, `projects`, `settings`, `editor`):
+
+```ts
+// src/locales/en/settings.ts
+export default {
+  title: 'Settings',
+  general: { theme: 'Theme', /* … */ },
+};
+```
+
+Use it in a component with `useTranslation('<namespace>')`:
+
+```tsx
+const { t } = useTranslation('settings');
+<h1>{t('title')}</h1>
+```
+
+Outside of React (`src/lib/factories.ts`, `src/lib/store.ts` — default
+layer/scene names), import the `i18n` singleton directly and call
+`i18n.t(key, { ns: '<namespace>' })`.
+
+**Adding a new user-facing string**: add the key to *both*
+`src/locales/fr/<namespace>.ts` and `src/locales/en/<namespace>.ts` in the
+same PR — a key only present in one language falls back to the other rather
+than erroring, which makes a missing translation easy to miss in review, so
+please don't rely on the fallback.
+
+**`DocsPage.tsx` is the one exception.** Its content (14 sections, dense
+prose) isn't addressed through individual `t()` keys — that would be
+unreadable to maintain. Instead `src/locales/fr/docs.ts` and
+`src/locales/en/docs.ts` each export a full `{ SECTIONS, CONTENT }` module in
+the same shape, and `DocsPage.tsx` picks the active one based on
+`i18n.language`. If you're documenting a new feature, add the paragraph to
+both files.
+
+**Adding a third language** would mean: a new `src/locales/<lng>/*.ts` set,
+registering it in `src/locales/index.ts` and `supportedLngs` in
+`src/lib/i18n.ts`, and a switcher UI change (`Header.tsx`/`SettingsPage.tsx`
+currently assume a 2-way FR/EN toggle, not a dropdown) — open an issue first
+to agree on the approach.

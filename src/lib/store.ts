@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { Project, Scene, Layer, Keyframe, Transition, BackgroundFill } from './types';
 import { uid } from './types';
+import i18n from './i18n';
 
 export type ViewMode = 'editor' | 'preview';
 export type TransformMode = 'translate' | 'rotate' | 'scale' | null;
@@ -140,7 +141,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       const project = cloneProject(s.project);
       const newScene: Scene = {
         id: uid(),
-        name: `Scène ${project.scenes.length + 1}`,
+        name: i18n.t('defaultNames.scene', { ns: 'editor', n: project.scenes.length + 1 }),
         duration: project.settings.defaultSceneDuration,
         order: project.scenes.length,
         layers: [],
@@ -260,7 +261,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       if (scene) {
         const layer = scene.layers.find((l) => l.id === id);
         if (layer) {
-          const copy = { ...cloneLayer(layer), id: uid(), name: `${layer.name} copy` };
+          const copy = { ...cloneLayer(layer), id: uid(), name: i18n.t('defaultNames.copySuffix', { ns: 'editor', name: layer.name }) };
           scene.layers.push(copy);
           return { project, selectedLayerIds: [copy.id], ...hist, saveStatus: 'unsaved' };
         }

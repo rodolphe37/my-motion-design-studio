@@ -1,8 +1,10 @@
 import { useRef, useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Play, Pause, ZoomIn, ZoomOut } from 'lucide-react';
 import { useEditorStore } from '@/lib/store';
 
 export function Timeline() {
+  const { t } = useTranslation('editor');
   const project = useEditorStore((s) => s.project);
   const currentSceneId = useEditorStore((s) => s.currentSceneId);
   const currentTime = useEditorStore((s) => s.currentTime);
@@ -71,9 +73,9 @@ export function Timeline() {
       <div className="flex-1 flex overflow-hidden">
         {/* Layer labels */}
         <div className="w-40 shrink-0 border-r border-ink-700 overflow-y-auto scrollbar-thin">
-          <div className="h-6 border-b border-ink-700 flex items-center px-2 text-xs text-ink-400 font-medium">Calques</div>
+          <div className="h-6 border-b border-ink-700 flex items-center px-2 text-xs text-ink-400 font-medium">{t('timeline.layers')}</div>
           {scene.layers.length === 0 && (
-            <div className="text-xs text-ink-500 px-2 py-3">Aucun calque</div>
+            <div className="text-xs text-ink-500 px-2 py-3">{t('timeline.noLayers')}</div>
           )}
           {[...scene.layers].reverse().map((layer) => (
             <div

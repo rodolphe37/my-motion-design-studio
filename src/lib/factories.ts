@@ -15,6 +15,7 @@ import type {
   ImportedMeshFormat,
 } from './types';
 import { ASPECT_RATIOS, uid } from './types';
+import i18n from './i18n';
 
 export function getAspectRatio(preset: AspectRatioPreset): { width: number; height: number } {
   if (preset === 'custom') return { width: 1920, height: 1080 };
@@ -45,7 +46,7 @@ export function createDefaultSettings(mode: ProjectMode, preset: AspectRatioPres
 export function createShapeLayer(): ShapeLayer {
   return {
     id: uid(),
-    name: 'Rectangle',
+    name: i18n.t('defaultNames.rectangle', { ns: 'editor' }),
     type: 'shape',
     shape: 'rectangle',
     x: 200,
@@ -69,7 +70,7 @@ export function createShapeLayer(): ShapeLayer {
 export function createTextLayer(): TextLayer {
   return {
     id: uid(),
-    name: 'Texte',
+    name: i18n.t('defaultNames.text', { ns: 'editor' }),
     type: 'text',
     x: 300,
     y: 300,
@@ -91,7 +92,7 @@ export function createTextLayer(): TextLayer {
 export function createImageLayer(src: string, width = 400, height = 400): ImageLayer {
   return {
     id: uid(),
-    name: 'Image',
+    name: i18n.t('defaultNames.image', { ns: 'editor' }),
     type: 'image',
     x: 200,
     y: 200,
@@ -108,17 +109,12 @@ export function createImageLayer(src: string, width = 400, height = 400): ImageL
 }
 
 export function createMeshLayer(mesh: MeshLayer['mesh']): MeshLayer {
-  const names: Record<string, string> = {
-    box: 'Cube',
-    sphere: 'Sphère',
-    cone: 'Cône',
-    cylinder: 'Cylindre',
-    plane: 'Plan',
-    torus: 'Tore',
-  };
+  const name = ['box', 'sphere', 'cone', 'cylinder', 'plane', 'torus'].includes(mesh)
+    ? i18n.t(`defaultNames.${mesh}`, { ns: 'editor' })
+    : i18n.t('defaultNames.mesh', { ns: 'editor' });
   return {
     id: uid(),
-    name: names[mesh] || 'Mesh',
+    name,
     type: 'mesh',
     mesh,
     position: { x: 0, y: 0, z: 0 },
@@ -162,7 +158,7 @@ export function createImportedMeshLayer(name: string, src: string, format: Impor
 export function createLightLayer(light: LightLayer['light']): LightLayer {
   return {
     id: uid(),
-    name: `Lumière ${light}`,
+    name: i18n.t('defaultNames.light', { ns: 'editor', kind: light }),
     type: 'light',
     light,
     position: { x: 5, y: 5, z: 5 },
@@ -180,9 +176,9 @@ export function createLightLayer(light: LightLayer['light']): LightLayer {
 export function createText3DLayer(): Text3DLayer {
   return {
     id: uid(),
-    name: 'Texte 3D',
+    name: i18n.t('defaultNames.text3d', { ns: 'editor' }),
     type: 'text3d',
-    text: 'Texte 3D',
+    text: i18n.t('defaultNames.text3d', { ns: 'editor' }),
     position: { x: 0, y: 0, z: 0 },
     rotation: { x: 0, y: 0, z: 0 },
     scale: { x: 1, y: 1, z: 1 },
@@ -200,7 +196,7 @@ export function createText3DLayer(): Text3DLayer {
 export function createCamera3DLayer(): Camera3DLayer {
   return {
     id: uid(),
-    name: 'Caméra',
+    name: i18n.t('defaultNames.camera', { ns: 'editor' }),
     type: 'camera3d',
     position: { x: 0, y: 2, z: 8 },
     rotation: { x: 0, y: 0, z: 0 },
@@ -241,7 +237,7 @@ export function createProject(
     updatedAt: Date.now(),
     thumbnail: null,
     settings,
-    scenes: [createScene('Scène 1', settings.defaultSceneDuration, 0)],
+    scenes: [createScene(i18n.t('defaultNames.scene', { ns: 'editor', n: 1 }), settings.defaultSceneDuration, 0)],
   };
 }
 

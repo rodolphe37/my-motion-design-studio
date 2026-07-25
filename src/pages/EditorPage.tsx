@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import type { Project } from '@/lib/types';
@@ -17,6 +18,7 @@ import { useKeyboardShortcuts } from '@/lib/useKeyboardShortcuts';
 import { Monitor } from 'lucide-react';
 
 export default function EditorPage() {
+  const { t } = useTranslation('editor');
   const { projectId } = useParams();
   const project = useLiveQuery(() => db.projects.get(projectId!), [projectId], undefined as Project | undefined);
   const setProject = useEditorStore((s) => s.setProject);
@@ -41,7 +43,7 @@ export default function EditorPage() {
     if (project) setProject(project);
   }, [project, setProject]);
 
-  if (project === undefined) return <div className="min-h-screen flex items-center justify-center text-ink-300">Chargement...</div>;
+  if (project === undefined) return <div className="min-h-screen flex items-center justify-center text-ink-300">{t('page.loading')}</div>;
   if (!project) return <Navigate to="/projects" replace />;
 
   if (viewMode === 'preview') {
@@ -67,8 +69,10 @@ export default function EditorPage() {
                 theme-flipping ink-* tokens, which would go dark-on-dark. */}
             <div className="sm:hidden absolute inset-0 bg-ink-950/95 flex flex-col items-center justify-center p-6 text-center z-50">
               <Monitor className="w-10 h-10 text-amber-400 mb-3" />
-              <h3 className="font-semibold mb-1 text-white">Écran trop petit</h3>
-              <p className="text-sm text-gray-300">L'éditeur est optimisé pour desktop. Utilisez un écran plus large pour une meilleure expérience{is3D ? ', surtout en mode 3D' : ''}.</p>
+              <h3 className="font-semibold mb-1 text-white">{t('page.smallScreenTitle')}</h3>
+              <p className="text-sm text-gray-300">
+                {t('page.smallScreenDesc', { extra: is3D ? t('page.smallScreen3dExtra') : '' })}
+              </p>
             </div>
           </div>
           <Timeline />
@@ -85,7 +89,7 @@ export default function EditorPage() {
                   rightPanel === p ? 'text-accent-violet bg-accent-violet/10 border-b-2 border-accent-violet' : 'text-ink-300 hover:text-ink-50'
                 }`}
               >
-                {p === 'properties' ? 'Propriétés' : p === 'layers' ? 'Calques' : p === 'animation' ? 'Anim' : p === 'transitions' ? 'Trans.' : 'Scène'}
+                {p === 'properties' ? t('page.tabs.properties') : p === 'layers' ? t('page.tabs.layers') : p === 'animation' ? t('page.tabs.animation') : p === 'transitions' ? t('page.tabs.transitions') : t('page.tabs.scene')}
               </button>
             ))}
           </div>
