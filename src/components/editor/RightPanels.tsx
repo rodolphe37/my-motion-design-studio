@@ -595,7 +595,6 @@ export function ScenePanel() {
   if (!project) return null;
   const scene = project.scenes.find((s) => s.id === currentSceneId);
   if (!scene) return null;
-  const is3D = project.mode === '3d';
 
   const bg = scene.background;
   const mode: 'default' | 'solid' | 'gradient' | 'spots' = bg?.type ?? 'default';
@@ -627,103 +626,99 @@ export function ScenePanel() {
         onChange={(v) => updateScene(scene.id, { duration: Math.max(0.1, v) })}
       />
 
-      {!is3D && (
+      <div>
+        <label className="label">Fond de la scène</label>
+        <div className="grid grid-cols-2 gap-2 mt-1">
+          {modes.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => setMode(opt.value)}
+              className={`px-3 py-2 rounded-lg border-2 text-sm transition-all ${
+                mode === opt.value ? 'border-accent-violet bg-accent-violet/10 text-accent-violet' : 'border-ink-600 text-ink-300 hover:border-ink-500'
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+        {mode === 'default' && (
+          <p className="text-xs text-ink-400 mt-2">Utilise la couleur de fond définie dans les Réglages du projet.</p>
+        )}
+      </div>
+
+      {bg?.type === 'solid' && (
+        <ColorField label="Couleur" value={bg.color} onChange={(v) => setSceneBackground(scene.id, { ...bg, color: v })} />
+      )}
+
+      {bg?.type === 'gradient' && (
         <>
-          <div>
-            <label className="label">Fond de la scène</label>
-            <div className="grid grid-cols-2 gap-2 mt-1">
-              {modes.map((opt) => (
-                <button
-                  key={opt.value}
-                  onClick={() => setMode(opt.value)}
-                  className={`px-3 py-2 rounded-lg border-2 text-sm transition-all ${
-                    mode === opt.value ? 'border-accent-violet bg-accent-violet/10 text-accent-violet' : 'border-ink-600 text-ink-300 hover:border-ink-500'
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
+          <ColorField label="Couleur de départ" value={bg.from} onChange={(v) => setSceneBackground(scene.id, { ...bg, from: v })} />
+          <ColorField label="Couleur d'arrivée" value={bg.to} onChange={(v) => setSceneBackground(scene.id, { ...bg, to: v })} />
+          <NumberField label="Angle (°)" value={bg.angle} onChange={(v) => setSceneBackground(scene.id, { ...bg, angle: v })} />
+        </>
+      )}
+
+      {bg?.type === 'spots' && (
+        <>
+          <ColorField label="Couleur de fond" value={bg.base} onChange={(v) => setSceneBackground(scene.id, { ...bg, base: v })} />
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="label !mb-0">Spots ({bg.spots.length})</label>
+              <button
+                onClick={() => setSceneBackground(scene.id, {
+                  ...bg,
+                  spots: [...bg.spots, { color: '#3b82f6', x: project.settings.width / 2, y: project.settings.height / 2, radius: Math.round(project.settings.width / 6), opacity: 0.5 }],
+                })}
+                className="icon-btn w-6 h-6"
+                title="Ajouter un spot"
+              >
+                +
+              </button>
             </div>
-            {mode === 'default' && (
-              <p className="text-xs text-ink-400 mt-2">Utilise la couleur de fond définie à la création du projet.</p>
-            )}
-          </div>
-
-          {bg?.type === 'solid' && (
-            <ColorField label="Couleur" value={bg.color} onChange={(v) => setSceneBackground(scene.id, { ...bg, color: v })} />
-          )}
-
-          {bg?.type === 'gradient' && (
-            <>
-              <ColorField label="Couleur de départ" value={bg.from} onChange={(v) => setSceneBackground(scene.id, { ...bg, from: v })} />
-              <ColorField label="Couleur d'arrivée" value={bg.to} onChange={(v) => setSceneBackground(scene.id, { ...bg, to: v })} />
-              <NumberField label="Angle (°)" value={bg.angle} onChange={(v) => setSceneBackground(scene.id, { ...bg, angle: v })} />
-            </>
-          )}
-
-          {bg?.type === 'spots' && (
-            <>
-              <ColorField label="Couleur de fond" value={bg.base} onChange={(v) => setSceneBackground(scene.id, { ...bg, base: v })} />
-              <div className="space-y-2">
+            {bg.spots.map((spot, i) => (
+              <div key={i} className="p-2 rounded-lg border border-ink-700 space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="label !mb-0">Spots ({bg.spots.length})</label>
+                  <span className="text-xs text-ink-400">Spot {i + 1}</span>
                   <button
-                    onClick={() => setSceneBackground(scene.id, {
-                      ...bg,
-                      spots: [...bg.spots, { color: '#3b82f6', x: project.settings.width / 2, y: project.settings.height / 2, radius: Math.round(project.settings.width / 6), opacity: 0.5 }],
-                    })}
-                    className="icon-btn w-6 h-6"
-                    title="Ajouter un spot"
+                    onClick={() => setSceneBackground(scene.id, { ...bg, spots: bg.spots.filter((_, si) => si !== i) })}
+                    className="p-1 hover:bg-red-500/20 hover:text-red-400 rounded"
+                    title="Supprimer ce spot"
                   >
-                    +
+                    <Trash2 className="w-3 h-3" />
                   </button>
                 </div>
-                {bg.spots.map((spot, i) => (
-                  <div key={i} className="p-2 rounded-lg border border-ink-700 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-ink-400">Spot {i + 1}</span>
-                      <button
-                        onClick={() => setSceneBackground(scene.id, { ...bg, spots: bg.spots.filter((_, si) => si !== i) })}
-                        className="p-1 hover:bg-red-500/20 hover:text-red-400 rounded"
-                        title="Supprimer ce spot"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </button>
-                    </div>
-                    <ColorField
-                      label="Couleur"
-                      value={spot.color}
-                      onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, color: v } : s)) })}
-                    />
-                    <div className="grid grid-cols-2 gap-2">
-                      <NumberField
-                        label="X"
-                        value={spot.x}
-                        onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, x: v } : s)) })}
-                      />
-                      <NumberField
-                        label="Y"
-                        value={spot.y}
-                        onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, y: v } : s)) })}
-                      />
-                      <NumberField
-                        label="Rayon"
-                        value={spot.radius}
-                        onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, radius: v } : s)) })}
-                      />
-                      <NumberField
-                        label="Opacité"
-                        value={spot.opacity}
-                        step={0.1}
-                        onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, opacity: v } : s)) })}
-                      />
-                    </div>
-                  </div>
-                ))}
-                {bg.spots.length === 0 && <p className="text-xs text-ink-400 px-1">Aucun spot — cliquez + pour en ajouter un.</p>}
+                <ColorField
+                  label="Couleur"
+                  value={spot.color}
+                  onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, color: v } : s)) })}
+                />
+                <div className="grid grid-cols-2 gap-2">
+                  <NumberField
+                    label="X"
+                    value={spot.x}
+                    onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, x: v } : s)) })}
+                  />
+                  <NumberField
+                    label="Y"
+                    value={spot.y}
+                    onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, y: v } : s)) })}
+                  />
+                  <NumberField
+                    label="Rayon"
+                    value={spot.radius}
+                    onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, radius: v } : s)) })}
+                  />
+                  <NumberField
+                    label="Opacité"
+                    value={spot.opacity}
+                    step={0.1}
+                    onChange={(v) => setSceneBackground(scene.id, { ...bg, spots: bg.spots.map((s, si) => (si === i ? { ...s, opacity: v } : s)) })}
+                  />
+                </div>
               </div>
-            </>
-          )}
+            ))}
+            {bg.spots.length === 0 && <p className="text-xs text-ink-400 px-1">Aucun spot — cliquez + pour en ajouter un.</p>}
+          </div>
         </>
       )}
     </div>

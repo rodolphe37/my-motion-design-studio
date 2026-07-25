@@ -100,18 +100,18 @@ export function ProjectSettingsModal({ open, onClose }: Props) {
           </div>
 
           <div className="space-y-2">
-            <label className="label">{is3D ? 'Couleur de fond' : 'Couleur de fond par défaut'}</label>
+            <label className="label">Couleur de fond par défaut</label>
             <div className="flex items-center gap-2">
               <input type="color" value={settings.backgroundColor} onChange={(e) => updateProjectSettings({ backgroundColor: e.target.value })} className="w-12 h-10" />
               <input type="text" value={settings.backgroundColor} onChange={(e) => updateProjectSettings({ backgroundColor: e.target.value })} className="input font-mono text-sm" />
             </div>
-            {!is3D && <p className="text-xs text-ink-400">Utilisée par les scènes qui n'ont pas de fond spécifique (onglet Scène).</p>}
+            <p className="text-xs text-ink-400">Utilisée par les scènes qui n'ont pas de fond spécifique (onglet Scène — uni, dégradé ou spots).</p>
           </div>
 
           {is3D && (
             <>
               <div className="space-y-2">
-                <label className="label">Environnement</label>
+                <label className="label">Reflets (environnement)</label>
                 <div className="flex gap-2">
                   {(['color', 'gradient', 'hdri'] as const).map((env) => (
                     <button
@@ -121,10 +121,11 @@ export function ProjectSettingsModal({ open, onClose }: Props) {
                         settings.environment === env ? 'border-accent-blue bg-accent-blue/10 text-accent-blue' : 'border-ink-600 text-ink-300 hover:border-ink-500'
                       }`}
                     >
-                      {env === 'hdri' ? 'HDRI Studio' : env}
+                      {env === 'hdri' ? 'HDRI Studio' : env === 'gradient' ? 'Ville' : 'Aucun'}
                     </button>
                   ))}
                 </div>
+                <p className="text-xs text-ink-400">Préréglage utilisé pour les reflets sur les matériaux métalliques/lisses — n'affecte pas le fond visible (réglé ci-dessus et dans l'onglet Scène).</p>
               </div>
               <div className="flex items-center justify-between p-3 bg-ink-900 rounded-lg border border-ink-600">
                 <div>

@@ -6,7 +6,7 @@ import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import * as THREE from 'three';
 import { useEditorStore } from '@/lib/store';
 import { getLayerAtTime } from '@/lib/animation';
-import type { Layer, MeshLayer, LightLayer, Camera3DLayer, Text3DLayer } from '@/lib/types';
+import type { Layer, MeshLayer, LightLayer, Camera3DLayer, Text3DLayer, BackgroundFill } from '@/lib/types';
 
 // A broken/invalid imported model file would otherwise throw during render
 // and take down the whole 3D canvas — isolate each import so the rest of the
@@ -26,6 +26,68 @@ class ImportErrorBoundary extends Component<{ children: ReactNode }, { hasError:
 // and silently renders accented Latin characters (é, à, ç…) as "?" — a
 // dealbreaker for French UI text. optimer_bold covers Latin-1.
 const TEXT3D_FONT = '/fonts/optimer_bold.typeface.json';
+
+function drawBackgroundFill(ctx: CanvasRenderingContext2D, fill: BackgroundFill, width: number, height: number) {
+  if (fill.type === 'gradient') {
+    const rad = (fill.angle * Math.PI) / 180;
+    const cx = width / 2, cy = height / 2;
+    const dx = Math.cos(rad) * cx, dy = Math.sin(rad) * cy;
+    const grad = ctx.createLinearGradient(cx - dx, cy - dy, cx + dx, cy + dy);
+    grad.addColorStop(0, fill.from);
+    grad.addColorStop(1, fill.to);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, width, height);
+    return;
+  }
+  if (fill.type === 'spots') {
+    ctx.fillStyle = fill.base;
+    ctx.fillRect(0, 0, width, height);
+    for (const spot of fill.spots) {
+      const grad = ctx.createRadialGradient(spot.x, spot.y, 0, spot.x, spot.y, Math.max(1, spot.radius));
+      grad.addColorStop(0, spot.color);
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.save();
+      ctx.globalAlpha = spot.opacity;
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, width, height);
+      ctx.restore();
+    }
+    return;
+  }
+  ctx.fillStyle = fill.color;
+  ctx.fillRect(0, 0, width, height);
+}
+
+// Three.js scene.background only accepts a Color or a Texture — a solid
+// fill sets it directly (cheap, no GPU upload), while gradient/spots fills
+// are rasterized once onto an offscreen canvas (same math as Canvas2D's
+// SceneBackground) and uploaded as a CanvasTexture. Keyed on the fill's
+// serialized value rather than its object identity, since the store clones
+// the whole project on every edit — using identity would regenerate (and
+// re-upload) the texture on every unrelated keystroke.
+function SceneBackground3D({ fill, width, height }: { fill: BackgroundFill; width: number; height: number }) {
+  const { scene } = useThree();
+  const fillKey = JSON.stringify(fill);
+
+  useEffect(() => {
+    if (fill.type === 'solid') {
+      scene.background = new THREE.Color(fill.color);
+      return;
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(width));
+    canvas.height = Math.max(1, Math.round(height));
+    const ctx = canvas.getContext('2d');
+    if (ctx) drawBackgroundFill(ctx, fill, canvas.width, canvas.height);
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    scene.background = texture;
+    return () => texture.dispose();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scene, fillKey, width, height]);
+
+  return null;
+}
 
 export function Canvas3D() {
   const project = useEditorStore((s) => s.project);
@@ -64,7 +126,7 @@ export function Canvas3D() {
   if (!scene) return null;
 
   const time = currentTime;
-  const bgColor = project.settings.backgroundColor;
+  const background: BackgroundFill = scene.background ?? { type: 'solid', color: project.settings.backgroundColor };
 
   // Find camera layer — evaluated at the current time so its keyframes
   // (position/rotation/fov…) actually animate instead of showing the static
@@ -88,7 +150,7 @@ export function Canvas3D() {
         dpr={isExporting ? 1 : undefined}
         onPointerMissed={() => selectLayer(null)}
       >
-        <color attach="background" args={[bgColor]} />
+        <SceneBackground3D fill={background} width={project.settings.width} height={project.settings.height} />
         {project.settings.environment === 'gradient' && (
           <Environment preset="city" background={false} />
         )}

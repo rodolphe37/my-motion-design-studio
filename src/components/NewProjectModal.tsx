@@ -224,14 +224,15 @@ export function NewProjectModal({ open, onClose }: Props) {
               {mode === '3d' && (
                 <>
                   <div className="space-y-2">
-                    <label className="label">Environnement par défaut</label>
+                    <label className="label">Reflets (environnement)</label>
                     <div className="flex gap-2">
                       {(['color', 'gradient', 'hdri'] as const).map((env) => (
                         <button key={env} onClick={() => setEnvironment(env)} className={`flex-1 py-2 rounded-lg border-2 text-sm font-medium capitalize transition-all ${
                           environment === env ? 'border-accent-blue bg-accent-blue/10 text-accent-blue' : 'border-ink-600 text-ink-300 hover:border-ink-500'
-                        }`}>{env === 'hdri' ? 'HDRI Studio' : env}</button>
+                        }`}>{env === 'hdri' ? 'HDRI Studio' : env === 'gradient' ? 'Ville' : 'Aucun'}</button>
                       ))}
                     </div>
+                    <p className="text-xs text-ink-400">Préréglage de reflets pour les matériaux métalliques/lisses — le fond visible se règle séparément juste au-dessus.</p>
                   </div>
                   <div className="flex items-center justify-between p-3 bg-ink-900 rounded-lg border border-ink-600">
                     <div>
