@@ -99,6 +99,8 @@ jobs:
           production-deploy: true
           deploy-message: 'Deploy ${{ github.sha }}'
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          enable-commit-comment: false
+          enable-commit-status: false
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
@@ -148,6 +150,8 @@ jobs:
           deploy-message: 'Preview PR #${{ github.event.pull_request.number }} — ${{ github.event.pull_request.head.sha }}'
           github-token: ${{ secrets.GITHUB_TOKEN }}
           github-deployment-environment: 'pr-${{ github.event.pull_request.number }}'
+          enable-commit-comment: false
+          enable-commit-status: false
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
