@@ -25,14 +25,14 @@ jobs:
       fail-fast: false
       matrix:
         # Matches the "node" range in package.json's "engines" field
-        # (^20.19.0 || >=22.12.0) — the latest 20.x and 22.x satisfy it.
+        # (^22 || >=24) — the latest 22.x and 24.x satisfy it.
         node-version: ['22', '24']
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
