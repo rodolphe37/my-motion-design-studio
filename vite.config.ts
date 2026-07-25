@@ -15,6 +15,10 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      injectRegister: "script-defer",
+      devOptions: {
+        enabled: true,
+      },
       manifest: {
         name: 'MyMotionStudio',
         short_name: 'MyMotionStudio',
@@ -23,11 +27,42 @@ export default defineConfig({
         background_color: '#0f0f12',
         display: 'standalone',
         orientation: 'any',
+        start_url: "/",
+        id: "/",
+        display_override: ["window-controls-overlay"],
+        protocol_handlers: [
+          { protocol: "web+tea", url: "/tea?type=%s" },
+          { protocol: "web+coffee", url: "/coffee?type=%s" },
+        ],
         icons: [
           { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: '/icon-512.png', sizes: '512x512', type: 'image/png' },
           { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
+        screenshots: [
+          {
+            src: "/desktop.webp",
+            sizes: "3164x1788",
+            type: "image/webp",
+            form_factor: "wide",
+          },
+          {
+            src: "/phone.webp",
+            sizes: "796x1634",
+            type: "image/webp",
+            platform: "ios",
+            label: "MyMotionStudio",
+          },
+          {
+            src: "/phone.webp",
+            sizes: "796x1634",
+            type: "image/webp",
+            platform: "android",
+            label: "MyMotionStudio",
+          },
+        ],
+        categories: ["education", "productivity"],
+        lang: "fr-FR",
       },
       workbox: {
         // json/jpg cover the Text3D font (public/fonts) and the landing-page
