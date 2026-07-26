@@ -89,7 +89,7 @@ The two source projects behind these are available as `public/demos/*.json` and 
 
 **Project & export**
 - Project settings (format/aspect ratio, FPS, background, environment, shadows, default scene duration) editable at any time, not just at creation
-- Client-side video export (MediaRecorder-based) to MP4, WebM, GIF, or MOV, with resolution presets up to 4K, quality/bitrate presets, progress reporting, and cancellation
+- Client-side export to MP4, WebM, or MOV (MediaRecorder-based, with quality/bitrate presets) and animated GIF (via [gifenc](https://github.com/mattdesl/gifenc), frame-by-frame quantization/encoding), with resolution presets up to 4K, progress reporting, and cancellation
 - Auto-generated project thumbnail after a successful export
 - JSON export/import for backup, sharing, or moving a project to another device
 - Undo/redo history (50 steps) and debounced autosave to the browser's local database
@@ -110,6 +110,7 @@ The two source projects behind these are available as `public/demos/*.json` and 
 | Styling | [Tailwind CSS](https://tailwindcss.com/) |
 | Icons | [lucide-react](https://lucide.dev/) |
 | Video export | [MediaRecorder API](https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder) |
+| GIF export | [gifenc](https://github.com/mattdesl/gifenc) |
 | Internationalization | [react-i18next](https://react.i18next.com/) / [i18next-browser-languagedetector](https://github.com/i18next/i18next-browser-languageDetector) |
 
 ### Getting started
@@ -242,7 +243,7 @@ Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for the full tex
 ### Acknowledgments
 
 This project wouldn't exist without these open-source projects:
-[React](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Vite](https://vitejs.dev/), [vite-plugin-pwa](https://vite-pwa-org.netlify.app/), [Tailwind CSS](https://tailwindcss.com/), [Zustand](https://github.com/pmndrs/zustand), [Dexie.js](https://dexie.org/), [Konva](https://konvajs.org/) / [react-konva](https://github.com/konvajs/react-konva), [Three.js](https://threejs.org/), [react-three-fiber](https://docs.pmnd.rs/react-three-fiber) / [drei](https://github.com/pmndrs/drei), and [lucide-react](https://lucide.dev/).
+[React](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Vite](https://vitejs.dev/), [vite-plugin-pwa](https://vite-pwa-org.netlify.app/), [Tailwind CSS](https://tailwindcss.com/), [Zustand](https://github.com/pmndrs/zustand), [Dexie.js](https://dexie.org/), [Konva](https://konvajs.org/) / [react-konva](https://github.com/konvajs/react-konva), [Three.js](https://threejs.org/), [react-three-fiber](https://docs.pmnd.rs/react-three-fiber) / [drei](https://github.com/pmndrs/drei), [gifenc](https://github.com/mattdesl/gifenc), and [lucide-react](https://lucide.dev/).
 
 ---
 
@@ -297,7 +298,7 @@ Ce projet a démarré comme réalisation personnelle/portfolio et est désormais
 
 **Projet & export**
 - Réglages du projet (format/ratio, FPS, fond, environnement, ombres, durée par défaut d'une scène) modifiables à tout moment, pas seulement à la création
-- Export vidéo côté client (via MediaRecorder) en MP4, WebM, GIF ou MOV, avec préréglages de résolution jusqu'à la 4K, préréglages de qualité/débit, suivi de progression et annulation
+- Export côté client en MP4, WebM ou MOV (via MediaRecorder, avec préréglages de qualité/débit) et en GIF animé (via [gifenc](https://github.com/mattdesl/gifenc), quantification/encodage image par image), avec préréglages de résolution jusqu'à la 4K, suivi de progression et annulation
 - Miniature de projet générée automatiquement après un export réussi
 - Export/import JSON pour sauvegarder, partager ou transférer un projet vers un autre appareil
 - Historique annuler/rétablir (50 étapes) et enregistrement automatique différé vers la base locale du navigateur
@@ -306,7 +307,7 @@ Ce projet a démarré comme réalisation personnelle/portfolio et est désormais
 
 ### Stack technique
 
-Voir le tableau de la section anglaise ci-dessus ([Tech stack](#tech-stack)) — les technologies utilisées sont les mêmes quel que soit le contexte de lecture : React 19 + TypeScript, Vite, React Router, Zustand, Konva, Three.js / react-three-fiber / drei, Dexie.js (IndexedDB), Tailwind CSS, lucide-react, et l'API MediaRecorder pour l'export vidéo.
+Voir le tableau de la section anglaise ci-dessus ([Tech stack](#tech-stack)) — les technologies utilisées sont les mêmes quel que soit le contexte de lecture : React 19 + TypeScript, Vite, React Router, Zustand, Konva, Three.js / react-three-fiber / drei, Dexie.js (IndexedDB), Tailwind CSS, lucide-react, l'API MediaRecorder pour l'export vidéo, et [gifenc](https://github.com/mattdesl/gifenc) pour l'export GIF.
 
 ### Démarrage rapide
 

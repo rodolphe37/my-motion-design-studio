@@ -29,7 +29,7 @@ export default {
       scenes3d: { title: 'Full 3D scenes', desc: 'Primitives, glTF import, lights, cameras, PBR materials — real-time WebGL rendering.' },
       keyframes: { title: 'Keyframes & Easing', desc: 'Custom animation engine with easing, spring, and custom bézier curves.' },
       scenesTransitions: { title: 'Scenes & Transitions', desc: 'Chain multiple scenes with fade, slide, zoom, and dissolve transitions.' },
-      videoExport: { title: 'Video export', desc: 'Export to MP4, WebM, GIF via MediaRecorder or ffmpeg.wasm for quality rendering.' },
+      videoExport: { title: 'Video export', desc: 'Export to MP4, WebM, animated GIF, or MOV (via ffmpeg.wasm) — from 480p to 4K, at 24/30/60 fps.' },
       offlinePwa: { title: 'Offline-first PWA', desc: 'Install the app, work without a network. Everything is persisted locally via IndexedDB.' },
     },
   },

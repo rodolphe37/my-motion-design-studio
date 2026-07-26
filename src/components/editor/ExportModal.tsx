@@ -54,6 +54,7 @@ export function ExportModal({ open, onClose }: Props) {
 
   if (!open || !project) return null;
 
+  const isGif = format === 'gif';
   const res = getExportResolution(project, resolution, customW, customH);
   const totalDuration = project.scenes.reduce((sum, s) => sum + s.duration, 0);
   const estimatedSize = (QUALITIES.find((q) => q.value === quality)?.bitrate || 8_000_000) * totalDuration / 8;
@@ -253,7 +254,7 @@ export function ExportModal({ open, onClose }: Props) {
         <div className="flex items-center justify-between p-5 border-b border-ink-700">
           <h2 className="text-lg font-semibold flex items-center gap-2">
             <FileVideo className="w-5 h-5 text-accent-violet" />
-            {t('exportModal.title')}
+            {isGif ? t('exportModal.titleGif') : t('exportModal.title')}
           </h2>
           <button onClick={handleClose} className="icon-btn"><X className="w-5 h-5" /></button>
         </div>
@@ -264,7 +265,7 @@ export function ExportModal({ open, onClose }: Props) {
               <Check className="w-8 h-8 text-emerald-400" />
             </div>
             <h3 className="font-semibold text-lg mb-1">{t('exportModal.doneTitle')}</h3>
-            <p className="text-sm text-ink-300 mb-4">{t('exportModal.doneDesc')}</p>
+            <p className="text-sm text-ink-300 mb-4">{isGif ? t('exportModal.doneDescGif') : t('exportModal.doneDesc')}</p>
             <button onClick={handleClose} className="btn-primary">{t('exportModal.close')}</button>
           </div>
         ) : exporting ? (
@@ -335,23 +336,27 @@ export function ExportModal({ open, onClose }: Props) {
                 </div>
               </div>
 
-              {/* Quality */}
-              <div>
-                <label className="label mb-2 block">{t('exportModal.qualityLabel')}</label>
-                <div className="flex gap-2">
-                  {QUALITIES.map((q) => (
-                    <button key={q.value} onClick={() => setQuality(q.value)} className={`flex-1 py-2 rounded-lg border-2 text-sm transition-all ${quality === q.value ? 'border-accent-violet bg-accent-violet/10 text-accent-violet' : 'border-ink-600 text-ink-300'}`}>
-                      {q.label}
-                    </button>
-                  ))}
+              {/* Quality: bitrate-based, not applicable to the GIF encoder */}
+              {!isGif && (
+                <div>
+                  <label className="label mb-2 block">{t('exportModal.qualityLabel')}</label>
+                  <div className="flex gap-2">
+                    {QUALITIES.map((q) => (
+                      <button key={q.value} onClick={() => setQuality(q.value)} className={`flex-1 py-2 rounded-lg border-2 text-sm transition-all ${quality === q.value ? 'border-accent-violet bg-accent-violet/10 text-accent-violet' : 'border-ink-600 text-ink-300'}`}>
+                        {q.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Info */}
               <div className="p-3 bg-ink-900 rounded-lg border border-ink-600 space-y-1 text-sm">
                 <div className="flex justify-between"><span className="text-ink-400">{t('exportModal.infoResolution')}</span><span className="font-mono">{res.width}×{res.height}</span></div>
                 <div className="flex justify-between"><span className="text-ink-400">{t('exportModal.infoDuration')}</span><span className="font-mono">{totalDuration.toFixed(1)}s</span></div>
-                <div className="flex justify-between"><span className="text-ink-400">{t('exportModal.infoEstimatedSize')}</span><span className="font-mono">~{formatBytes(estimatedSize)}</span></div>
+                {!isGif && (
+                  <div className="flex justify-between"><span className="text-ink-400">{t('exportModal.infoEstimatedSize')}</span><span className="font-mono">~{formatBytes(estimatedSize)}</span></div>
+                )}
               </div>
 
               {isHeavy && (
