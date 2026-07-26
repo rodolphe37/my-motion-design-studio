@@ -50,8 +50,9 @@ export default {
     items: {
       demo2d: 'MyMotionStudio — Démo 2D',
       demo3d: 'MyMotionStudio — Démo 3D',
+      demoGif: 'MyMotionStudio — Export GIF animé',
     },
-    playAria: 'Lire {{title}}',
+    viewAria: 'Voir {{title}}',
     closeAria: 'Fermer l\'aperçu',
   },
   cta: {

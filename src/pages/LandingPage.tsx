@@ -21,7 +21,7 @@ import {
   X,
 } from 'lucide-react';
 import { DemoPlayer } from '@/components/DemoPlayer';
-import { ShowcaseLightbox } from '@/components/ShowcaseLightbox';
+import { ShowcaseLightbox, type ShowcaseSource } from '@/components/ShowcaseLightbox';
 import { useTheme } from '@/lib/useTheme';
 
 export default function LandingPage() {
@@ -47,10 +47,11 @@ export default function LandingPage() {
     { icon: Download, key: 'export' },
   ] as const;
 
-  const SHOWCASE = [
-    { key: 'demo2d', mode: '2D', thumb: '/demos/2d-thumb.jpg', demoUrl: '/demos/2d-demo.json' },
-    { key: 'demo3d', mode: '3D', thumb: '/demos/3d-thumb.jpg', demoUrl: '/demos/3d-demo.json' },
-  ] as const;
+  const SHOWCASE: { key: string; badge: string; thumb: string; source: ShowcaseSource }[] = [
+    { key: 'demo2d', badge: '2D', thumb: '/demos/2d-thumb.jpg', source: { kind: 'video', demoUrl: '/demos/2d-demo.json' } },
+    { key: 'demo3d', badge: '3D', thumb: '/demos/3d-thumb.jpg', source: { kind: 'video', demoUrl: '/demos/3d-demo.json' } },
+    { key: 'demoGif', badge: 'GIF', thumb: '/demos/gif-thumb.gif', source: { kind: 'gif', gifUrl: '/demos/gif-thumb.gif' } },
+  ];
 
   return (
     <div className="min-h-screen bg-ink-900 text-ink-100 overflow-x-hidden">
@@ -276,12 +277,12 @@ export default function LandingPage() {
             <h2 className="text-3xl sm:text-4xl font-bold mb-3">{t('showcase.heading')}</h2>
             <p className="text-ink-300">{t('showcase.subheading')}</p>
           </div>
-          <div className="grid sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
             {SHOWCASE.map((item, i) => (
               <button
                 key={i}
                 onClick={() => setActiveShowcase(i)}
-                aria-label={t('showcase.playAria', { title: t(`showcase.items.${item.key}`) })}
+                aria-label={t('showcase.viewAria', { title: t(`showcase.items.${item.key}`) })}
                 className="group relative aspect-video rounded-xl overflow-hidden panel cursor-pointer text-left"
               >
                 <img src={item.thumb} alt={t(`showcase.items.${item.key}`)} className="absolute inset-0 w-full h-full object-cover" />
@@ -293,7 +294,7 @@ export default function LandingPage() {
                   <div className="flex items-center justify-between gap-2">
                     <h3 className="font-medium text-white truncate min-w-0">{t(`showcase.items.${item.key}`)}</h3>
                     <span className="shrink-0 px-2 py-0.5 rounded text-xs font-bold bg-white/20 text-white backdrop-blur">
-                      {item.mode}
+                      {item.badge}
                     </span>
                   </div>
                 </div>
@@ -342,7 +343,7 @@ export default function LandingPage() {
       </footer>
 
       <ShowcaseLightbox
-        demoUrl={activeShowcase !== null ? SHOWCASE[activeShowcase].demoUrl : null}
+        source={activeShowcase !== null ? SHOWCASE[activeShowcase].source : null}
         label={activeShowcase !== null ? t(`showcase.items.${SHOWCASE[activeShowcase].key}`) : ''}
         closeAria={t('showcase.closeAria')}
         onClose={() => setActiveShowcase(null)}

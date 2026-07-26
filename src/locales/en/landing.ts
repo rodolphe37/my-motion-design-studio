@@ -46,12 +46,13 @@ export default {
   },
   showcase: {
     heading: 'Example gallery',
-    subheading: "Real projects rendered by the app — click a thumbnail to watch it play.",
+    subheading: "Real projects rendered by the app — click a thumbnail to see it in motion.",
     items: {
       demo2d: 'MyMotionStudio — 2D Demo',
       demo3d: 'MyMotionStudio — 3D Demo',
+      demoGif: 'MyMotionStudio — Animated GIF export',
     },
-    playAria: 'Play {{title}}',
+    viewAria: 'View {{title}}',
     closeAria: 'Close preview',
   },
   cta: {

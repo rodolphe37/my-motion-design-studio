@@ -5,18 +5,22 @@ import { Canvas2D } from '@/components/editor/Canvas2D';
 import { Canvas3D } from '@/components/editor/Canvas3D';
 import type { Project } from '@/lib/types';
 
+export type ShowcaseSource = { kind: 'video'; demoUrl: string } | { kind: 'gif'; gifUrl: string };
+
 interface Props {
-  demoUrl: string | null;
+  source: ShowcaseSource | null;
   label: string;
   closeAria: string;
   onClose: () => void;
 }
 
-// Plays a single demo project on loop through the app's own Canvas2D/Canvas3D,
-// in a modal overlay — used when a showcase thumbnail is clicked. Assumes the
-// caller pauses <DemoPlayer/> while this is open, since both drive the same
-// shared editor store.
-export function ShowcaseLightbox({ demoUrl, label, closeAria, onClose }: Props) {
+// Shows a single showcase item in a modal overlay, used when a gallery
+// thumbnail is clicked. A 'video' source plays the real demo project on loop
+// through the app's own Canvas2D/Canvas3D (assumes the caller pauses
+// <DemoPlayer/> while this is open, since both drive the same shared editor
+// store); a 'gif' source just displays the already-animated GIF file.
+export function ShowcaseLightbox({ source, label, closeAria, onClose }: Props) {
+  const demoUrl = source?.kind === 'video' ? source.demoUrl : null;
   const [project, setProjectState] = useState<Project | null>(null);
   const setProject = useEditorStore((s) => s.setProject);
   const rafRef = useRef(0);
@@ -29,12 +33,6 @@ export function ShowcaseLightbox({ demoUrl, label, closeAria, onClose }: Props) 
       .then((data) => { if (!cancelled) setProjectState(data); })
       .catch(() => {});
     return () => { cancelled = true; };
-  }, [demoUrl]);
-
-  useEffect(() => {
-    if (!demoUrl) return;
-    useEditorStore.setState({ viewMode: 'preview' });
-    return () => { useEditorStore.setState({ viewMode: 'editor', isPlaying: false }); };
   }, [demoUrl]);
 
   useEffect(() => {
@@ -64,13 +62,13 @@ export function ShowcaseLightbox({ demoUrl, label, closeAria, onClose }: Props) 
   }, [project]);
 
   useEffect(() => {
-    if (!demoUrl) return;
+    if (!source) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [demoUrl, onClose]);
+  }, [source, onClose]);
 
-  if (!demoUrl) return null;
+  if (!source) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
@@ -80,7 +78,9 @@ export function ShowcaseLightbox({ demoUrl, label, closeAria, onClose }: Props) 
           <X className="w-5 h-5" />
         </button>
         <div className="relative rounded-2xl overflow-hidden border border-ink-700 shadow-2xl aspect-video bg-ink-950">
-          {project ? (
+          {source.kind === 'gif' ? (
+            <img src={source.gifUrl} alt={label} className="absolute inset-0 w-full h-full object-contain" />
+          ) : project ? (
             <div className="absolute inset-0 pointer-events-none select-none">
               {project.mode === '3d' ? <Canvas3D /> : <Canvas2D />}
             </div>
