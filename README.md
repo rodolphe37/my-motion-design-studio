@@ -57,13 +57,13 @@ This project started as a personal/portfolio build and is now open-sourced under
 
 ### Screenshots
 
-Frames captured from the app's own exported demo projects:
+Frames captured from the app's own exported demo projects. On the landing page's example gallery, clicking a thumbnail plays the actual project live through the app's own renderer:
 
-| 2D scene | 3D scene | 3D — imported model |
-|---|---|---|
-| ![2D demo](public/demos/2d-thumb.jpg) | ![3D demo](public/demos/3d-thumb.jpg) | ![3D imported model demo](public/demos/3d-objects-thumb.jpg) |
+| 2D scene | 3D scene |
+|---|---|
+| ![2D demo](public/demos/2d-thumb.jpg) | ![3D demo](public/demos/3d-thumb.jpg) |
 
-The three source projects behind these are available as `public/demos/*.json` and can be imported straight into the app (Projects page → **Importer**) to explore them yourself.
+The two source projects behind these are available as `public/demos/*.json` and can be imported straight into the app (Projects page → **Importer**) to explore them yourself.
 
 ### Features
 

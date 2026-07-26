@@ -46,12 +46,13 @@ export default {
   },
   showcase: {
     heading: "Galerie d'exemples",
-    subheading: 'Images extraites des démos exportées ci-dessus — le rendu réel de l\'app.',
+    subheading: "Des projets réels rendus par l'app — cliquez sur une miniature pour la voir s'animer.",
     items: {
       demo2d: 'MyMotionStudio — Démo 2D',
       demo3d: 'MyMotionStudio — Démo 3D',
-      demoImport3d: 'MyMotionStudio — Démo Import 3D',
     },
+    playAria: 'Lire {{title}}',
+    closeAria: 'Fermer l\'aperçu',
   },
   cta: {
     heading: 'Prêt à créer ?',

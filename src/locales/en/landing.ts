@@ -46,12 +46,13 @@ export default {
   },
   showcase: {
     heading: 'Example gallery',
-    subheading: "Frames captured from the exported demos above — the app's actual rendering.",
+    subheading: "Real projects rendered by the app — click a thumbnail to watch it play.",
     items: {
       demo2d: 'MyMotionStudio — 2D Demo',
       demo3d: 'MyMotionStudio — 3D Demo',
-      demoImport3d: 'MyMotionStudio — 3D Import Demo',
     },
+    playAria: 'Play {{title}}',
+    closeAria: 'Close preview',
   },
   cta: {
     heading: 'Ready to create?',

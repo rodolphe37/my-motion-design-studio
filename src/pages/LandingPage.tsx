@@ -21,6 +21,7 @@ import {
   X,
 } from 'lucide-react';
 import { DemoPlayer } from '@/components/DemoPlayer';
+import { ShowcaseLightbox } from '@/components/ShowcaseLightbox';
 import { useTheme } from '@/lib/useTheme';
 
 export default function LandingPage() {
@@ -28,6 +29,7 @@ export default function LandingPage() {
   const { t, i18n } = useTranslation('landing');
   const { t: tCommon } = useTranslation('common');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeShowcase, setActiveShowcase] = useState<number | null>(null);
 
   const FEATURES = [
     { icon: Shapes, key: 'edit2d', color: 'from-violet-500 to-purple-500' },
@@ -46,9 +48,8 @@ export default function LandingPage() {
   ] as const;
 
   const SHOWCASE = [
-    { key: 'demo2d', mode: '2D', thumb: '/demos/2d-thumb.jpg' },
-    { key: 'demo3d', mode: '3D', thumb: '/demos/3d-thumb.jpg' },
-    { key: 'demoImport3d', mode: '3D', thumb: '/demos/3d-objects-thumb.jpg' },
+    { key: 'demo2d', mode: '2D', thumb: '/demos/2d-thumb.jpg', demoUrl: '/demos/2d-demo.json' },
+    { key: 'demo3d', mode: '3D', thumb: '/demos/3d-thumb.jpg', demoUrl: '/demos/3d-demo.json' },
   ] as const;
 
   return (
@@ -210,7 +211,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="animate-scale-in">
-            <DemoPlayer />
+            <DemoPlayer paused={activeShowcase !== null} />
           </div>
         </div>
       </section>
@@ -275,9 +276,14 @@ export default function LandingPage() {
             <h2 className="text-3xl sm:text-4xl font-bold mb-3">{t('showcase.heading')}</h2>
             <p className="text-ink-300">{t('showcase.subheading')}</p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
+          <div className="grid sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
             {SHOWCASE.map((item, i) => (
-              <div key={i} className="group relative aspect-video rounded-xl overflow-hidden panel cursor-pointer">
+              <button
+                key={i}
+                onClick={() => setActiveShowcase(i)}
+                aria-label={t('showcase.playAria', { title: t(`showcase.items.${item.key}`) })}
+                className="group relative aspect-video rounded-xl overflow-hidden panel cursor-pointer text-left"
+              >
                 <img src={item.thumb} alt={t(`showcase.items.${item.key}`)} className="absolute inset-0 w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -291,7 +297,7 @@ export default function LandingPage() {
                     </span>
                   </div>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>
@@ -334,6 +340,13 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      <ShowcaseLightbox
+        demoUrl={activeShowcase !== null ? SHOWCASE[activeShowcase].demoUrl : null}
+        label={activeShowcase !== null ? t(`showcase.items.${SHOWCASE[activeShowcase].key}`) : ''}
+        closeAria={t('showcase.closeAria')}
+        onClose={() => setActiveShowcase(null)}
+      />
     </div>
   );
 }
