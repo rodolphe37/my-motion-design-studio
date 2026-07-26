@@ -252,8 +252,8 @@ export default function LandingPage() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {STEPS.map((step, i) => (
-              <div key={i} className="relative">
-                <div className="panel p-6 text-center">
+              <div key={i} className="relative h-full">
+                <div className="panel p-6 text-center h-full">
                   <div className="w-14 h-14 rounded-full bg-gradient-to-br from-accent-violet to-accent-blue flex items-center justify-center mx-auto mb-4 shadow-lg">
                     <step.icon className="w-7 h-7 text-white" />
                   </div>
