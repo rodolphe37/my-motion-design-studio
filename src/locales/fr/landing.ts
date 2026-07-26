@@ -29,7 +29,7 @@ export default {
       scenes3d: { title: 'Scènes 3D complètes', desc: 'Primitives, import glTF, lumières, caméras, matériaux PBR — rendu WebGL temps réel.' },
       keyframes: { title: 'Keyframes & Easing', desc: "Moteur d'animation custom avec courbes d'easing, spring et bézier custom." },
       scenesTransitions: { title: 'Scènes & Transitions', desc: 'Enchaînez plusieurs scènes avec transitions fondu, slide, zoom, dissolve.' },
-      videoExport: { title: 'Export vidéo', desc: 'Export MP4, WebM, GIF via MediaRecorder ou ffmpeg.wasm pour un rendu qualité.' },
+      videoExport: { title: 'Export vidéo', desc: 'Export en MP4, WebM, GIF animé ou MOV (via ffmpeg.wasm) — de 480p à la 4K, en 24/30/60 fps.' },
       offlinePwa: { title: 'Offline-first PWA', desc: "Installez l'app, travaillez sans réseau. Tout est persisté en local via IndexedDB." },
     },
   },
@@ -46,12 +46,14 @@ export default {
   },
   showcase: {
     heading: "Galerie d'exemples",
-    subheading: 'Images extraites des démos exportées ci-dessus — le rendu réel de l\'app.',
+    subheading: "Des projets réels rendus par l'app — cliquez sur une miniature pour la voir s'animer.",
     items: {
       demo2d: 'MyMotionStudio — Démo 2D',
       demo3d: 'MyMotionStudio — Démo 3D',
-      demoImport3d: 'MyMotionStudio — Démo Import 3D',
+      demoGif: 'MyMotionStudio — Export GIF animé',
     },
+    viewAria: 'Voir {{title}}',
+    closeAria: 'Fermer l\'aperçu',
   },
   cta: {
     heading: 'Prêt à créer ?',
@@ -63,6 +65,5 @@ export default {
     docs: 'Documentation',
     projects: 'Mes projets',
     githubAria: 'GitHub',
-    twitterAria: 'Twitter',
   },
 };

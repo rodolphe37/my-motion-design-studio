@@ -6,10 +6,17 @@ import type { Project } from '@/lib/types';
 
 const DEMO_URLS = ['/demos/2d-demo.json', '/demos/3d-demo.json'];
 
+interface Props {
+  // When true, releases the shared editor store instead of driving it —
+  // used while the showcase lightbox below is playing its own demo project,
+  // since both components render through the same global Canvas2D/Canvas3D state.
+  paused?: boolean;
+}
+
 // Renders the real 2D/3D demo projects through the app's own Canvas2D/Canvas3D
 // — not a mocked-up animation — looping through each project's scenes and
 // alternating between the 2D and 3D demo once each finishes.
-export function DemoPlayer() {
+export function DemoPlayer({ paused = false }: Props) {
   const [demos, setDemos] = useState<Project[] | null>(null);
   const [demoIndex, setDemoIndex] = useState(0);
   const setProject = useEditorStore((s) => s.setProject);
@@ -35,11 +42,11 @@ export function DemoPlayer() {
   const project = demos?.[demoIndex] ?? null;
 
   useEffect(() => {
-    if (project) setProject(project);
-  }, [project, setProject]);
+    if (project && !paused) setProject(project);
+  }, [project, paused, setProject]);
 
   useEffect(() => {
-    if (!project) return;
+    if (!project || paused) return;
     let sceneIndex = 0;
     let start = performance.now();
     useEditorStore.setState({ currentSceneId: project.scenes[0].id, currentTime: 0 });
@@ -62,7 +69,7 @@ export function DemoPlayer() {
     };
     rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [project]);
+  }, [project, paused]);
 
   return (
     <div className="relative rounded-2xl overflow-hidden border border-ink-700 shadow-2xl shadow-accent-violet/10 aspect-video bg-ink-950">

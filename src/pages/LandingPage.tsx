@@ -14,7 +14,6 @@ import {
   Zap,
   ArrowRight,
   GitBranch,
-  Send,
   Monitor,
   Sun,
   Moon,
@@ -22,6 +21,7 @@ import {
   X,
 } from 'lucide-react';
 import { DemoPlayer } from '@/components/DemoPlayer';
+import { ShowcaseLightbox, type ShowcaseSource } from '@/components/ShowcaseLightbox';
 import { useTheme } from '@/lib/useTheme';
 
 export default function LandingPage() {
@@ -29,6 +29,7 @@ export default function LandingPage() {
   const { t, i18n } = useTranslation('landing');
   const { t: tCommon } = useTranslation('common');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeShowcase, setActiveShowcase] = useState<number | null>(null);
 
   const FEATURES = [
     { icon: Shapes, key: 'edit2d', color: 'from-violet-500 to-purple-500' },
@@ -46,11 +47,11 @@ export default function LandingPage() {
     { icon: Download, key: 'export' },
   ] as const;
 
-  const SHOWCASE = [
-    { key: 'demo2d', mode: '2D', thumb: '/demos/2d-thumb.jpg' },
-    { key: 'demo3d', mode: '3D', thumb: '/demos/3d-thumb.jpg' },
-    { key: 'demoImport3d', mode: '3D', thumb: '/demos/3d-objects-thumb.jpg' },
-  ] as const;
+  const SHOWCASE: { key: string; badge: string; thumb: string; source: ShowcaseSource }[] = [
+    { key: 'demo2d', badge: '2D', thumb: '/demos/2d-thumb.jpg', source: { kind: 'video', demoUrl: '/demos/2d-demo.json' } },
+    { key: 'demo3d', badge: '3D', thumb: '/demos/3d-thumb.jpg', source: { kind: 'video', demoUrl: '/demos/3d-demo.json' } },
+    { key: 'demoGif', badge: 'GIF', thumb: '/demos/gif-thumb.gif', source: { kind: 'gif', gifUrl: '/demos/gif-thumb.gif' } },
+  ];
 
   return (
     <div className="min-h-screen bg-ink-900 text-ink-100 overflow-x-hidden">
@@ -211,7 +212,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="animate-scale-in">
-            <DemoPlayer />
+            <DemoPlayer paused={activeShowcase !== null} />
           </div>
         </div>
       </section>
@@ -278,7 +279,12 @@ export default function LandingPage() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
             {SHOWCASE.map((item, i) => (
-              <div key={i} className="group relative aspect-video rounded-xl overflow-hidden panel cursor-pointer">
+              <button
+                key={i}
+                onClick={() => setActiveShowcase(i)}
+                aria-label={t('showcase.viewAria', { title: t(`showcase.items.${item.key}`) })}
+                className="group relative aspect-video rounded-xl overflow-hidden panel cursor-pointer text-left"
+              >
                 <img src={item.thumb} alt={t(`showcase.items.${item.key}`)} className="absolute inset-0 w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -288,11 +294,11 @@ export default function LandingPage() {
                   <div className="flex items-center justify-between gap-2">
                     <h3 className="font-medium text-white truncate min-w-0">{t(`showcase.items.${item.key}`)}</h3>
                     <span className="shrink-0 px-2 py-0.5 rounded text-xs font-bold bg-white/20 text-white backdrop-blur">
-                      {item.mode}
+                      {item.badge}
                     </span>
                   </div>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>
@@ -330,12 +336,18 @@ export default function LandingPage() {
             <div className="flex items-center gap-4 text-sm text-ink-400">
               <Link to="/docs" className="hover:text-ink-100 transition-colors">{t('footer.docs')}</Link>
               <Link to="/projects" className="hover:text-ink-100 transition-colors">{t('footer.projects')}</Link>
-              <a href="#" className="hover:text-ink-100 transition-colors" aria-label={t('footer.githubAria')}><GitBranch className="w-4 h-4" /></a>
-              <a href="#" className="hover:text-ink-100 transition-colors" aria-label={t('footer.twitterAria')}><Send className="w-4 h-4" /></a>
+              <a href="https://github.com/rodolphe37/my-motion-studio" target="_blank" rel="noopener noreferrer" className="hover:text-ink-100 transition-colors" aria-label={t('footer.githubAria')}><GitBranch className="w-4 h-4" /></a>
             </div>
           </div>
         </div>
       </footer>
+
+      <ShowcaseLightbox
+        source={activeShowcase !== null ? SHOWCASE[activeShowcase].source : null}
+        label={activeShowcase !== null ? t(`showcase.items.${SHOWCASE[activeShowcase].key}`) : ''}
+        closeAria={t('showcase.closeAria')}
+        onClose={() => setActiveShowcase(null)}
+      />
     </div>
   );
 }

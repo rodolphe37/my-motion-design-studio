@@ -1,0 +1,479 @@
+{
+  "id": "gif-demo-2d-formes",
+  "name": "GIF Demo — Formes",
+  "mode": "2d",
+  "createdAt": 1785091130443,
+  "updatedAt": 1785091130443,
+  "thumbnail": null,
+  "settings": {
+    "width": 1920,
+    "height": 1080,
+    "aspectRatioPreset": "16:9",
+    "fps": 30,
+    "backgroundColor": "#0f0f12",
+    "environment": "color",
+    "shadows": true,
+    "defaultSceneDuration": 3,
+    "exportDefaults": {
+      "format": "mp4",
+      "resolutionPreset": "1080p",
+      "quality": "high",
+      "fps": 24
+    }
+  },
+  "scenes": [
+    {
+      "id": "du66a3tum7ep3oy",
+      "name": "Formes",
+      "duration": 4,
+      "order": 0,
+      "layers": [
+        {
+          "id": "pr8gt75xm7eo4rq",
+          "name": "Titre section",
+          "type": "text",
+          "x": 403,
+          "y": 110,
+          "text": "Des formes vectorielles à l’infini",
+          "fontSize": 56,
+          "fontFamily": "Inter",
+          "fontWeight": 700,
+          "fill": "#f4f4f6",
+          "rotation": 0,
+          "opacity": 1,
+          "align": "left",
+          "visible": true,
+          "locked": false,
+          "keyframes": [
+            {
+              "id": "8wqwnv8bm7eo3r",
+              "time": 0.1,
+              "property": "y",
+              "value": 80,
+              "easing": "easeOut"
+            },
+            {
+              "id": "dilu1jqtm7eo2lq",
+              "time": 0.6,
+              "property": "y",
+              "value": 110,
+              "easing": "easeOut"
+            },
+            {
+              "id": "jzo0wha1m7eo6kc",
+              "time": 0.1,
+              "property": "opacity",
+              "value": 0,
+              "easing": "easeOut"
+            },
+            {
+              "id": "va10nkuem7eo8s",
+              "time": 0.55,
+              "property": "opacity",
+              "value": 1,
+              "easing": "easeOut"
+            },
+            {
+              "id": "jjfgw8htm7eo2k9",
+              "time": 3.6,
+              "property": "opacity",
+              "value": 1,
+              "easing": "easeIn"
+            },
+            {
+              "id": "wh6n2otim7eo42o",
+              "time": 4,
+              "property": "opacity",
+              "value": 0,
+              "easing": "easeIn"
+            }
+          ],
+          "parentId": null
+        },
+        {
+          "id": "atnilotsm7eo6i1",
+          "name": "Rectangle",
+          "type": "shape",
+          "shape": "rectangle",
+          "x": 60,
+          "y": 430,
+          "width": 300,
+          "height": 220,
+          "rotation": -8,
+          "opacity": 0,
+          "fill": "#8b5cf6",
+          "stroke": "#ffffff",
+          "strokeWidth": 0,
+          "cornerRadius": 28,
+          "sides": 6,
+          "visible": true,
+          "locked": false,
+          "keyframes": [
+            {
+              "id": "1azlsrxgm7eoqp",
+              "time": 0.3,
+              "property": "x",
+              "value": 60,
+              "easing": "easeOut"
+            },
+            {
+              "id": "4mkyxq4vm7eo4k7",
+              "time": 1,
+              "property": "x",
+              "value": 260,
+              "easing": "easeOut"
+            },
+            {
+              "id": "dzzb8yp5m7eo2y4",
+              "time": 0.3,
+              "property": "rotation",
+              "value": -8,
+              "easing": "easeOut"
+            },
+            {
+              "id": "h37tdkm4m7eo54f",
+              "time": 1,
+              "property": "rotation",
+              "value": 0,
+              "easing": "easeOut"
+            },
+            {
+              "id": "dbi9md1im7eoi3",
+              "time": 0.3,
+              "property": "opacity",
+              "value": 0,
+              "easing": "easeOut"
+            },
+            {
+              "id": "srrl3zwxm7eobm",
+              "time": 0.7,
+              "property": "opacity",
+              "value": 1,
+              "easing": "easeOut"
+            },
+            {
+              "id": "tevqm5idm7eo2i3",
+              "time": 3.6,
+              "property": "opacity",
+              "value": 1,
+              "easing": "easeIn"
+            },
+            {
+              "id": "ohtvtwe7m7eo4we",
+              "time": 4,
+              "property": "opacity",
+              "value": 0,
+              "easing": "easeIn"
+            }
+          ],
+          "parentId": null
+        },
+        {
+          "id": "y33xhz72m7eo164",
+          "name": "Cercle",
+          "type": "shape",
+          "shape": "ellipse",
+          "x": 860,
+          "y": 530,
+          "width": 20,
+          "height": 20,
+          "rotation": 0,
+          "opacity": 0,
+          "fill": "#ec4899",
+          "stroke": "#ffffff",
+          "strokeWidth": 0,
+          "cornerRadius": 0,
+          "sides": 6,
+          "visible": true,
+          "locked": false,
+          "keyframes": [
+            {
+              "id": "1646qgslm7eo5wp",
+              "time": 0.6,
+              "property": "width",
+              "value": 20,
+              "easing": "spring"
+            },
+            {
+              "id": "f3dosz1rm7eo66y",
+              "time": 1.3,
+              "property": "width",
+              "value": 220,
+              "easing": "spring"
+            },
+            {
+              "id": "0oeh72vfm7eo4d3",
+              "time": 0.6,
+              "property": "height",
+              "value": 20,
+              "easing": "spring"
+            },
+            {
+              "id": "c3jyew9km7eo3vy",
+              "time": 1.3,
+              "property": "height",
+              "value": 220,
+              "easing": "spring"
+            },
+            {
+              "id": "ay5za9edm7eo7br",
+              "time": 0.6,
+              "property": "x",
+              "value": 860,
+              "easing": "spring"
+            },
+            {
+              "id": "249ptp13m7eo2wh",
+              "time": 1.3,
+              "property": "x",
+              "value": 760,
+              "easing": "spring"
+            },
+            {
+              "id": "1d9eabgjm7eo6er",
+              "time": 0.6,
+              "property": "y",
+              "value": 530,
+              "easing": "spring"
+            },
+            {
+              "id": "71s4qvd4m7eo450",
+              "time": 1.3,
+              "property": "y",
+              "value": 430,
+              "easing": "spring"
+            },
+            {
+              "id": "fpc951y1m7eo67y",
+              "time": 0.6,
+              "property": "opacity",
+              "value": 0,
+              "easing": "easeOut"
+            },
+            {
+              "id": "86w1kk3im7eo1dt",
+              "time": 0.9,
+              "property": "opacity",
+              "value": 1,
+              "easing": "easeOut"
+            },
+            {
+              "id": "cm3zuj92m7eo66x",
+              "time": 3.6,
+              "property": "opacity",
+              "value": 1,
+              "easing": "easeIn"
+            },
+            {
+              "id": "7iejs7pgm7eo5x1",
+              "time": 4,
+              "property": "opacity",
+              "value": 0,
+              "easing": "easeIn"
+            }
+          ],
+          "parentId": null
+        },
+        {
+          "id": "9qccg35cm7eo46h",
+          "name": "Étoile",
+          "type": "shape",
+          "shape": "star",
+          "x": 1180,
+          "y": 420,
+          "width": 240,
+          "height": 240,
+          "rotation": 0,
+          "opacity": 0,
+          "fill": "#3b82f6",
+          "stroke": "#ffffff",
+          "strokeWidth": 0,
+          "cornerRadius": 0,
+          "sides": 6,
+          "visible": true,
+          "locked": false,
+          "keyframes": [
+            {
+              "id": "69s87n9zm7eo206",
+              "time": 0.9,
+              "property": "rotation",
+              "value": 0,
+              "easing": "linear"
+            },
+            {
+              "id": "r3apr8s6m7eo2nr",
+              "time": 4,
+              "property": "rotation",
+              "value": 300,
+              "easing": "linear"
+            },
+            {
+              "id": "g4m3vsmfm7eo29m",
+              "time": 0.9,
+              "property": "opacity",
+              "value": 0,
+              "easing": "easeOut"
+            },
+            {
+              "id": "4gctts41m7eo3xq",
+              "time": 1.2,
+              "property": "opacity",
+              "value": 1,
+              "easing": "easeOut"
+            },
+            {
+              "id": "aebal6w8m7eo2zu",
+              "time": 3.6,
+              "property": "opacity",
+              "value": 1,
+              "easing": "easeIn"
+            },
+            {
+              "id": "9p5nuxsom7eo63n",
+              "time": 4,
+              "property": "opacity",
+              "value": 0,
+              "easing": "easeIn"
+            }
+          ],
+          "parentId": null
+        },
+        {
+          "id": "8ynlkmvbm7ep668",
+          "name": "Hexagone",
+          "type": "shape",
+          "shape": "polygon",
+          "x": 1560,
+          "y": 640,
+          "width": 220,
+          "height": 220,
+          "rotation": 0,
+          "opacity": 0,
+          "fill": "#f4f4f6",
+          "stroke": "#ffffff",
+          "strokeWidth": 0,
+          "cornerRadius": 0,
+          "sides": 6,
+          "visible": true,
+          "locked": false,
+          "keyframes": [
+            {
+              "id": "f1bylmjtm7ep519",
+              "time": 1.1,
+              "property": "y",
+              "value": 640,
+              "easing": "spring"
+            },
+            {
+              "id": "r97yad88m7epf1",
+              "time": 1.8,
+              "property": "y",
+              "value": 440,
+              "easing": "spring"
+            },
+            {
+              "id": "975gyq95m7ep3wt",
+              "time": 1.1,
+              "property": "opacity",
+              "value": 0,
+              "easing": "easeOut"
+            },
+            {
+              "id": "5lkf7tvim7ep26",
+              "time": 1.4,
+              "property": "opacity",
+              "value": 1,
+              "easing": "easeOut"
+            },
+            {
+              "id": "oj446kdqm7ep2tw",
+              "time": 3.6,
+              "property": "opacity",
+              "value": 1,
+              "easing": "easeIn"
+            },
+            {
+              "id": "qw1dgvjnm7ep8r",
+              "time": 4,
+              "property": "opacity",
+              "value": 0,
+              "easing": "easeIn"
+            }
+          ],
+          "parentId": null
+        },
+        {
+          "id": "kqd30bmpm7ep21o",
+          "name": "Sous-texte",
+          "type": "text",
+          "x": 477,
+          "y": 900,
+          "text": "Rectangles, cercles, étoiles, polygones… tout est animable",
+          "fontSize": 32,
+          "fontFamily": "Inter",
+          "fontWeight": 500,
+          "fill": "#9a9aa6",
+          "rotation": 0,
+          "opacity": 1,
+          "align": "left",
+          "visible": true,
+          "locked": false,
+          "keyframes": [
+            {
+              "id": "56401929m7ep15l",
+              "time": 1.6,
+              "property": "y",
+              "value": 930,
+              "easing": "easeOut"
+            },
+            {
+              "id": "c6xy2x6pm7ep2ss",
+              "time": 2.1,
+              "property": "y",
+              "value": 900,
+              "easing": "easeOut"
+            },
+            {
+              "id": "lo3rew1um7ep1f9",
+              "time": 1.6,
+              "property": "opacity",
+              "value": 0,
+              "easing": "easeOut"
+            },
+            {
+              "id": "x3ei6iwxm7epl4",
+              "time": 2.1,
+              "property": "opacity",
+              "value": 1,
+              "easing": "easeOut"
+            },
+            {
+              "id": "41asd7yfm7ep4ru",
+              "time": 3.6,
+              "property": "opacity",
+              "value": 1,
+              "easing": "easeIn"
+            },
+            {
+              "id": "ottaco6sm7ep4ua",
+              "time": 4,
+              "property": "opacity",
+              "value": 0,
+              "easing": "easeIn"
+            }
+          ],
+          "parentId": null
+        }
+      ],
+      "transitionToNext": {
+        "type": "fade",
+        "duration": 0.4,
+        "easing": "easeInOut"
+      },
+      "background": {
+        "type": "solid",
+        "color": "#0f0f12"
+      }
+    }
+  ]
+}

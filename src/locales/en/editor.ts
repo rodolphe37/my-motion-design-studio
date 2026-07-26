@@ -203,6 +203,7 @@ export default {
   },
   exportModal: {
     title: 'Export video',
+    titleGif: 'Export animated GIF',
     formats: {
       mp4: { label: 'MP4 (H.264)', desc: 'Maximum compatibility, recommended by default' },
       webm: { label: 'WebM (VP9)', desc: 'Lighter file, ideal for web use' },
@@ -234,6 +235,7 @@ export default {
     exportButton: 'Export',
     doneTitle: 'Export complete!',
     doneDesc: 'Your video has been downloaded.',
+    doneDescGif: 'Your animated GIF has been downloaded.',
     close: 'Close',
     renderingTitle: 'Rendering...',
     cancel: 'Cancel',

@@ -9,9 +9,9 @@ here is unclear or missing, opening an issue to ask is itself a welcome
 contribution.
 
 > **Note on language**: the codebase, comments, and this guide are in
-> English, but the product itself (UI copy, in-app documentation) is French
-> only for now. See [Internationalization](#internationalization) below if
-> you'd like to help change that.
+> English. The product itself (UI copy, in-app documentation) supports
+> French and English — see [Internationalization](#internationalization)
+> below for how translations are organized.
 
 ## Table of contents
 

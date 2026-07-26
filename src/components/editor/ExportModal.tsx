@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Download, FileVideo, Check, Loader2, AlertTriangle } from 'lucide-react';
+import { GIFEncoder, quantize, applyPalette } from 'gifenc';
 import { useEditorStore } from '@/lib/store';
 import { getExportResolution } from '@/lib/factories';
 import type { ExportDefaults } from '@/lib/types';
@@ -53,6 +54,7 @@ export function ExportModal({ open, onClose }: Props) {
 
   if (!open || !project) return null;
 
+  const isGif = format === 'gif';
   const res = getExportResolution(project, resolution, customW, customH);
   const totalDuration = project.scenes.reduce((sum, s) => sum + s.duration, 0);
   const estimatedSize = (QUALITIES.find((q) => q.value === quality)?.bitrate || 8_000_000) * totalDuration / 8;
@@ -96,44 +98,6 @@ export function ExportModal({ open, onClose }: Props) {
       targetCanvas.height = res.height;
       const ctx = targetCanvas.getContext('2d')!;
 
-      const mimeType = format === 'mp4' ? 'video/mp4' : format === 'webm' ? 'video/webm' : format === 'gif' ? 'video/webm' : 'video/quicktime';
-      const bitrate = QUALITIES.find((q) => q.value === quality)?.bitrate || 8_000_000;
-
-      const stream = targetCanvas.captureStream(fps);
-      const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: bitrate });
-      const chunks: Blob[] = [];
-
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) chunks.push(e.data);
-      };
-
-      recorder.onstop = () => {
-        const blob = new Blob(chunks, { type: mimeType });
-        const filename = `${project.name.replace(/\s+/g, '-').toLowerCase()}.${format === 'gif' ? 'webm' : format}`;
-        downloadBlob(blob, filename);
-
-        // Save thumbnail
-        const thumbCanvas = document.createElement('canvas');
-        thumbCanvas.width = 320;
-        thumbCanvas.height = 180;
-        const thumbCtx = thumbCanvas.getContext('2d')!;
-        thumbCtx.drawImage(targetCanvas, 0, 0, 320, 180);
-        setThumbnail(thumbCanvas.toDataURL('image/jpeg', 0.7));
-
-        // Save export defaults
-        updateProjectSettings({
-          exportDefaults: { format, resolutionPreset: resolution, quality, fps },
-        });
-        saveProject(useEditorStore.getState().project!);
-
-        useEditorStore.setState({ ...restoreState, isExporting: false });
-        setExporting(false);
-        setDone(true);
-        setProgress(100);
-      };
-
-      recorder.start();
-
       // Render frames: drive the store's scene/time for each frame so the
       // on-screen canvas actually reflects that instant before we capture it.
       const totalFrames = Math.ceil(totalDuration * fps);
@@ -160,15 +124,9 @@ export function ExportModal({ open, onClose }: Props) {
         srcH = project.settings.height * viewport.scale * dprY;
       }
 
-      for (let i = 0; i < totalFrames; i++) {
-        const frameStart = performance.now();
-        if (cancelRef.current) {
-          recorder.stop();
-          useEditorStore.setState({ ...restoreState, isExporting: false });
-          setExporting(false);
-          return;
-        }
-
+      // Drives the store to frame `i`'s instant and draws the resulting
+      // on-screen canvas state onto targetCanvas, cropped to the content rect.
+      const drawFrame = async (i: number) => {
         const t = i / fps;
         let active = sceneOffsets[sceneOffsets.length - 1];
         for (const so of sceneOffsets) {
@@ -180,12 +138,89 @@ export function ExportModal({ open, onClose }: Props) {
         useEditorStore.setState({ currentSceneId: active.sceneId, currentTime: localTime });
         await waitForPaint();
 
-        // Draw current canvas state, cropped to the actual content rect.
         if (sourceCanvas) {
           ctx.fillStyle = '#000000';
           ctx.fillRect(0, 0, res.width, res.height);
           ctx.drawImage(sourceCanvas, srcX, srcY, srcW, srcH, 0, 0, res.width, res.height);
         }
+      };
+
+      const finishExport = (blob: Blob, extension: string) => {
+        const filename = `${project.name.replace(/\s+/g, '-').toLowerCase()}.${extension}`;
+        downloadBlob(blob, filename);
+
+        // Save thumbnail
+        const thumbCanvas = document.createElement('canvas');
+        thumbCanvas.width = 320;
+        thumbCanvas.height = 180;
+        const thumbCtx = thumbCanvas.getContext('2d')!;
+        thumbCtx.drawImage(targetCanvas, 0, 0, 320, 180);
+        setThumbnail(thumbCanvas.toDataURL('image/jpeg', 0.7));
+
+        // Save export defaults
+        updateProjectSettings({
+          exportDefaults: { format, resolutionPreset: resolution, quality, fps },
+        });
+        saveProject(useEditorStore.getState().project!);
+
+        useEditorStore.setState({ ...restoreState, isExporting: false });
+        setExporting(false);
+        setDone(true);
+        setProgress(100);
+      };
+
+      if (format === 'gif') {
+        // No MediaRecorder involved: quantize and LZW-encode each frame
+        // directly into a real animated GIF (gifenc), frame by frame.
+        const gif = GIFEncoder();
+        const delay = Math.round(1000 / fps);
+
+        for (let i = 0; i < totalFrames; i++) {
+          if (cancelRef.current) {
+            useEditorStore.setState({ ...restoreState, isExporting: false });
+            setExporting(false);
+            return;
+          }
+
+          await drawFrame(i);
+          const { data } = ctx.getImageData(0, 0, res.width, res.height);
+          const palette = quantize(data, 256);
+          const index = applyPalette(data, palette);
+          gif.writeFrame(index, res.width, res.height, { palette, delay });
+
+          if (i % 4 === 0 || i === totalFrames - 1) setProgress((i / totalFrames) * 100);
+        }
+
+        gif.finish();
+        finishExport(new Blob([new Uint8Array(gif.bytes())], { type: 'image/gif' }), 'gif');
+        return;
+      }
+
+      const mimeType = format === 'mp4' ? 'video/mp4' : format === 'webm' ? 'video/webm' : 'video/quicktime';
+      const bitrate = QUALITIES.find((q) => q.value === quality)?.bitrate || 8_000_000;
+
+      const stream = targetCanvas.captureStream(fps);
+      const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: bitrate });
+      const chunks: Blob[] = [];
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunks.push(e.data);
+      };
+
+      recorder.onstop = () => finishExport(new Blob(chunks, { type: mimeType }), format);
+
+      recorder.start();
+
+      for (let i = 0; i < totalFrames; i++) {
+        const frameStart = performance.now();
+        if (cancelRef.current) {
+          recorder.stop();
+          useEditorStore.setState({ ...restoreState, isExporting: false });
+          setExporting(false);
+          return;
+        }
+
+        await drawFrame(i);
 
         if (i % 4 === 0 || i === totalFrames - 1) setProgress((i / totalFrames) * 100);
         const elapsed = performance.now() - frameStart;
@@ -219,7 +254,7 @@ export function ExportModal({ open, onClose }: Props) {
         <div className="flex items-center justify-between p-5 border-b border-ink-700">
           <h2 className="text-lg font-semibold flex items-center gap-2">
             <FileVideo className="w-5 h-5 text-accent-violet" />
-            {t('exportModal.title')}
+            {isGif ? t('exportModal.titleGif') : t('exportModal.title')}
           </h2>
           <button onClick={handleClose} className="icon-btn"><X className="w-5 h-5" /></button>
         </div>
@@ -230,7 +265,7 @@ export function ExportModal({ open, onClose }: Props) {
               <Check className="w-8 h-8 text-emerald-400" />
             </div>
             <h3 className="font-semibold text-lg mb-1">{t('exportModal.doneTitle')}</h3>
-            <p className="text-sm text-ink-300 mb-4">{t('exportModal.doneDesc')}</p>
+            <p className="text-sm text-ink-300 mb-4">{isGif ? t('exportModal.doneDescGif') : t('exportModal.doneDesc')}</p>
             <button onClick={handleClose} className="btn-primary">{t('exportModal.close')}</button>
           </div>
         ) : exporting ? (
@@ -301,23 +336,27 @@ export function ExportModal({ open, onClose }: Props) {
                 </div>
               </div>
 
-              {/* Quality */}
-              <div>
-                <label className="label mb-2 block">{t('exportModal.qualityLabel')}</label>
-                <div className="flex gap-2">
-                  {QUALITIES.map((q) => (
-                    <button key={q.value} onClick={() => setQuality(q.value)} className={`flex-1 py-2 rounded-lg border-2 text-sm transition-all ${quality === q.value ? 'border-accent-violet bg-accent-violet/10 text-accent-violet' : 'border-ink-600 text-ink-300'}`}>
-                      {q.label}
-                    </button>
-                  ))}
+              {/* Quality: bitrate-based, not applicable to the GIF encoder */}
+              {!isGif && (
+                <div>
+                  <label className="label mb-2 block">{t('exportModal.qualityLabel')}</label>
+                  <div className="flex gap-2">
+                    {QUALITIES.map((q) => (
+                      <button key={q.value} onClick={() => setQuality(q.value)} className={`flex-1 py-2 rounded-lg border-2 text-sm transition-all ${quality === q.value ? 'border-accent-violet bg-accent-violet/10 text-accent-violet' : 'border-ink-600 text-ink-300'}`}>
+                        {q.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Info */}
               <div className="p-3 bg-ink-900 rounded-lg border border-ink-600 space-y-1 text-sm">
                 <div className="flex justify-between"><span className="text-ink-400">{t('exportModal.infoResolution')}</span><span className="font-mono">{res.width}×{res.height}</span></div>
                 <div className="flex justify-between"><span className="text-ink-400">{t('exportModal.infoDuration')}</span><span className="font-mono">{totalDuration.toFixed(1)}s</span></div>
-                <div className="flex justify-between"><span className="text-ink-400">{t('exportModal.infoEstimatedSize')}</span><span className="font-mono">~{formatBytes(estimatedSize)}</span></div>
+                {!isGif && (
+                  <div className="flex justify-between"><span className="text-ink-400">{t('exportModal.infoEstimatedSize')}</span><span className="font-mono">~{formatBytes(estimatedSize)}</span></div>
+                )}
               </div>
 
               {isHeavy && (
