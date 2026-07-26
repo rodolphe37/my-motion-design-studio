@@ -63,6 +63,5 @@ export default {
     docs: 'Documentation',
     projects: 'Mes projets',
     githubAria: 'GitHub',
-    twitterAria: 'Twitter',
   },
 };

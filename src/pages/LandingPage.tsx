@@ -14,7 +14,6 @@ import {
   Zap,
   ArrowRight,
   GitBranch,
-  Send,
   Monitor,
   Sun,
   Moon,
@@ -330,8 +329,7 @@ export default function LandingPage() {
             <div className="flex items-center gap-4 text-sm text-ink-400">
               <Link to="/docs" className="hover:text-ink-100 transition-colors">{t('footer.docs')}</Link>
               <Link to="/projects" className="hover:text-ink-100 transition-colors">{t('footer.projects')}</Link>
-              <a href="#" className="hover:text-ink-100 transition-colors" aria-label={t('footer.githubAria')}><GitBranch className="w-4 h-4" /></a>
-              <a href="#" className="hover:text-ink-100 transition-colors" aria-label={t('footer.twitterAria')}><Send className="w-4 h-4" /></a>
+              <a href="https://github.com/rodolphe37/my-motion-studio" target="_blank" rel="noopener noreferrer" className="hover:text-ink-100 transition-colors" aria-label={t('footer.githubAria')}><GitBranch className="w-4 h-4" /></a>
             </div>
           </div>
         </div>
